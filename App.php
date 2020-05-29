@@ -15,7 +15,7 @@ $request = new Request(); // Create a request object
 $data = null;
 
 
-if (BetCommunity::routes[$request->route] != null) {
+if (in_array($request->route, array_keys(BetCommunity::routes))) {
      $controllerClass = BetCommunity::routes[$request->route];
      
      $controllerObject = new $controllerClass($request);
@@ -25,9 +25,11 @@ if (BetCommunity::routes[$request->route] != null) {
     }
 
     $data = $controllerObject->data;
-    if ($controllerObject->responseType == 'html') 
-       include 'Pages/' . $data['template'];
+    if ($controllerObject->responseType == 'html'){
+         include 'Pages/' . $data['template'];
+    }  
+}else{
+    include './Pages/404.php'; //include error 404 page for undefined routes
 }
 ?>
-
 
