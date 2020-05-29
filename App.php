@@ -6,7 +6,7 @@ spl_autoload_register(function ($name) {
     if (file_exists($classPaths[$name])) {
         include $classPaths[$name];
     } else {
-        echo "file not found";
+        echo $name . "class not found";
     }
 });
 
@@ -17,22 +17,17 @@ $data = null;
 
 if (BetCommunity::routes[$request->route] != null) {
      $controllerClass = BetCommunity::routes[$request->route];
+     
      $controllerObject = new $controllerClass($request);
 
     if ($controllerObject->validate()) {
         $controllerObject->perform();
     }
+
+    $data = $controllerObject->data;
+    if ($controllerObject->responseType == 'html') 
+       include 'Pages/' . $data['template'];
 }
 ?>
 
-<html class="js sizes customelements history pointerevents postmessage webgl websockets cssanimations csscolumns csscolumns-width csscolumns-span csscolumns-fill csscolumns-gap csscolumns-rule csscolumns-rulecolor csscolumns-rulestyle csscolumns-rulewidth csscolumns-breakbefore csscolumns-breakafter csscolumns-breakinside flexbox picture srcset webworkers" lang="en">
-<head>
-  
-</head>
-<body>
-    <div id="spinner-wrapper" style="display: none;">
-      <div class="spinner"></div>
-    </div>
-</body>
-</html>
 

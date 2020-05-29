@@ -1,6 +1,8 @@
 <?php
 
 class PDOConnection {
+    public $pdo;
+    public $dbConfig;
     public function __construct() {
         $this->pdo = null;
         $this->dbConfig = DBConfig::dbConfig[Enviroment::getEnv()];

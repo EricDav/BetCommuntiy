@@ -3,7 +3,6 @@
 */
 CREATE TABLE users (
     id int NOT NULL,
-    username VARCHAR(100) NOT NULL,
     email VARCHAR(100),
     password VARCHAR(225) NOT NULL,
     role int NOT NULL,
@@ -12,7 +11,8 @@ CREATE TABLE users (
     role int,
     special_id VARCHAR(50),
     country VARCHAR(125),
-    phone_number VARCHAR(100)
+    city VARCHAR(125),
+    phone_number VARCHAR(100),
     PRIMARY KEY(id)
 );
 
