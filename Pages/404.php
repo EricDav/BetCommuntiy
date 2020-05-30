@@ -9,17 +9,15 @@
         ?>
     </head>
     <body>
+        <?php
+            include 'Pages/common/Header.php';
+        ?>
         <section>
             <div class="error-page">
                 <div class="error-content">
                     <div class="container">
-                        <img src="images/404.png" alt="" class="img-responsive">
+                        <img src="/bet_community/Public/images/404.png" alt="" class="img-responsive">
                         <div class="error-message">
-                            <h1>
-                                <span>4</span>
-                                <i style = 'font-size: 100px' class = 'icon icon ion-bug'></i>
-                                <span>4</span>
-                            </h1>
                             <h1 class="error-title">Whoops!</h1>
                             <p>Looks like you are lost. But don't worry there is plenty to see!!</p>
                         </div>
@@ -34,5 +32,8 @@
                 </div>
             </div>
         </section>
+        <?php
+            include 'Pages/common/Footer.php';
+        ?>
     </body>
 </html>
