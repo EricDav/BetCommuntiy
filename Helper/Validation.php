@@ -1,6 +1,6 @@
 <?php
     class Validation {
-        public function isValidName($name) {
+        public static function isValidName($name) {
             if (!preg_match("/^[a-zA-Z0-9 ]*$/",$name)) {
                 return Array("isValid" => false, "message" => 'Name must contain only letters, numbers and white space');
             } else if (empty(trim($name))) {

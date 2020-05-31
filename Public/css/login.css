@@ -1,0 +1,10 @@
+.invalid {
+    border-color: red!important;
+}
+#error-message {
+    color: red;
+}
+
+#signup-error-message {
+    color: red;
+}

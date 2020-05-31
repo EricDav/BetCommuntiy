@@ -10,6 +10,7 @@ abstract class Controller {
     const HTTP_BAD_REQUEST_CODE = 400;
     const HTTP_SERVER_ERROR_CODE = 500;
     CONST HTTP_UNAUTHORIZED_CODE = 401;
+    const HTTP_OKAY_CODE = 200;
 
     public function __construct($request) {
         $this->data = array();

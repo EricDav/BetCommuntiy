@@ -5,7 +5,7 @@
                 'user' => 'root',
                 'password' => 'root',
                 'host' => 'localhost',
-                'database' => 'automobile',
+                'database' => 'bet_community',
                 'port' => 8889
             ),
     

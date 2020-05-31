@@ -2,17 +2,17 @@
     Users table
 */
 CREATE TABLE users (
-    id int NOT NULL,
+    id int NOT NULL AUTO_INCREAMENT,
     email VARCHAR(100),
     password VARCHAR(225) NOT NULL,
     role int NOT NULL,
     name VARCHAR(225),
     socials VARCHAR(1000),
-    role int,
     special_id VARCHAR(50),
     country VARCHAR(125),
     city VARCHAR(125),
     phone_number VARCHAR(100),
+    sex VARCHAR(2),
     PRIMARY KEY(id)
 );
 

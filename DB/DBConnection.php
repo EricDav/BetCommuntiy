@@ -16,6 +16,8 @@ class PDOConnection {
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, //make the default fetch be an associative array
             ];
 
+            $dbConfig = $this->dbConfig;
+
             $pdo = new PDO('mysql:host=' . $dbConfig['host'] . ";port=" . $dbConfig['port'] . ';dbname=' . $dbConfig['database'], 
             $dbConfig['user'], $dbConfig['password'], $options);
 
