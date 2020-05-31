@@ -53,7 +53,7 @@ $('#signup-button').click(function() {
     if (!lastName.val().trim()) empty.push('Last Name');
     if (!city.val().trim()) empty.push('City');
     if (!signupEmail.val().trim()) empty.push('Email');
-    if (!signupEmail.val().trim()) empty.push('Password');
+    if (!signupPassword.val().trim()) empty.push('Password');
 
 
     if (empty.length == 1) {

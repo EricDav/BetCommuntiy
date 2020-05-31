@@ -42,6 +42,10 @@ class LoginController extends Controller {
         $firstNameValidity = Validation::isValidName($this->request->postData['firstName']);
         $lastNameValidity = Validation::isValidName($this->request->postData['lastName']);
 
+        if (empty(trim($this->request->postData['password']))) {
+            $this->error['password'] = 'Password can not be empty';
+        }
+        
         if (empty(trim($this->request->postData['email']))) {
             $this->error['email'] = 'Email address can not be empty';
         } else if (!filter_var($this->request->postData['email'], FILTER_VALIDATE_EMAIL)) {
