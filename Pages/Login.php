@@ -1,13 +1,9 @@
 <html class="js sizes customelements history pointerevents postmessage webgl websockets cssanimations csscolumns csscolumns-width csscolumns-span csscolumns-fill csscolumns-gap csscolumns-rule csscolumns-rulecolor csscolumns-rulestyle csscolumns-rulewidth csscolumns-breakbefore csscolumns-breakafter csscolumns-breakinside flexbox picture srcset webworkers" lang="en">
 <head>
   <?php include 'Pages/common/Head.php'?>
+  <link rel="stylesheet" href="/bet_community/Public/css/login.css">
 </head>
 <body>
-    <style>
-        .invalid {
-          border-color: red;
-        }
-    </style>
     <?php include 'Pages/common/Header.php'?>
     <div id="lp-register">
     <div class="container wrapper">
@@ -37,7 +33,7 @@
                 <div class="tab-pane active" id="register">
                   <h3>Register Now !!!</h3>
                   <p class="text-muted">Be cool and join today. Meet millions</p>
-                  
+                  <p id="signup-error-message"></p>
                   <!--Register Form-->
                   <form name="registration_form" id="registration_form" class="form-inline" _lpchecked="1">
                     <div class="row">
@@ -66,10 +62,10 @@
                     
                     <div class="form-group gender">
                       <label class="radio-inline">
-                        <input type="radio" name="sex" checked="">Male
+                        <input id="sex-male" type="radio" name="sex" checked="">Male
                       </label>
                       <label class="radio-inline">
-                        <input type="radio" name="sex">Female
+                        <input id="sex-female" type="radio" name="sex">Female
                       </label>
                     </div>
                     <div class="row">
@@ -89,20 +85,20 @@
                     </div>
                   </form><!--Register Now Form Ends-->
                   <p><a href="#">Already have an account?</a></p>
-                  <button class="btn btn-primary">Register Now</button>
+                  <button id="signup-button" class="btn btn-primary">Register Now</button>
                 </div><!--Registration Form Contents Ends-->
                 
                 <!--Login-->
                 <div class="tab-pane" id="login">
                   <h3>Login</h3>
                   <p class="text-muted">Log into your account</p>
-                  
+                  <p id="error-message"></p>
                   <!--Login Form-->
                   <form name="Login_form" id="Login_form">
                      <div class="row">
                       <div class="form-group col-xs-12">
                         <label for="my-email" class="sr-only">Email</label>
-                        <input id="my-email" class="form-control input-group-lg" type="text" name="Email" title="Enter Email" placeholder="Your Email" style="background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAkCAYAAADo6zjiAAAAAXNSR0IArs4c6QAAAbNJREFUWAntV8FqwkAQnaymUkpChB7tKSfxWCie/Yb+gbdeCqGf0YsQ+hU95QNyDoWCF/HkqdeiIaEUqyZ1ArvodrOHxanQOiCzO28y781skKwFW3scPV1/febP69XqarNeNTB2KGs07U3Ttt/Ozp3bh/u7V7muheQf6ftLUWyYDB5yz1ijuPAub2QRDDunJsdGkAO55KYYjl0OUu1VXOzQZ64Tr+IiPXedGI79bQHdbheCIAD0dUY6gV6vB67rAvo6IxVgWVbFy71KBKkAFaEc2xPQarXA931ot9tyHphiPwpJgSbfe54Hw+EQHMfZ/msVEEURjMfjCjbFeG2dFxPo9/sVOSYzxmAwGIjnTDFRQLMQAjQ5pJAQkCQJ5HlekeERxHEsiE0xUUCzEO9AmqYQhiF0Oh2Yz+ewWCzEY6aYKKBZCAGYs1wuYTabKdNNMWWxnaA4gp3Yry5JBZRlWTXDvaozUgGTyQSyLAP0dbb3DtQlmcan0yngT2ekE9ARc+z4AvC7nauh9iouhpcGamJeX8XF8MaClwaeROWRA7nk+tUnyzGvZrKg0/40gdME/t8EvgG0/NOS6v9NHQAAAABJRU5ErkJggg==&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%;" autocomplete="off" required>
+                        <input id="my-email" class="form-control input-group-lg" type="text" name="email" title="Enter Email" placeholder="Your Email" style="background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAkCAYAAADo6zjiAAAAAXNSR0IArs4c6QAAAbNJREFUWAntV8FqwkAQnaymUkpChB7tKSfxWCie/Yb+gbdeCqGf0YsQ+hU95QNyDoWCF/HkqdeiIaEUqyZ1ArvodrOHxanQOiCzO28y781skKwFW3scPV1/febP69XqarNeNTB2KGs07U3Ttt/Ozp3bh/u7V7muheQf6ftLUWyYDB5yz1ijuPAub2QRDDunJsdGkAO55KYYjl0OUu1VXOzQZ64Tr+IiPXedGI79bQHdbheCIAD0dUY6gV6vB67rAvo6IxVgWVbFy71KBKkAFaEc2xPQarXA931ot9tyHphiPwpJgSbfe54Hw+EQHMfZ/msVEEURjMfjCjbFeG2dFxPo9/sVOSYzxmAwGIjnTDFRQLMQAjQ5pJAQkCQJ5HlekeERxHEsiE0xUUCzEO9AmqYQhiF0Oh2Yz+ewWCzEY6aYKKBZCAGYs1wuYTabKdNNMWWxnaA4gp3Yry5JBZRlWTXDvaozUgGTyQSyLAP0dbb3DtQlmcan0yngT2ekE9ARc+z4AvC7nauh9iouhpcGamJeX8XF8MaClwaeROWRA7nk+tUnyzGvZrKg0/40gdME/t8EvgG0/NOS6v9NHQAAAABJRU5ErkJggg==&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%;" autocomplete="off" required>
                       </div>
                     </div>
                     <div class="row">
