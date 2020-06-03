@@ -1,4 +1,5 @@
 <?php
+session_start();
 include 'BetCommunity.class.php';
 spl_autoload_register(function ($name) {
     $classPaths =  BetCommunity::loads;

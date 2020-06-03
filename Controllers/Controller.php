@@ -9,8 +9,11 @@ abstract class Controller {
 
     const HTTP_BAD_REQUEST_CODE = 400;
     const HTTP_SERVER_ERROR_CODE = 500;
-    CONST HTTP_UNAUTHORIZED_CODE = 401;
+    const HTTP_UNAUTHORIZED_CODE = 401;
     const HTTP_OKAY_CODE = 200;
+    const DEFAULT_LIMIT = 20;
+    const DEFAULT_OFFSET = 1;
+
 
     public function __construct($request) {
         $this->data = array();
@@ -20,8 +23,26 @@ abstract class Controller {
         $this->error = array();
     }
 
+
     public function setData($data) {
         $this->data = $data;
+    }
+
+    public function setToken() {
+        if ($this->isLogin()) {
+            // var_dump('I got here'); exit;
+            $token = bin2hex(openssl_random_pseudo_bytes(16));
+            $_SESSION['token'] = $token;
+            $this->data['token'] = $token;
+        }
+    }
+    /**
+     * Checks if current user is logged in
+     */
+    public function isLogin() {
+        if (isset($_SESSION['userInfo']))
+            return true;
+        return false;
     }
 
     public function setResponseType($responseType) {

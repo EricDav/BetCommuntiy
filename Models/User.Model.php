@@ -51,6 +51,16 @@
                 return null;
             }
         }
+
+        public static function getFollowers($pdoConnection, $userId) {
+            try {
+                $sql = 'SELECT * FROM followers WHERE follower_id=' . $userId;
+                return $pdoConnection->pdo->query($sql)->fetchAll();
+            } catch(Exception $e) {
+                var_dump($e);
+                return null;
+            }
+        }
     }
 
 ?>

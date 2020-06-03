@@ -2,7 +2,10 @@
 
 class BetCommunity {
     const routes = [
-        '/login' => "LoginController"
+        '/login' => "LoginController",
+        '/api/web/create-prediction' => "CreatePredictionController",
+        '/' => "HomeController"
+        
     ];
 
     // saves class name as key and path as value
@@ -14,7 +17,10 @@ class BetCommunity {
         'Validation' => 'Helper/validation.php',
         'UserModel' => 'Models/User.Model.php',
         'DBConfig' => 'Config/Config.php',
-        'PDOConnection' => 'DB/DBConnection.php'
+        'PDOConnection' => 'DB/DBConnection.php',
+        'CreatePredictionController' => 'Controllers/CreatePrediction.Controller.php',
+        'CreatePredictionModel' => 'Models/CreatePrediction.Model.php',
+        'HomeController' => 'Controllers/Home.Controller.php'
     ];
 
     const countries = array

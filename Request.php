@@ -5,7 +5,8 @@ class Request {
     public $query;
     public $postData;
     public $host;
-    public $path; 
+    public $path;
+    public $session;
     // public $uri = $_SERVER['REQUEST_URI'];
     public $serverName;
     
@@ -14,6 +15,7 @@ class Request {
         $this->host = $_SERVER['HTTP_HOST'];
         $this->query = $_GET;
         $this->postData = $_POST;
+        $this->session = $_SESSION;
         $this->serverName = $_SERVER['SERVER_NAME'];
         $path = explode('?', $_SERVER['REQUEST_URI'])[0];
 
