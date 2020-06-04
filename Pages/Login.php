@@ -14,7 +14,7 @@
             	<p>Bet Community is a social network platform that can be used to connect people that have passion in bettings. 
                This platform help people to be able to share there betting tips.<br>
                 <br>What are you waiting for? Join now.</p>
-              <button class="btn btn-primary">Learn More</button>
+              <button class="btn btn-primary" id = "LearnMore">Learn More</button>
             </div>
           </div>
         	<div class="col-sm-6 col-sm-offset-1" style="margin-top: -40px;">
@@ -135,5 +135,6 @@
     </div>
     <?php include 'Pages/common/Script.php'?>
     <script src="/bet_community/Public/js/login.js"></script>
+    <script src="/bet_community/Public/js/notification.js"></script>
 </body>
 </html>

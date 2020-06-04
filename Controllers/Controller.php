@@ -34,6 +34,7 @@ abstract class Controller {
 
     public function jsonResponse($response) {
         header('Content-Type: application/json');
+    
         echo json_encode($response);
         exit;
     }

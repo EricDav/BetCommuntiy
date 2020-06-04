@@ -23,7 +23,7 @@ class LoginController extends Controller {
             !empty($this->request->postData['email']) && filter_var($this->request->postData['email'], FILTER_VALIDATE_EMAIL)) {
                 return true;
             }
-
+           
             $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_BAD_REQUEST_CODE, 'messages' => 'Invalid email or password'));
 
         } else if ($this->request->postData['type'] == 'signup') {

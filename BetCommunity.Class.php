@@ -2,7 +2,8 @@
 
 class BetCommunity {
     const routes = [
-        '/login' => "LoginController"
+        '/login' => "LoginController",
+        '/notification' => 'NotificationController'
     ];
 
     // saves class name as key and path as value
@@ -14,7 +15,9 @@ class BetCommunity {
         'Validation' => 'Helper/validation.php',
         'UserModel' => 'Models/User.Model.php',
         'DBConfig' => 'Config/Config.php',
-        'PDOConnection' => 'DB/DBConnection.php'
+        'PDOConnection' => 'DB/DBConnection.php',
+        'NotificationController' => 'Controllers/Notification.Controller.php',
+        'NotificationModel' => 'Models/Notification.Model.php'
     ];
 
     const countries = array

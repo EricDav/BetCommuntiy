@@ -1,4 +1,5 @@
 <?php
+clearstatcache();
 include 'BetCommunity.class.php';
 spl_autoload_register(function ($name) {
     $classPaths =  BetCommunity::loads;
@@ -16,7 +17,6 @@ $data = null;
 
 
 if (in_array($request->route, array_keys(BetCommunity::routes))) {
-
      $controllerClass = BetCommunity::routes[$request->route];
      
      $controllerObject = new $controllerClass($request);
@@ -27,7 +27,7 @@ if (in_array($request->route, array_keys(BetCommunity::routes))) {
 
     $data = $controllerObject->data;
     if ($controllerObject->responseType == 'html'){
-         include 'Pages/' . $data['template'];
+        include 'Pages/' . $data['template'];
     }  
 } else{
     include './Pages/404.php'; //include error 404 page for undefined routes

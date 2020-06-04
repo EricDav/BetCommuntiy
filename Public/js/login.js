@@ -91,7 +91,7 @@ $('#signup-button').click(function() {
 
         $.ajax('/login', { data: postData,
             type: 'POST',  success: function(result) {
-             console.log(result);
+             alert(result);
            // response = JSON.parse(result)
             if (!result.success) {
                 message = '';
