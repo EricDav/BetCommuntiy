@@ -1109,11 +1109,11 @@ html, body {
   #chat-block .title{
     background: #8dc63f;
     padding: 2px 20px;
-    width: 70%;
+    width: 100%;
     height: 30px;
     border-radius: 15px;
     position: relative;
-    margin: 0 auto 20px;
+    margin-top: 20px;
     color: #fff;
     font-size: 14px;
     font-weight: 600;

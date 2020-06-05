@@ -7,7 +7,9 @@ var totalOdds = $('#total-odds');
 var monthsArr = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 dates.forEach(function(item, index) {
+    console.log(item.date_created );
     date = new Date(item.date_created + ' UTC');
+    console.log(date);
     $('#date-' + item.id.toString()).text(formatDateCreated(date));
 });
 
@@ -15,12 +17,12 @@ function formatDateCreated(date) {
     var now = new Date();
 
     var  nowYear = now.getFullYear();
-    var nowMonth = now.getDate();
-    var nowDay = now.getDay();
+    var nowMonth = now.getMonth();
+    var nowDay = now.getDate();
 
     var  year = date.getFullYear();
-    var month = date.getDate();
-    var day = date.getDay();
+    var month = date.getMonth();
+    var day = date.getDate();
     var hours = date.getHours();
     var minutes = date.getMinutes();
 
@@ -59,7 +61,7 @@ $('#prediction-submit').click(function() {
 
     /**
      * This checks if error exist in the start date
-     * and saves error messages in the @eerror object if they exist
+     * and saves error messages in the @error object if they exist
      */
     if (errorArr.includes('start-date') && errorArr.includes('start-time')) {
         error['start'] = 'Date and time are required';
@@ -120,7 +122,7 @@ $('#prediction-submit').click(function() {
 
 
     /**
-     * This block of code display tthe red border for empty input
+     * This block of code display the red border for empty input
      */
     errorArr.forEach(function(item, index){
         $('#' + item).addClass('invalid');
@@ -175,6 +177,48 @@ $('#prediction-submit').click(function() {
                 $('#main-error').text(message);
             }
        }});
+    }
+});
+
+$('.title').click(function() {
+    var min = $('#min_odd');
+    var max = $('#max_odd');
+    error = {};
+    $('#min-error-text').text('');
+    $('#max-error-text').text('');
+
+    if (!min.val()) {
+        error['min'] = 'required';
+    } else if (!Number.parseFloat(min.val())) {
+        error['min'] = 'Minimum odd must be a number';
+    }
+
+    
+    if (!max.val())
+        error['max'] = 'required';
+    else if (!Number.parseFloat(max.val())) {
+        error['max'] = 'Maximum odd must be a number';
+    } else if (Number.parseFloat(max.val()) <= Number.parseFloat(min.val())) {
+        error['max'] = 'Maximum odd must be greater than minimum odd';
+    }
+    
+    console.log(Object.keys(error).length, '====>>>');
+    if (Object.keys(error).length == 0) {
+        // console.log(window.location.host + '/?m=' + min.val() + '_' + max.val());
+        window.location.href = window.location.origin + '/?filter_option=' + min.val() + '_' + max.val();
+        console.log(window.location);
+        // window.location.reload();
+    }
+
+    console.log(error);
+    if (error['min']) {
+        min.addClass('invalid');
+        $('#min-error-text').text(error['min']);
+    }
+
+    if (error['max']) {
+        max.addClass('invalid');
+        $('#max-error-text').text(error['max']);
     }
 });
 

@@ -61,3 +61,8 @@ CREATE TABLE payslip(
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP 
 );
 
+CREATE TABLE featured_users(
+    user_id int references users(id),
+    featured_date DATETIME NOT NULL
+);
+

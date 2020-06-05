@@ -22,7 +22,7 @@
             if ($this->token != $this->request->session['token'] ||  $this->id != $userId) {
                 $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_SERVER_ERROR_CODE, 'message' => 'Something is not right'));
             }
-            
+
 
             // Validate odds
             if (!is_numeric($this->totalOdds)) {
@@ -64,6 +64,20 @@
 
         }
 
+        public function getStatus($prediction) {
+            if (!$prediction['won']) {
+                $now = gmdate("Y-m-d\ H:i:s");
+
+                if ($now > $prediction['created_at'])
+                    return 'In progress';
+                return 'Not started';
+            }
+
+            if ($prediction['won'] == 0)
+                return 'Concluded Won';
+            return 'Concluded Lost';
+        }
+
         public function perform() {
             $this->pdoConnection->open();
             $approved = $this->request->session['userInfo']['role'] > 1 ? 1 : 0;
@@ -79,7 +93,7 @@
         /**
          * Checks if date and time is valid
          * 
-         * take date and time as parameters Y/m/d H:s
+         * take date and time as parameters in this form Y/m/d H:s
          */
         public function validateDateTime($date, $time) {
             $dateArr = explode('-', $date);

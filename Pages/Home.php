@@ -58,26 +58,24 @@
     			<div class="col-md-3 static">
 
             <ul class="nav-news-feed">
-              <li><i class="icon ion-ios-paper"></i><div><a href="newsfeed.html">My Newsfeed</a></div></li>
-              <li><i class="icon ion-ios-people"></i><div><a href="newsfeed-people-nearby.html">People Nearby</a></div></li>
-              <li><i class="icon ion-ios-people-outline"></i><div><a href="newsfeed-friends.html">Friends</a></div></li>
-              <li><i class="icon ion-chatboxes"></i><div><a href="newsfeed-messages.html">Messages</a></div></li>
-              <li><i class="icon ion-images"></i><div><a href="newsfeed-images.html">Images</a></div></li>
-              <li><i class="icon ion-ios-videocam"></i><div><a href="newsfeed-videos.html">Videos</a></div></li>
+              <li><i class="fa fa-futbol-o"></i><div><a href="/"><?=$controllerObject->formatFilterText('Predictions', $data['homeNum'])?></a></div></li>
+              <li><i class="fa fa-user"></i><div><a href="newsfeed-people-nearby.html">Admin Predictions</a></div></li>
+              <li><i class="icon ion-ios-people-outline"></i><div><a href="newsfeed-friends.html">Forcasters</a></div></li>
+              <li><i style="color: green;" class="fa fa-check"></i><div style="color: black"><a href="<?='/?filter_option=' . $data['predictionWonQuery']?>"><?=$controllerObject->formatFilterText('Correct Predictions', $data['correctNum'])?></a></div></li>
+              <li><i style="color: red;" class="fa fa-close"></i><div><a href="<?='/?filter_option=' . $data['predictionLostQuery']?>"><?=$controllerObject->formatFilterText('Lost Predictions', $data['lostNum'])?></a></div></li>
+              <li><i class="fa fa-spinner"></i><div><a href="<?='/?filter_option=' . $data['predictionInprogressQuery']?>"><?=$controllerObject->formatFilterText('Predictions In-progress', $data['inprogressNum'])?></a></div></li>
             </ul><!--news-feed links ends-->
             <div id="chat-block" class="" style="">
-              <div class="title">Chat online</div>
-              <ul class="online-users list-inline">
-                <li><a href="newsfeed-messages.html" title="Linda Lohan"><img src="images/users/user-2.jpg" alt="user" class="img-responsive profile-photo"><span class="online-dot"></span></a></li>
-                <li><a href="newsfeed-messages.html" title="Sophia Lee"><img src="images/users/user-3.jpg" alt="user" class="img-responsive profile-photo"><span class="online-dot"></span></a></li>
-                <li><a href="newsfeed-messages.html" title="John Doe"><img src="images/users/user-4.jpg" alt="user" class="img-responsive profile-photo"><span class="online-dot"></span></a></li>
-                <li><a href="newsfeed-messages.html" title="Alexis Clark"><img src="images/users/user-5.jpg" alt="user" class="img-responsive profile-photo"><span class="online-dot"></span></a></li>
-                <li><a href="newsfeed-messages.html" title="James Carter"><img src="images/users/user-6.jpg" alt="user" class="img-responsive profile-photo"><span class="online-dot"></span></a></li>
-                <li><a href="newsfeed-messages.html" title="Robert Cook"><img src="images/users/user-7.jpg" alt="user" class="img-responsive profile-photo"><span class="online-dot"></span></a></li>
-                <li><a href="newsfeed-messages.html" title="Richard Bell"><img src="images/users/user-8.jpg" alt="user" class="img-responsive profile-photo"><span class="online-dot"></span></a></li>
-                <li><a href="newsfeed-messages.html" title="Anna Young"><img src="images/users/user-9.jpg" alt="user" class="img-responsive profile-photo"><span class="online-dot"></span></a></li>
-                <li><a href="newsfeed-messages.html" title="Julia Cox"><img src="images/users/user-10.jpg" alt="user" class="img-responsive profile-photo"><span class="online-dot"></span></a></li>
-              </ul>
+              
+              <label class="odds-label">Min Odds</label>
+              <input id="min_odd"  type="text" class="form-control" value="<?=$data['min']?>">
+              <p id="min-error-text" class="odd_error"></p>
+
+              <label class="odds-label">Max Odds</label>
+              <input id="max_odd"  type="text" class="form-control" value="<?=$data['max']?>">
+              <p id="max-error-text" class="odd_error"></p>
+
+              <div class="title">Search Odd</div>
             </div><!--chat block ends-->
           </div>
     			<div class="col-md-7">
@@ -87,11 +85,10 @@
             <div class="create-post">
             	<div class="row">
             		<div class="col-md-7 col-sm-7">
+                    <?=$data['paginationHtml']?>
                 </div>
-            		<div class="col-md-5 col-sm-5">
-                  <div class="tools">
+            		<div  class="col-md-5 col-sm-9">
                     <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#exampleModal" id="open-prediction-modal">Create Prediction</button>
-                  </div>
                 </div>
             	</div>
             </div>
@@ -117,37 +114,24 @@
                   </div>
                   <div class="line-divider"></div>
 
-                  <div class="post-meta">
-                                    <button class="post-meta-like">
-                                        <i class="bi bi-heart-beat"></i>
-                                        <span>You and 206 people like this</span>
-                                        <strong>206</strong>
-                                    </button>
-                                    <ul class="comment-share-meta">
-                                        <li>
-                                            <button class="post-comment">
-                                                <i class="bi bi-chat-bubble"></i>
-                                                <span>41</span>
-                                            </button>
-                                        </li>
-                                        <li>
-                                            <button class="post-share">
-                                                <i class="bi bi-share"></i>
-                                                <span>07</span>
-                                            </button>
-                                        </li>
-                                    </ul>
-                                </div>
-
-
-                  <div class="post-comment">
+                  <div style="margin-bottom: 20px;" class="post-meta">
+                      <div class="post-meta-like">
+                        <div>
+                            <i class="fa fa-commenting-o ic"><strong>206</strong></i>
+                            <!-- <strong>206</strong> -->
+                            <span class="status"><b>Status:</b><strong>  <i>Not started</i></strong></span>
+                        </div>
+                      </div>
+                            
+                    </div>
+                  <!-- <div class="post-comment">
                     <img src="images/users/user-10.jpg" alt="" class="profile-photo-sm">
                     <p><a href="timeline.html" class="profile-link">Julia </a>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga.</p>
                   </div>
                   <div class="post-comment">
                     <img src="images/users/user-1.jpg" alt="" class="profile-photo-sm">
                     <input type="text" class="form-control" placeholder="Post a comment">
-                  </div>
+                  </div> -->
                 </div>
               </div>
             </div>
@@ -157,44 +141,20 @@
           ================================================= -->
     			<div class="col-md-2 static">
             <div class="suggestions is_stuck" id="sticky-sidebar" style="position: fixed; top: -3px; width: 155px;">
-              <h4 class="grey">Who to Follow</h4>
-              <div class="follow-user">
-                <img src="images/users/user-11.jpg" alt="" class="profile-photo-sm pull-left">
-                <div>
-                  <h5><a href="timeline.html">Diana Amber</a></h5>
-                  <a href="#" class="text-green">Add friend</a>
+              <h4 class="grey"><b>Featured Users</b></h4>
+              <?php foreach($data['featuredUsers'] as $featuredUser): ?>
+                <div class="follow-user">
+                  <img src="images/users/user-15.jpg" alt="" class="profile-photo-sm pull-left">
+                  <div>
+                    <h5><a href="timeline.html"><?=$featuredUser['name']?></a></h5>
+                    <a id="<?=$featuredUser['id']?>" href="#" class="text-green"><?=$controllerObject->isFollowing($prediction['user_id']) ? 'Following': 'Follow' ?></a>
+                  </div>
                 </div>
-              </div>
-              <div class="follow-user">
-                <img src="images/users/user-12.jpg" alt="" class="profile-photo-sm pull-left">
-                <div>
-                  <h5><a href="timeline.html">Cris Haris</a></h5>
-                  <a href="#" class="text-green">Add friend</a>
-                </div>
-              </div>
-              <div class="follow-user">
-                <img src="images/users/user-13.jpg" alt="" class="profile-photo-sm pull-left">
-                <div>
-                  <h5><a href="timeline.html">Brian Walton</a></h5>
-                  <a href="#" class="text-green">Add friend</a>
-                </div>
-              </div>
-              <div class="follow-user">
-                <img src="images/users/user-14.jpg" alt="" class="profile-photo-sm pull-left">
-                <div>
-                  <h5><a href="timeline.html">Olivia Steward</a></h5>
-                  <a href="#" class="text-green">Add friend</a>
-                </div>
-              </div>
-              <div class="follow-user">
-                <img src="images/users/user-15.jpg" alt="" class="profile-photo-sm pull-left">
-                <div>
-                  <h5><a href="timeline.html">Sophia Page</a></h5>
-                  <a href="#" class="text-green">Add friend</a>
-                </div>
-              </div>
+              <?php endforeach ?>
             </div><div style="position: static; width: 155px; height: 374px; display: block; vertical-align: baseline; float: none;"></div>
           </div>
+
+
     		</div>
     	</div>
     </div>

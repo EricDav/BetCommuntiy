@@ -4,22 +4,52 @@
 }
 #open-prediction-modal {
     outline: none !important;
+    width: 100% !important;
+    margin-top: 18px;
 }
 
 .invalid {
     border-color: red!important;
 }
 
+.title {
+    cursor: pointer;
+}
 
-.post-meta {
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: -ms-flexbox;
+.ic {
+    font-size: 18px;
+}
+
+.ic > strong {
+    font-size: 15px;
+    margin-left: 2px;
+    cursor: pointer;
+}
+
+
+.odds-label {
+    width: 100%;
+    text-align: left;
+}
+
+#message {
+    cursor: pointer;
+    display: inline;
+}
+
+.post-meta-like {
     display: flex;
-    -webkit-box-align: center;
-    -webkit-align-items: center;
-    -ms-flex-align: center;
-    align-items: center;
-    padding: 0 12px;
-    margin-top: 20px;
+    flex-direction: row-reverse;
+}
+
+.status{
+    display: inline-block;
+    margin-left: 20px;
+}
+
+.odd_error {
+    text-align: left;
+    margin-top: 0px;
+    font-style: italic;
+    color: red;
 }

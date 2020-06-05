@@ -47,14 +47,25 @@
                 $temp = $stmt->fetch(PDO::FETCH_ASSOC);
                 return ['specialId' => $specialId, 'id' => $pdoConnection->pdo->lastInsertId()];
             } catch(Exception $e) {
-                var_dump($e);
-                return null;
+                var_dump($e); exit;
             }
         }
 
         public static function getFollowers($pdoConnection, $userId) {
             try {
                 $sql = 'SELECT * FROM followers WHERE follower_id=' . $userId;
+                return $pdoConnection->pdo->query($sql)->fetchAll();
+            } catch(Exception $e) {
+                var_dump($e);
+                return null;
+            }
+        }
+
+        public static function getFeaturedUsers($pdoConnection) {
+            try {
+                $sql = 'SELECT users.id, users.name FROM featured_users INNER JOIN users ON
+                 featured_users.user_id=users.id WHERE featured_users.featured_date > ' . "'" . gmdate("Y-m-d\ H:i:s", strtotime('-7 days')) .  "'";
+                // echo $sql; exit;
                 return $pdoConnection->pdo->query($sql)->fetchAll();
             } catch(Exception $e) {
                 var_dump($e);
