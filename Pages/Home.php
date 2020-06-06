@@ -161,6 +161,30 @@
 
   <?php  include 'Pages/common/Footer.php';?>
   <?php include 'Pages/common/Script.php'?>
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/7.15.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.15.0/firebase-database.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+<script src="https://www.gstatic.com/firebasejs/7.15.0/firebase-analytics.js"></script>
+
+<script>
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyCQ7OffeQuUOQlD31h3D0J6EE9kQnXXHvc",
+    authDomain: "betcommunity-7fb66.firebaseapp.com",
+    databaseURL: "https://betcommunity-7fb66.firebaseio.com",
+    projectId: "betcommunity-7fb66",
+    storageBucket: "betcommunity-7fb66.appspot.com",
+    messagingSenderId: "330744767541",
+    appId: "1:330744767541:web:028895b50835bfcc433d7c",
+    measurementId: "G-KTZTRR4ESW"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  firebase.analytics();
+</script>
     <script type="text/javascript">var dates=<?=json_encode($data['dates'])?>;</script>
     <script src="/bet_community/Public/js/prediction.js"></script>
   </body>

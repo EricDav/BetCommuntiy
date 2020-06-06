@@ -64,7 +64,7 @@
                 $predictions = CreatePredictionModel::getPredictions($this->pdoConnection, Controller::DEFAULT_LIMIT, $this->offset, $this->query, $this->isOddsFilter);
                 $featuredUsers = UserModel::getFeaturedUsers($this->pdoConnection);
 
-                if (!$prediction && !is_array($predictions)) {
+                if (!$predictions && !is_array($predictions)) {
                     $isProblemWhileFecthingData = true;
                 }
 
@@ -79,7 +79,7 @@
                 }
 
                 if (!$isProblemWhileFecthingData) {
-                    $this->data['followers'] = $follower;
+                    $this->data['followers'] = $followers;
                     $this->data['predictions'] = $predictions;
                     $this->data['featuredUsers'] = $featuredUsers;
                     $count = $predictions ? $predictions[0]['total'] : 0; // total number of predictions in the system
