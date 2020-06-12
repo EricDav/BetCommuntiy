@@ -1,6 +1,6 @@
 <html class="js sizes customelements history pointerevents postmessage webgl websockets cssanimations csscolumns csscolumns-width csscolumns-span csscolumns-fill csscolumns-gap csscolumns-rule csscolumns-rulecolor csscolumns-rulestyle csscolumns-rulewidth csscolumns-breakbefore csscolumns-breakafter csscolumns-breakinside flexbox picture srcset webworkers" lang="en">
 <head>
-  <?php include 'Pages/common/Head.php'?>
+  <?php include 'Pages/common/Head.php'; ?>
   <link rel="stylesheet" href="/bet_community/Public/css/home.css">
 </head>
 <body>
@@ -99,7 +99,7 @@
           <?php foreach($data['predictions'] as $prediction): ?>
             <div class="post-content">
               <div class="post-container">
-                <!-- <img src="images/users/user-9.jpg" alt="user" class="profile-photo-md pull-left"> -->
+              <img src="<?=$prediction['image_path']?>" alt="user" class="profile-photo-md pull-left">
                 <div class="post-detail">
                   <div class="user-info">
                     <h5><a href="timeline.html" class="profile-link"><?=$prediction['name']?></a> <a style="cursor:pointer;" class="following"><?=$controllerObject->isFollowing($prediction['user_id']) ? 'unfellow': 'Follow' ?></a></h5>
@@ -117,9 +117,9 @@
                   <div style="margin-bottom: 20px;" class="post-meta">
                       <div class="post-meta-like">
                         <div>
-                            <i class="fa fa-commenting-o ic"><strong>206</strong></i>
+                            <i class="fa fa-commenting-o ic"><strong><?=((int)$prediction['total_comments'] == 0 ? '' : $prediction['total_comments'])?></strong></i>
                             <!-- <strong>206</strong> -->
-                            <span class="status"><b>Status:</b><strong>  <i>Not started</i></strong></span>
+                            <span class="status"><b>Status:</b><strong><i><?=$controllerObject->getPredictionStatus($prediction)?></i></strong></span>
                         </div>
                       </div>
                             

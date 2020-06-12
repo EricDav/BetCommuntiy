@@ -13,6 +13,7 @@ CREATE TABLE users (
     city VARCHAR(125),
     phone_number VARCHAR(100),
     sex VARCHAR(2),
+    image_path VARCHAR(125),
     PRIMARY KEY(id)
 );
 
@@ -32,6 +33,7 @@ CREATE TABLE predictions (
     created_at DATETIME NOT NULL,
     total_odds VARCHAR(100),
     approved boolean NOT NULL,
+    approved_by int,
     PRIMARY KEY(id)
 );
 
@@ -64,5 +66,18 @@ CREATE TABLE payslip(
 CREATE TABLE featured_users(
     user_id int references users(id),
     featured_date DATETIME NOT NULL
+);
+
+CREATE TABLE comments(
+    id int NOT NULL AUTO_INCREMENT,
+    prediction_id int references predictions(id),
+    user_id int references users(id),
+    comment VARCHAR(301),
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE likes(
+    user_id int references users(id),
+    prediction_id int references predictions(id),
 );
 

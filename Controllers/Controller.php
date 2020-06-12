@@ -45,6 +45,14 @@ abstract class Controller {
         return false;
     }
 
+    public function getPredictionStatus($prediction) {
+        if ($prediction['won']) {
+            return ((int)$prediction['won'] == 0 ? 'Lost <i style="color: red;" class="fa fa-close"></i>' : 'Won <i style="color: green;" class="fa fa-check"></i>');
+        }
+
+        return ($prediction['start_date'] > gmdate("Y-m-d\ H:i:s") ? '  Not started' : '  Running');
+    }
+
     public function setResponseType($responseType) {
         $this->responseType = $responseType;
     }

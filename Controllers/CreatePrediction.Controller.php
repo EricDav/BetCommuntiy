@@ -82,7 +82,7 @@
             $this->pdoConnection->open();
             $approved = $this->request->session['userInfo']['role'] > 1 ? 1 : 0;
             $userId = $this->request->session['userInfo']['id'];
-            $result = CreatePredictionModel::createPrediction($this->pdoConnection, $this->startDateTime, $this->endDateTime, $userId, $this->totalOdds, $this->prediction, $approved);
+            $result = PredictionModel::createPrediction($this->pdoConnection, $this->startDateTime, $this->endDateTime, $userId, $this->totalOdds, $this->prediction, $approved);
 
             if ($result)
                 $this->jsonResponse(array('success' => true, 'code' => Controller::HTTP_OKAY_CODE, 'messages' => 'Prediction created successfully'));

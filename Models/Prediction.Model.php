@@ -1,6 +1,6 @@
 <?php
 
-    class CreatePredictionModel {
+    class PredictionModel {
         const PREDICTION_WON = 1;
         const PREDICTION_LOST = 0;
         public static function createPrediction($pdoConnection, $startDate, $endDate, $userId, $odds, $prediction, $approved) {
@@ -17,10 +17,10 @@
 
         public static function getPredictions($pdoConnection, $limit, $offset, $query, $isOddsQuery) {
             try {
-                $sql = "SELECT (SELECT COUNT(*) FROM predictions 
-                    WHERE predictions.approved = 0) AS total, 
+                $sql = "SELECT (SELECT COUNT(*) FROM predictions WHERE predictions.approved = 0) AS total, 
+                     (SELECT COUNT(*) FROM comments WHERE predictions.id=comments.id) AS total_comments,
                     predictions.prediction, predictions.id, predictions.created_at, predictions.start_date, 
-                    predictions.end_date, users.id AS user_id, users.name, users.sex
+                    predictions.end_date, predictions.won, users.id AS user_id, users.name, users.sex, users.image_path
                     FROM predictions 
                     INNER JOIN users ON predictions.user_id = users.id 
                     WHERE predictions.approved = 0" . self::getQueryPredictionSQL($query, $isOddsQuery) . 

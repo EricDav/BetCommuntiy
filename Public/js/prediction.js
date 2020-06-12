@@ -6,22 +6,6 @@ var prediction = $('#prediction');
 var totalOdds = $('#total-odds');
 var monthsArr = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-var database = firebase.database();
-
-try {
-    var t = database.ref('comments').push({
-        prediction_id: 4,
-        comment: 'Chelsea is fucked up',
-        user_name: 'David Alienyi'
-    });
-}
-catch (err) {
-    console.log(err);
-}
-
-// console.log(t);
-
-console.log(database);
 dates.forEach(function(item, index) {
     console.log(item.date_created );
     date = new Date(item.date_created + ' UTC');

@@ -61,14 +61,14 @@
                 $isProblemWhileFecthingData = false;
                 $followers = array();
 
-                $predictions = CreatePredictionModel::getPredictions($this->pdoConnection, Controller::DEFAULT_LIMIT, $this->offset, $this->query, $this->isOddsFilter);
+                $predictions = PredictionModel::getPredictions($this->pdoConnection, Controller::DEFAULT_LIMIT, $this->offset, $this->query, $this->isOddsFilter);
                 $featuredUsers = UserModel::getFeaturedUsers($this->pdoConnection);
 
                 if (!$predictions && !is_array($predictions)) {
                     $isProblemWhileFecthingData = true;
                 }
 
-                if (!$featuredUsers) {
+                if (!$featuredUsers && !is_array($predictions)) {
                     $isProblemWhileFecthingData = true;
                 }
                 

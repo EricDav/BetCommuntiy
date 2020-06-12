@@ -29,9 +29,9 @@ $("#login_button").click(function(){
             // response = JSON.parse(result)
            if (!result.success) {
                 $('#error-message').text(result.messages);
+           } else {
+               window.location = '/';
            }
-            
-            console.log(message, 'Inside====>>>>>');
         }});
     }
 
@@ -114,6 +114,8 @@ $('#signup-button').click(function() {
                     });   
                 }
                 $('#signup-error-message').text(message);
+            } else {
+                window.location = '/';
             }
        }});
     } 

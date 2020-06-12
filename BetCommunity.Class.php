@@ -4,6 +4,7 @@ class BetCommunity {
     const routes = [
         '/login' => "LoginController",
         '/api/web/create-prediction' => "CreatePredictionController",
+        '/api/web/users-action' => "UserController",
         '/' => "HomeController"
         
     ];
@@ -19,7 +20,7 @@ class BetCommunity {
         'DBConfig' => 'Config/Config.php',
         'PDOConnection' => 'DB/DBConnection.php',
         'CreatePredictionController' => 'Controllers/CreatePrediction.Controller.php',
-        'CreatePredictionModel' => 'Models/CreatePrediction.Model.php',
+        'PredictionModel' => 'Models/Prediction.Model.php',
         'HomeController' => 'Controllers/Home.Controller.php'
     ];
 

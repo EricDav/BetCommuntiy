@@ -98,7 +98,7 @@ class LoginController extends Controller {
                 if (!$user || !password_verify($this->request->postData['password'], $user['password']))
                     $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_UNAUTHORIZED_CODE,  'message' => 'Invalid username or password'));
                 
-                $this->setUserSession($user['name'], $user['email'], $user['special_id'], $user['id'], $user['role']);
+                $this->setUserSession($user['name'], $user['email'], $user['special_id'], $user['id'], $user['role'], $user['image_path']);
                 $this->jsonResponse(array('success' => true, 'code' => Controller::HTTP_OKAY_CODE, 'message' => 'User successfuly logs in'));
             }
 
@@ -119,9 +119,10 @@ class LoginController extends Controller {
 
             $result = UserModel::createUser($this->pdoConnection, $name, $this->request->postData['email'], $passwordHash, 
                 $sex, $country, $city);
-
+            
             if ($result) {
-                $this->setUserSession($name, $this->request->postData['email'], $result['specialId'], $result['id'], 1);
+                $imagePath = $sex == 'M' ? UserModel::DEFAULT_IMAGE_PATH_MALE : UserModel::DEFAULT_IMAGE_PATH_FEMALE;
+                $this->setUserSession($name, $this->request->postData['email'], $result['specialId'], $result['id'], 1, $imagePath);
                 $this->jsonResponse(array('success' => true, 'code' => Controller::HTTP_OKAY_CODE, 'message' => 'User successfuly signs up'));
             }
 
@@ -129,13 +130,14 @@ class LoginController extends Controller {
         }
     }
 
-    public function setUserSession($name, $email, $specialId, $id, $role) {
+    public function setUserSession($name, $email, $specialId, $id, $role, $imagePath) {
         $userInfo = array(
             'id' => $id,
             'name' => $name,
             'email' => $email,
             'specialId' => $specialId,
             'role' => $role,
+            'imagePath' => $imagePath
         );
 
         $_SESSION['userInfo'] = $userInfo;

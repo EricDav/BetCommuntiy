@@ -4,6 +4,8 @@
         const DEFAULT_COUNTRY = 'Nigeria';
         const DEFAULT_STATE = null;
         const DEFAULT_ROLE = 1;
+        const DEFAULT_IMAGE_PATH_MALE = '/bet_community/Public/images/default_male';
+        const DEFAULT_IMAGE_PATH_FEMALE = '/bet_community/Public/images/default_female';
 
         public static function getUser($pdoConnection, $email, $password) {
             try {
@@ -40,10 +42,11 @@
             }
 
             try {
-                $sql = 'INSERT INTO users (name, email, password, sex, country, city, role, special_id) VALUES(?,?,?,?,?,?,?,?)';
+                $sql = 'INSERT INTO users (name, email, password, sex, country, city, role, special_id, image_path) VALUES(?,?,?,?,?,?,?,?,?)';
                 $stmt = $pdoConnection->pdo->prepare($sql);
                 $specialId = uniqid();
-                $stmt->execute([$name, $email, $password, $sex, $country, $city, UserModel::DEFAULT_ROLE, $specialId]);
+                $imagePath = $sex == 'M' ? self::DEFAULT_IMAGE_PATH_MALE : DEFAULT_IMAGE_PATH_FEMALE;
+                $stmt->execute([$name, $email, $password, $sex, $country, $city, UserModel::DEFAULT_ROLE, $specialId, $imagePath]);
                 $temp = $stmt->fetch(PDO::FETCH_ASSOC);
                 return ['specialId' => $specialId, 'id' => $pdoConnection->pdo->lastInsertId()];
             } catch(Exception $e) {

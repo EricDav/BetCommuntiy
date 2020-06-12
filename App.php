@@ -6,7 +6,7 @@ spl_autoload_register(function ($name) {
     if (file_exists($classPaths[$name])) {
         include $classPaths[$name];
     } else {
-        echo $name . "class not found";
+        echo $name . " class not found";
     }
 });
 
@@ -27,9 +27,10 @@ if (in_array($request->route, array_keys(BetCommunity::routes))) {
     }
 
     $data = $controllerObject->data;
+    $data['isLogin'] = $controllerObject->isLogin();
     if ($controllerObject->responseType == 'html'){
          include 'Pages/' . $data['template'];
-    }  
+    }
 } else{
     include './Pages/404.php'; //include error 404 page for undefined routes
  }
