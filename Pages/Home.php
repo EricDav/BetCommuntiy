@@ -1,3 +1,22 @@
+<?php 
+  /**
+   * Given a competition object it returns 
+   * the name e.g England Premier league
+   */
+  function getCompetitionName($competition) {
+    if (sizeof($competition->countries) > 0) {
+      return $competition->countries[0]->fifa_code ? $competition->countries[0]->fifa_code . ' - ' . $competition->name :  $competition->countries[0]->name . ' - ' . $competition->name;
+    }
+
+    if (sizeof($competition->federations) > 0) {
+      return $competition->federations[0]->name . ' - ' . $competition->name;
+    }
+
+    return $competition->name;
+  }
+
+?>
+
 <html class="js sizes customelements history pointerevents postmessage webgl websockets cssanimations csscolumns csscolumns-width csscolumns-span csscolumns-fill csscolumns-gap csscolumns-rule csscolumns-rulecolor csscolumns-rulestyle csscolumns-rulewidth csscolumns-breakbefore csscolumns-breakafter csscolumns-breakinside flexbox picture srcset webworkers" lang="en">
 <head>
   <?php include 'Pages/common/Head.php'; ?>
@@ -11,14 +30,20 @@
   <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title" id="exampleModalLongTitle">Create Prediction</h4>
+      <div style="display: flex;" class="modal-header">
+        <h4 style="width: 95%; font-size: 2rem;" class="modal-title" id="exampleModalLongTitle">Create Prediction Using: </h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-    <div class="modal-body">
-      <div class="">
+    <div id='m-body-id' class="modal-body m-body">
+    <ul class="nav nav-tabs ul-navs-tabs">
+      <li id="tab-one-id" class="active"><a id="tab-one" data-toggle="tab" href="">Booking Number</a></li>
+      <li id="tab-two-id"><a id="tab-two" data-toggle="tab" href="">Fixtures</a></li>
+      <li id="tab-three-id"><a id="tab" data-toggle="tab" href="">Text</a></li>
+    </ul>
+    
+      <!-- <div class="">
            <p id="main-error"></p>
            <div style="margin-top: 5px;"><b>First Game Begins: </b></div>
           <div class="flex-input">
@@ -41,10 +66,70 @@
           <div style="margin-top: 5px;"><b>Total odds: </b></div>
           <input id="total-odds" type="text">
           <p id="odds" style="color:red; font-style:italic"></p>
-      </div>
+      </div> -->
+
+      <!-- This section begins displays for the first tab for creating prediction through booking code-->
+      <div id="booking-code-tab" id="data-entry" style="margin-top: 15px;">
+        <div class="flex-input">
+          <div class="input-wrapper">
+          <div style="margin-top: 5px;"><b>Betting Platform: </b></div>
+            <select id="betting-type" type="time" class="form-control">
+              <?php foreach($data['supportedBettingPlatforms'] as $platform): ?>
+                <option><?=$platform?></option>
+              <?php endforeach; ?>
+            </select>
+          </diV>
+          <div class="input-wrapper input-wrapper-code">
+            <div style="margin-top: 5px;"><b>Booking Number: </b></div>
+            <input id="booking-number" type="text" class="form-control">
+          </div>
+        </div>
+     </div>
+    <!-- This section ends displays for the first tab for creating prediction through booking code-->
+    
+     <div id="fixtures-tab" class="data-entry" style="margin-top: 15px; display: none;">
+        <!-- Section table for displaying  selected games-->
+        <div id="table-section">
+
+        </div>
+        <!-- End Section table for displaying  selected games-->
+
+        <div class="row">
+          <div class="col-md-4">
+          <div style="margin-top: 5px;"><b>Competition: </b></div>
+            <input autocomplete="off" id="competition-search" type="search" class="form-control my-input" placeholder="Search by name, countr">
+            <div id="dropdown-competetion" class="dropdown-content">
+              <?php foreach($data['competitions'] as $competition): ?>
+                  <a onclick="selectCompetition(this)"  id="<?=$competition->id?>"><?=getCompetitionName($competition)?></a>
+              <?php endforeach; ?>
+            </div>
+            <div id="competition-error" class="fixtures-booking-error">Required. You need to select a competition</div>
+          </diV>
+          <div class="col-md-4">
+            <div style="margin-top: 5px;"><b>Fixture: </b></div>
+            <input autocomplete="off" id="fixtures-search" type="search" class="form-control my-input" placeholder="Search by team name...">
+            <div id="fetching-fixtures">Fetching fixtures...</div>
+            <div id="dropdown-fixture" class="dropdown-content">
+            </div>
+            <div id="fixtures-error" class="fixtures-booking-error">Required. You need to select a fixture.</div>
+          </div>
+
+          <div class="col-md-4">
+            <div style="margin-top: 5px;"><b>Enter Outcome: </b></div>
+            <input id="outcome" type="text" class="form-control my-input" placeholder="e.g X2">
+            <div id="dropdown-outcomes" class="dropdown-content">
+              <?php foreach($data['outcomes'] as $outcome): ?>
+                  <a onclick="selectOutcome(this)"><?=$outcome?></a>
+              <?php endforeach; ?>
+            </div>
+            <div id="outcome-error" class="fixtures-booking-error">Required. You need to enter an outcome.</div>
+          </div>
+        </div>
+        <button id="add-game" type="button" class="btn btn-primary">Add</button>
+     </div>
     </div>
       <div class="modal-footer">
-        <button id="prediction-submit" type="button" class="btn btn-primary">Save changes</button>
+        <button id="prediction-submit" type="button" class="btn btn-primary">Submit</button>
       </div>
     </div>
   </div>
@@ -97,21 +182,43 @@
             <!-- Post Content
             ================================================= -->
           <?php foreach($data['predictions'] as $prediction): ?>
+            <?php $isFollowing = $data['isLogin'] && $controllerObject->isFollowing($prediction['user_id']); ?>
             <div class="post-content">
-              <div class="post-container">
+            <div class="dropdown dot-menu">
+              <i class="fa fa-ellipsis-h dropdown-toggle" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
+              <div id="menu-action" class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                <?php if($data['isLogin'] && (int)$_SESSION['userInfo']['role'] > 1): ?>
+                  <a class="dropdown-item" href="#"> <i class="fa fa-user"></i>  Action</a>
+                <?php endif ?>
+
+                <a  id="<?= 'dot-menu-' . $prediction['user_id']?>" class="dropdown-item" href="#"> <i class="<?= $isFollowing ? 'fa fa-user-times' : 'fa fa-user'; ?>"></i>
+                  <?= !$isFollowing ? '  Follow     ' . explode(' ', $prediction['name'])[0] : '  Unfollow     ' . explode(' ', $prediction['name'])[0]?>
+                </a>
+                <div class="line-divider"></div>
+                <a class="dropdown-item" href="#"><i class="fa fa-bug"></i> Report Prediction</a>
+                <div class="line-divider"></div>
+                <a class="dropdown-item" href="#"><i class="fa fa-share-alt"></i> Copy Prediction Link</a>
+              </div>
+            </div>
+              <div style="padding-top: 10px;" class="post-container">
               <img src="<?=$prediction['image_path']?>" alt="user" class="profile-photo-md pull-left">
                 <div class="post-detail">
                   <div class="user-info">
-                    <h5><a href="timeline.html" class="profile-link"><?=$prediction['name']?></a> <a style="cursor:pointer;" class="following"><?=$controllerObject->isFollowing($prediction['user_id']) ? 'unfellow': 'Follow' ?></a></h5>
+                    <h5>
+                      <a href="timeline.html" class="profile-link"><?=$prediction['name']?></a>
+                      <?php if (!$data['isLogin'] || ($data['isLogin'] && $prediction['user_id'] != $_SESSION['userInfo']['id'])): ?>
+                        <a id="<?='follow-' . $prediction['user_id']?>" style="<?= $isFollowing ?  'cursor:default;' : 'cursor:pointer;' ?>" class="following"><?=$isFollowing ? 'Following': 'Follow' ?></a>
+                      <?php endif ?>
+                   </h5>
                     <p id="<?='date-'.$prediction['id']?>" class="text-muted"></p>
                   </div>
                   <div class="reaction">
                     <a class="btn text-green"><i class="icon ion-thumbsup"></i> 2</a>
                   </div>
                   <div class="line-divider"></div>
-                  <div class="post-text">
-                    <p><?=$prediction['prediction']?></p>
-                  </div>
+                    <div class="post-text">
+                      <p><?=$prediction['prediction']?></p>
+                    </div>
                   <div class="line-divider"></div>
 
                   <div style="margin-bottom: 20px;" class="post-meta">
@@ -162,30 +269,10 @@
   <?php  include 'Pages/common/Footer.php';?>
   <?php include 'Pages/common/Script.php'?>
   <!-- The core Firebase JS SDK is always required and must be listed first -->
-<script src="https://www.gstatic.com/firebasejs/7.15.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/7.15.0/firebase-database.js"></script>
-
-<!-- TODO: Add SDKs for Firebase products that you want to use
-     https://firebase.google.com/docs/web/setup#available-libraries -->
-<script src="https://www.gstatic.com/firebasejs/7.15.0/firebase-analytics.js"></script>
-
-<script>
-  // Your web app's Firebase configuration
-  var firebaseConfig = {
-    apiKey: "AIzaSyCQ7OffeQuUOQlD31h3D0J6EE9kQnXXHvc",
-    authDomain: "betcommunity-7fb66.firebaseapp.com",
-    databaseURL: "https://betcommunity-7fb66.firebaseio.com",
-    projectId: "betcommunity-7fb66",
-    storageBucket: "betcommunity-7fb66.appspot.com",
-    messagingSenderId: "330744767541",
-    appId: "1:330744767541:web:028895b50835bfcc433d7c",
-    measurementId: "G-KTZTRR4ESW"
-  };
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  firebase.analytics();
-</script>
     <script type="text/javascript">var dates=<?=json_encode($data['dates'])?>;</script>
+    <script type="text/javascript">var __allCompetitions=<?=json_encode($data['competitions'])?>;</script>
+    <script type="text/javascript">var __predictionInfo=<?=json_encode($data['predictionInfo'])?>;</script>
+    <script type="text/javascript">var __outcomes=<?=json_encode($data['outcomes'])?>;</script>
     <script src="/bet_community/Public/js/prediction.js"></script>
   </body>
 </html>

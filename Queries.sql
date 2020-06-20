@@ -34,6 +34,7 @@ CREATE TABLE predictions (
     total_odds VARCHAR(100),
     approved boolean NOT NULL,
     approved_by int,
+    type VARCHAR(30),
     PRIMARY KEY(id)
 );
 

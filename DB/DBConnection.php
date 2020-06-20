@@ -17,7 +17,6 @@ class PDOConnection {
             ];
 
             $dbConfig = $this->dbConfig;
-
             $pdo = new PDO('mysql:host=' . $dbConfig['host'] . ";port=" . $dbConfig['port'] . ';dbname=' . $dbConfig['database'], 
             $dbConfig['user'], $dbConfig['password'], $options);
 
@@ -25,7 +24,7 @@ class PDOConnection {
         } catch(Exception $e) {
             // TODO 
             // Determines what to do in catch of open 
-            var_dump($e);
+            var_dump($e->getMessage());
         }
     }
 

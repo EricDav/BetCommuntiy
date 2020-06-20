@@ -3,12 +3,15 @@
     class PredictionModel {
         const PREDICTION_WON = 1;
         const PREDICTION_LOST = 0;
-        public static function createPrediction($pdoConnection, $startDate, $endDate, $userId, $odds, $prediction, $approved) {
+        const APPROVED = 1;
+        const UN_APPROVED = 0;
+        
+        public static function createPrediction($pdoConnection, $startDate, $endDate, $userId, $odds, $prediction, $approved, $type) {
             // var_dump($approved); exit;
             try {
-                $sql = 'INSERT INTO predictions (start_date, end_date, prediction, total_odds, user_id, approved, created_at) VALUES(?,?,?,?,?,?,?)';
+                $sql = 'INSERT INTO predictions (start_date, end_date, prediction, total_odds, user_id, approved, created_at, type) VALUES(?,?,?,?,?,?,?,?)';
                 $stmt= $pdoConnection->pdo->prepare($sql);
-                return $stmt->execute([$startDate, $endDate, $prediction, $odds, $userId, $approved, gmdate("Y-m-d\ H:i:s")]);
+                return $stmt->execute([$startDate, $endDate, $prediction, $odds, $userId, $approved, gmdate("Y-m-d\ H:i:s"), $type]);
             } catch(Exception $e) {
                 var_dump($e->getMessage()); exit;
                 return false;
@@ -23,9 +26,10 @@
                     predictions.end_date, predictions.won, users.id AS user_id, users.name, users.sex, users.image_path
                     FROM predictions 
                     INNER JOIN users ON predictions.user_id = users.id 
-                    WHERE predictions.approved = 0" . self::getQueryPredictionSQL($query, $isOddsQuery) . 
+                    WHERE predictions.approved = " . self::APPROVED . self::getQueryPredictionSQL($query, $isOddsQuery) . 
                     " ORDER BY predictions.start_date desc
                     LIMIT " . $limit . " OFFSET " . $offset . ";";
+                    
 
                   // echo $sql; exit;
                 return $pdoConnection->pdo->query($sql)->fetchAll();

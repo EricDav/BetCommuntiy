@@ -10,11 +10,11 @@
             ),
     
             'production' => array(
-                'user' => 'automob5_automobile_user',
-                'password' => 'Iloveodunayo123',
-                'host' => 'localhost',
-                'database' => 'automob5_automobile',
-                'port' => 3306
+                'user' => 'root',
+                'password' => 'root',
+                'host' => '127.0.0.1',
+                'database' => 'bet_community',
+                'port' => 8889
             )
         );
     }

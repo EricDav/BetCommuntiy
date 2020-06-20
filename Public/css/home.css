@@ -2,6 +2,7 @@
     display: flex;
     flex-direction: row;
 }
+
 #open-prediction-modal {
     outline: none !important;
     width: 100% !important;
@@ -53,3 +54,252 @@
     font-style: italic;
     color: red;
 }
+
+.dot-menu {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.dot-menu > i {
+    font-size: 2rem;
+    margin-right: 15px;
+    margin-top: 15px;
+    cursor: pointer;
+}
+
+#menu-action {
+    left: unset !important;
+}
+
+#menu-action > a {
+    display: block !important;
+    margin-left: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 160;
+}
+
+.nav-tabs > li {
+    width: 33%;
+}
+
+#menu-action > a > i {
+    margin-right: 5px;
+}
+
+.m-body {
+    padding-top: 0px;
+}
+
+.m-body > ul {
+    padding: 0px;
+    margin-left: -15px;
+    margin-right: -15px;
+}
+
+.ul-nav-tabs {
+    height: 50px;
+    margin-left: -15px;
+    margin-right: -15px;
+}
+
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+    border-top: unset !important;
+    color: black;
+    font-size: 1.4rem;
+    font-style: oblique;
+    border-bottom-color: black;
+    border-bottom-style: solid;
+    border-bottom-width: 2px;
+}
+
+#tab-one {
+    border-right-color: transparent;
+    border-right-style: solid;
+    border-right-width: 1px;
+    height: 50px;
+}
+
+#tab-two {
+    border-right-color: transparent !important;
+    border-right-style: solid !important;
+    border-right-width: 1px !important;
+    height: 50px;
+}
+
+#tab-three-id > a {
+    height: 50px;
+}
+
+.input-wrapper {
+    width: 50%;
+}
+
+.input-wrapper-code {
+    margin-left: 10px;
+}
+
+table, th, td {
+    border: 1px solid black;
+}
+
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+}
+
+th {
+    text-align: left;
+}
+
+table {
+    border-spacing: 5px;
+    font-size: 1.2rem;
+    
+}
+
+#prediction-submit {
+    width: 170px;
+}
+
+.booking-not-found {
+    margin-top: 10px;
+    color: red;
+    font-style: oblique;
+    font-weight: 300;
+}
+
+
+  .dropbtn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  /* Dropdown button on hover & focus */
+  .dropbtn:hover, .dropbtn:focus {
+    background-color: #3e8e41;
+  }
+  
+  /* The search field */
+  #myInput {
+    box-sizing: border-box;
+    background-image: url('searchicon.png');
+    background-position: 14px 12px;
+    background-repeat: no-repeat;
+    font-size: 16px;
+    padding: 14px 20px 12px 45px;
+    border: none;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  
+  /* Dropdown Content (Hidden by Default) */
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f6f6f6;
+    /* min-width: 230px; */
+    width: 180;
+    border: 1px solid #ddd;
+    max-height: 300px;
+    overflow: scroll;
+    z-index: 1;
+  }
+  
+  /* Links inside the dropdown */
+  .dropdown-content a {
+    font-size: 1.154rem;
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    cursor: pointer;
+    line-height: 14px;
+  }
+  
+  /* Change color of dropdown links on hover */
+  .dropdown-content a:hover {background-color: white}
+
+  .dropdown-content div:hover {background-color: white}
+  
+  /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
+  .show {display:block;}
+
+  #add-game {
+    width: 100%;
+    border-radius: unset;
+    margin-top: 10px;
+  }
+
+  #fetching-fixtures {
+      display: none;
+      font-size: 1.1rem;
+      font-style: oblique;
+  }
+
+  ::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+    font-size: 1.2rem;
+  }
+  ::-moz-placeholder { /* Firefox 19+ */
+    font-size: 1.2rem;
+  }
+  :-ms-input-placeholder { /* IE 10+ */
+    font-size: 1.2rem;
+  }
+  :-moz-placeholder { /* Firefox 18- */
+    font-size: 1.2rem;
+  }
+
+  .fixture-date {
+    font-size: 1rem;
+    margin-left: 15px;
+    display: inline-block;
+    margin-top: -10px;
+    font-style: oblique;
+    color: #28aae1;
+    line-height: 20px;
+  }
+
+  .fixtures-booking-error {
+    display: none;
+    font-size: 1.2rem;
+    font-style: oblique;
+    color: red;
+    text-align: start;
+    margin-top: -5px;
+    line-height: 15px;
+    margin-top: 8px;
+  }
+
+  .my-input {
+      font-size: 1.2rem;
+  }
+
+  #table-section {
+      margin-bottom: 10px;
+      max-height: 400px;
+      overflow: scroll;
+  }
+
+  @media only screen and (max-width: 800px) {
+    table {
+      font-size: 1rem;
+    }
+    .data-entry {
+        font-size: 1.2rem;
+    }
+
+    #table-section {
+        max-height: 300px;
+    }
+    
+  }

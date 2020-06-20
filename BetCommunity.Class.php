@@ -5,8 +5,9 @@ class BetCommunity {
         '/login' => "LoginController",
         '/api/web/create-prediction' => "CreatePredictionController",
         '/api/web/users-action' => "UserController",
+        '/api/web/bet-games' => "BetGamesController",
+        '/api/web/fixtures' => "FixturesController",
         '/' => "HomeController"
-        
     ];
 
     // saves class name as key and path as value
@@ -21,8 +22,27 @@ class BetCommunity {
         'PDOConnection' => 'DB/DBConnection.php',
         'CreatePredictionController' => 'Controllers/CreatePrediction.Controller.php',
         'PredictionModel' => 'Models/Prediction.Model.php',
-        'HomeController' => 'Controllers/Home.Controller.php'
+        'HomeController' => 'Controllers/Home.Controller.php',
+        'UserController' => 'Controllers/User.Controller.php',
+        'BetGamesController' => 'Controllers/BetGames.Controller.php',
+        'FixturesController' => 'Controllers/Fixtures.Controller.php',
     ];
+
+    const OUTCOMES = array('1', '2', 'X', '1X', '2X', '12', 'GG', 'NG', 'Over 0.5', 'Over 1.5',
+        'Over 2.5', 'Over 3.5', 'Over 4.5', 'Over 5.5', 'Under 0.5', 'Under 1.5', 'Under 2.5',
+        'Under 3.5', 'Under 4.5', 'Under 5.5', '1-0) 1 Handicap', '(2:0) 1 Handicap',
+        '1 Handicap', '(0:2) 1 Handicap', '(1:0) 2 Handicap', '(2:0) 2 Handicap', '(0:1) 2 Handicap',
+        '(0:2) 2 Handicap', '1/X', '1/2', '2/2', '2/1', '1/1', '2/X', 'X/2', 'X/1', 'X/X', 'Over 0.5 HT',
+        '1 HT', 'GG HT', 'Over 1.5 2HT', 'GG 2HT', 'Home Win Either Half (Yes)', 'Home Win Either Half (No)',
+        'Away Win Either Half (Yes)', 'Away Win Either Half (No)', 'Home Scores Either Half (Yes)',
+        'Home Scores Either Half (No)', 'Away Scores Either Half (Yes)', 'Away Scores Either Half (No)',
+        'Home Win Both Half (Yes)', 'Home Win Both Half (No)', 'Away Win Both Half (Yes)', 'Away Win Both Half (No)',
+        '1 & Over 1.5', 'X & Over 2.5', '2 & Under 3.5', '2 & Over 4.5', 'Correct Score 0-0', 'Correct Score 1-0',
+        'Correct Score 1-1', 'Correct Score 2-0', 'Correct Score 2-1', 'Correct Score 2-2', 'Correct Score 3-0',
+        'Correct Score 3-1', 'Correct Score 3-2', 'Correct Score 3-3', 'Correct Score 4-0,', 'Correct Score 4-1',
+        'Correct Score 4-2', 'Correct Score 4-3', 'Correct Score 4-4', 'Correct Score 5-0', 'Correct Score 5-1',
+        'Correct Score 5-2', 'Correct Score 5-3', 'Correct Score 6-0', 'Correct Score 6-1', 'Correct Score 6-2',
+        'Correct Score 7-0', 'Correct Score 7-1');
 
     const countries = array
         (

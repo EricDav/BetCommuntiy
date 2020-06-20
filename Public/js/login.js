@@ -9,6 +9,9 @@ var firstName = $('#firstname');
 var lastName = $('#lastname');
 var city = $('#city');
 var sexMale = $('#sex-male');
+const FOLLOW_ELEMENT_ID_PREFIX = 'follow-';
+const DOT_MENU_ELEMENT_ID_PREFIX = 'dot-menu-'
+
 
 $("#login_button").click(function(){
 
@@ -122,15 +125,14 @@ $('#signup-button').click(function() {
 
 })
 
-
 function removeErrorBorder() {
     if (message != '') {
         $(this).removeClass('invalid');
     }
 }
 
-
 // login email
 $('#my-email').focus(removeErrorBorder);
 $('#my-password').focus(removeErrorBorder);
+
 

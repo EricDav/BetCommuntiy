@@ -4,8 +4,8 @@
         const DEFAULT_COUNTRY = 'Nigeria';
         const DEFAULT_STATE = null;
         const DEFAULT_ROLE = 1;
-        const DEFAULT_IMAGE_PATH_MALE = '/bet_community/Public/images/default_male';
-        const DEFAULT_IMAGE_PATH_FEMALE = '/bet_community/Public/images/default_female';
+        const DEFAULT_IMAGE_PATH_MALE = '/bet_community/Public/images/default_male.png';
+        const DEFAULT_IMAGE_PATH_FEMALE = '/bet_community/Public/images/default_female.png';
 
         public static function getUser($pdoConnection, $email, $password) {
             try {
@@ -59,7 +59,7 @@
                 $sql = 'SELECT * FROM followers WHERE follower_id=' . $userId;
                 return $pdoConnection->pdo->query($sql)->fetchAll();
             } catch(Exception $e) {
-                var_dump($e);
+                var_dump($e); exit;
                 return null;
             }
         }
@@ -71,8 +71,62 @@
                 // echo $sql; exit;
                 return $pdoConnection->pdo->query($sql)->fetchAll();
             } catch(Exception $e) {
-                var_dump($e);
+                var_dump($e); exit;
                 return null;
+            }
+        }
+
+        public static function addFollower($pdoConnection, $followerId, $userId) {
+            try {
+                $sql = 'INSERT INTO followers (follower_id, user_id) VALUES(' . $followerId . ',' . $userId . ')';
+                $pdoConnection->pdo->query($sql);
+                return true;
+            } catch(Exception $e) {
+                var_dump($e); 
+                return false;
+            }
+        }
+
+        public static function getFollower($pdoConnection, $followerId, $userId) {
+            try {
+                $sql = 'SELECT * FROM followers WHERE user_id=' . $userId . ' AND follower_id=' . $followerId;
+                return $pdoConnection->pdo->query($sql)->fetchAll();
+            } catch(Exception $e) {
+                var_dump($e);
+                return false;
+            }
+        }
+
+        public static function removeFollower($pdoConnection, $followerId, $userId) {
+            try {
+                $sql = 'DELETE FROM followers WHERE user_id=' . $userId . ' AND follower_id=' . $followerId;
+                $pdoConnection->pdo->query($sql);
+                return true;
+            } catch(Exception $e) {
+                var_dump($e);
+                return false;
+            }
+        }
+
+        public static function like($pdoConnection, $predictionId, $userId) {
+            try {
+                $sql = 'INSERT INTO likes (prediction_id, user_id) VALUES(' . $predictionId . ',' . $userId . ')';
+                $pdoConnection->pdo->query($sql);
+                return true;
+            } catch(Exception $e) {
+                var_dump($e);
+                return false;
+            }
+        }
+
+        public static function unlike($pdoConnection, $predictionId, $userId) {
+            try {
+                $sql = 'DELETE FROM likes WHERE prediction_id=' . $predictionId . ' AND user_id=' . $userId;
+                $pdoConnection->pdo->query($sql);
+                return true;
+            } catch(Exception $e) {
+                var_dump($e);
+                return false;
             }
         }
     }

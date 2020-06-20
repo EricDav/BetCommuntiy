@@ -57,6 +57,7 @@
 
         public function perform() {
             if ($this->request->method == 'GET') {
+                $competitions = json_decode(file_get_contents(__DIR__  . '/../JsonData/competitions.json'));
                 $this->pdoConnection->open();
                 $isProblemWhileFecthingData = false;
                 $followers = array();
@@ -85,6 +86,7 @@
                     $count = $predictions ? $predictions[0]['total'] : 0; // total number of predictions in the system
                     $this->data['paginationHtml'] = $this->generatePaginationNum($count, $this->pageNum);
                     $this->setDateCreatedUTC($predictions);
+                    $this->setPredictionInfo($predictions);
                     $this->data['template'] = 'Home.php';
                     $this->data['title'] = 'Home';
                     $this->data['predictionLostQuery'] = self::LOST_PREDICTION_QUERY;
@@ -93,6 +95,9 @@
                     $this->data['homeNum'] = self::HOME_FILTER;
                     $this->data['correctNum'] = self::CORRECT_FILTER;
                     $this->data['lostNum'] = self::LOST_FILTER;
+                    $this->data['supportedBettingPlatforms'] = BetGamesController::SUPPORTED_BETTING_PLATFORMS;
+                    $this->data['competitions'] = $competitions->data->competition;
+                    $this->data['outcomes'] = BetCommunity::OUTCOMES;
                     if ($this->isOddsFilter) {
                         $minMax = explode('_', $this->query);
                         $this->data['min'] = $minMax[0];
@@ -110,7 +115,6 @@
                 $this->data['title'] = '404';
                 $this->responseType = 'html';        
             }
-            $this->setToken();
         }
 
         public function getFeaturedUsers() {
@@ -125,7 +129,18 @@
             $this->data['dates'] = $dates;
         }
 
+        /**
+         * @param user_id the id of the user we want to know 
+         * if the current user is following.
+         * 
+         * Checks if a user is among the users the current 
+         * user is following
+         */
         public function isFollowing($userId) {
+            if (!$this->isLogin())
+                false;
+            
+            $data = $this->data;
             if (sizeof($data['followers']) == 0) 
                 return false;
             foreach($data['followers']  as $follower) {
@@ -207,6 +222,29 @@
                         return '<b style="color:black;">' . $text . '</b>';
                     return $text;
             }           
+        }
+
+        /**
+         * This functions set the user_i, prediction_id of 
+         * the prediction. It is used at the client side to make 
+         * onclick events for following and liking users.
+         * 
+         * Note: This function should come after the when we 
+         * have all the followers, or we have called the getFollowers method.
+         */
+        public function setPredictionInfo($predictions) {
+            $predictionInfo = array();
+
+            foreach($predictions as $prediction):
+                $firstName = explode(' ', $prediction['name'])[0];
+                array_push($predictionInfo, array('user_id' => $prediction['user_id'], 
+                    'prediction_id' => $prediction['id'],
+                    'isFollowing_author' => $this->isFollowing($prediction['user_id']),
+                    'first_name' => $firstName
+                ));
+            endforeach;
+
+            $this->data['predictionInfo'] = $predictionInfo;
         }
     }
 
