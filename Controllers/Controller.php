@@ -23,9 +23,13 @@ abstract class Controller {
         $this->error = array();
     }
 
-    public function authenticate() {
-        $token = isset($this->request->postData['token']) ? $this->request->postData['token'] : $this->request->query['token'];
-        $id = isset($this->request->postData['id']) ? $this->request->postData['id'] : $this->request->query['id'];
+    public function authenticate($id=null, $token=null) {
+
+        if (!$token)
+            $token = isset($this->request->postData['token']) ? $this->request->postData['token'] : $this->request->query['token'];
+        
+        if (!$id)
+            $id = isset($this->request->postData['id']) ? $this->request->postData['id'] : $this->request->query['id'];
 
         // check if user is logged in
         if (!isset($this->request->session['userInfo'])) {
@@ -82,6 +86,48 @@ abstract class Controller {
         header('Content-Type: application/json');
         echo json_encode($response);
         exit;
+    }
+
+    public function setDateCreatedUTC($predictions) {
+        $dates = array();
+        foreach($predictions as $prediction) {
+            array_push($dates, array('date_created' => $prediction['created_at'], 'id' => $prediction['id']));
+        }
+        $this->data['dates'] = $dates;
+    }
+    
+    /**
+    * @param user_id the id of the user we want to know 
+    * if the current user is following.
+    * 
+    * Checks if a user is among the users the current 
+    * user is following
+    */
+    public function isFollowing($userId) {
+        if (!$this->isLogin())
+            false;
+            
+        $data = $this->data;
+        if (sizeof($data['followers']) == 0) 
+            return false;
+        foreach($data['followers']  as $follower) {
+            if ($userId == $follower['user_id']) 
+                return true;
+        }
+    }
+
+    public function setUserSession($name, $email, $specialId, $id, $role, $imagePath, $phoneNumber) {
+        $userInfo = array(
+            'id' => $id,
+            'name' => $name,
+            'email' => $email,
+            'specialId' => $specialId,
+            'role' => $role,
+            'imagePath' => $imagePath,
+            'phoneNumber' => $phoneNumber,
+        );
+
+        $_SESSION['userInfo'] = $userInfo;
     }
 
     abstract function validate();

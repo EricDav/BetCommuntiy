@@ -75,8 +75,6 @@
                 
                 if ($this->isLogin()) {
                     $followers = UserModel::getFollowers($this->pdoConnection, $this->request->session['userInfo']['id']);
-                    //if (!$followers)
-                      //  $isProblemWhileFecthingData = true;
                 }
 
                 if (!$isProblemWhileFecthingData) {
@@ -119,34 +117,6 @@
 
         public function getFeaturedUsers() {
             $featuredUsers = UserModel::getFeaturedUsers($this->pdoConnection);
-        }
-
-        public function setDateCreatedUTC($predictions) {
-            $dates = array();
-            foreach($predictions as $prediction) {
-                array_push($dates, array('date_created' => $prediction['created_at'], 'id' => $prediction['id']));
-            }
-            $this->data['dates'] = $dates;
-        }
-
-        /**
-         * @param user_id the id of the user we want to know 
-         * if the current user is following.
-         * 
-         * Checks if a user is among the users the current 
-         * user is following
-         */
-        public function isFollowing($userId) {
-            if (!$this->isLogin())
-                false;
-            
-            $data = $this->data;
-            if (sizeof($data['followers']) == 0) 
-                return false;
-            foreach($data['followers']  as $follower) {
-                if ($userId == $follower['user_id']) 
-                    return true;
-            }
         }
 
         /**
@@ -227,7 +197,8 @@
         /**
          * This functions set the user_i, prediction_id of 
          * the prediction. It is used at the client side to make 
-         * onclick events for following and liking users.
+         * onclick events for following and liking users. And also
+         * used for displaying prediciton data
          * 
          * Note: This function should come after the when we 
          * have all the followers, or we have called the getFollowers method.
@@ -240,11 +211,17 @@
                 array_push($predictionInfo, array('user_id' => $prediction['user_id'], 
                     'prediction_id' => $prediction['id'],
                     'isFollowing_author' => $this->isFollowing($prediction['user_id']),
-                    'first_name' => $firstName
+                    'first_name' => $firstName,
+                    'prediction' => $prediction['prediction'],
+                    'prediction_type' => $prediction['type']
                 ));
             endforeach;
 
             $this->data['predictionInfo'] = $predictionInfo;
+        }
+
+        public function formatPredictionJson($predictionJson) {
+            $predictions = json_decode($predictionJson);
         }
     }
 

@@ -301,5 +301,26 @@ table {
     #table-section {
         max-height: 300px;
     }
-    
+  }
+
+  .bet-info {
+      display: flex;
+      margin-left: 10px;
+      flex-direction: column;
+      font-size: 1.3rem;
+  }
+
+  .bet-info span {
+    font-style:oblique;
+    margin-left: 5px;
+    color: black;
+  }
+
+  .bet-info div {
+    color: black;
+    font-size: 1.2rem;
+  }
+
+  .post-text {
+      margin-left: -10px !important;
   }

@@ -1,0 +1,77 @@
+.basic-info-profile {
+    display: flex;
+    flex-direction: column;
+}
+
+.basic-info-profile  > div > span >i {
+    font-size: 2rem;
+    margin-right: 10px;
+    
+}
+
+ em {
+    color: #b3b3b3;
+}
+.error-messages {
+    color: red; 
+    font-style: oblique; 
+    text-align: center;
+}
+
+#submit-update-btn {
+    margin-top: -15px;
+    outline: none;
+}
+
+/* Main container */
+.overlay-image {
+    position: relative;
+    width: 100%;
+   }
+   /* Original image */
+   .overlay-image .image {
+    display: block;
+    width: 100%;
+    height: auto;
+   }
+   /* Original text overlay */
+   .overlay-image .text {
+    color: #fff;
+    font-size: 2rem;
+    line-height: 1.5em;
+    text-shadow: 2px 2px 2px #000;
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+   }
+
+   /********* Overlay on hover *******/
+/* New overlay on hover */
+.overlay-image .hover {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    opacity: 0;
+    transition: .5s ease;
+    border-radius: 50%;
+    cursor: pointer;
+   }
+   /* New overlay appearance on hover */
+   .overlay-image:hover .hover {
+    opacity: 1;
+   }
+
+   .overlay-image .normal {
+    transition: .5s ease;
+   }
+   .overlay-image:hover .normal {
+    opacity: 0;
+   }
+   .overlay-image .hover {
+    background-color: rgba(0,0,0,0.5);
+   }   
+

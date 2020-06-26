@@ -1,4 +1,8 @@
 <?php
+    /**
+     * This class is responsible for fetching the games 
+     * of some betting platform.
+     */
     class BetGamesController extends Controller {
         const PLATFORM_BET9JA = 'Bet9ja';
         const PLATFORM_BETKING = 'BetKing';

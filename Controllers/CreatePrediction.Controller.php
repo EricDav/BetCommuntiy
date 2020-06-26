@@ -34,11 +34,11 @@
             $endDate = $endDateTimeArr[0];
             $endTime = $endDateTimeArr[1];
 
-            if ($this->validateDateTime($startDate, $startTime)) {
+            if (!$this->isValidateDateTime($startDate, $startTime)) {
                 $this->error['start_date_time'] = 'Invalid game start date time';
             }
 
-            if ($this->validateDateTime($endDate, $endTime)) {
+            if (!$this->isValidateDateTime($endDate, $endTime)) {
                 $this->error['end_date_time'] = 'Invalid game end date time';
             }
 
@@ -57,26 +57,25 @@
             } else if ($this->startDateTime && $this->type != BetGamesController::PLATFORM_BET9JA &&  gmdate("Y-m-d\ H:i:s") > $this->startDateTime) {
                 $this->error['prediction'] = 'At least the first game has begun.';
             } else {
-
-                if ($this->type == BetGamesController::PLATFORM_BETKING) {
+                if (sizeof($this->error) == 0 && $this->type == BetGamesController::PLATFORM_BETKING) {
                     if (!$this->validateBetKingPredictionJson($this->prediction)['success']) {
                         $this->error['prediction'] = 'Something is wrong with prediction json';
                     }
                 }
 
-                if ($this->type == BetGamesController::PLATFORM_SPORTY_BET) {
+                if (sizeof($this->error) == 0 && $this->type == BetGamesController::PLATFORM_SPORTY_BET) {
                     if (!$this->validateSportyBetPredictionJson($this->prediction)['success']) {
                         $this->error['prediction'] = 'Something is wrong with prediction json';
                     }
                 }
 
-                if ($this->type == BetGamesController::PLATFORM_BET9JA) {
-                    if (!$this->getDatesForBet9jaBooking($this->prediction)) {
-                        $this->error['prediction'] = 'Something is wrong with prediction json';
-                    }
-                }
+                // if ($this->type == BetGamesController::PLATFORM_BET9JA) {
+                //     if (!$this->getDatesForBet9jaBooking($this->prediction)) {
+                //         $this->error['prediction'] = 'Something is wrong with prediction json';
+                //     }
+                // }
 
-                if ($this->type == 'fixtures') {
+                if (sizeof($this->error) == 0 && $this->type == 'fixtures') {
                     if($this->validateFixtureJson($this->prediction)['']) {
                         $this->error['prediction'] = 'Something is wrong with prediction json';
                     }
@@ -122,10 +121,12 @@
          * 
          * take date and time as parameters in this form Y/m/d H:s
          */
-        public function validateDateTime($date, $time) {
+        public function isValidateDateTime($date, $time) {
             $dateArr = explode('-', $date);
+            $timeArr = explode(':', $time);
+            $time = $timeArr[0] . ':' . $timeArr[1]; // Enforce time to be in the format HH:mm
             $isValiddate = checkdate($dateArr[1], $dateArr[2], $dateArr[0]);
-            $isValidTime = preg_match("/^(?:2[0-3]|[01][0-9]):[0-5][0-9]$/", $time);
+            $isValidTime = preg_match("/^(?:2[0-3]|[01][0-9]):[0-5][0-9]$/", $time);  // Checks if a time is valid in this format HH:mm
 
             if ($isValiddate && $isValidTime) 
                 return true;
@@ -214,63 +215,6 @@
             return array('success' => true);
         }
 
-        public function getDatesForBet9jaBooking($predictionJson) {
-            $dataFromClient = json_decode($predictionJson);
-            $fixtures = $dataFromClient->fixtures;
-            $homeAwayFixtures = array(); // fixtures with home and away team in an object e.g [{homeTeam: Chelsea, awayTeam: Barca}]
-
-            /**
-             * retrieve fixtures in the homeTeam and awayTeam form
-             * strore each in an array e.g of a fixture ==> array('homeTeam': Chelsea, 'awayTeam': Liverpool)
-             * $homeAwayFixtures will be an array of the example above e.g [array('homeTeam': Chelsea, 'awayTeam': Liverpool)]
-             */
-            foreach($fixtures as $fixture):
-                $homeAway = explode('-', $fixture);
-                array_push($homeAwayFixtures, array('homeTeam' => trim($homeAway[0]), 'awayTeam' => trim($homeAway[1])));
-            endforeach;
-
-            $dateTimeCompetetionArr = array();
-
-            $url = 'https://livescore-api.com/api-client/fixtures/matches.json?key=I6AUQWWnzLs6X5Jp&secret=EsdilZDQwoq6EpLnvmhmjeJSZcZXiImW';
-            $liveFixtures = json_decode(file_get_contents($url));
-            $keepSearching = true;
-            $page = 1;
-
-            while ($keepSearching) {
-                // network error 
-                if (!$liveFixtures)  {
-                    $liveFixtures = json_decode(file_get_contents($url));
-                    continue;
-                }
-
-                foreach($liveFixtures->data->fixtures as $liveFixture) {
-                    foreach($homeAwayFixtures as $homeAwayFixture) {
-                        if ($this->determineMatch($liveFixture->home_name, $liveFixture->away_name, $homeAwayFixture)) {
-                            array_push($dateTimeCompetetionArr, array('date_time' => $feat->date . ' ' . $feat->time, 'competition_id' => $feat->competition_id));
-                            break;
-                        }
-                    }
-
-                }
-
-                if (!$liveFixtures->data->next_page) {
-                    $keepSearching = false;
-                    break;
-                }
-
-                if (sizeof($dateTimeCompetetionArr) == sizeof($homeAwayFixtures)) {
-                    $keepSearching = false;
-                    break;
-                }
-
-                $url = $liveFixtures->data->next_page;
-                // echo $url;
-        
-                $liveFixtures = json_decode(file_get_contents($url));
-                $page+=1;
-            }
-        }
-
         public function validateFixtureJson($predictionJson) {
             $competitionFixtures = array();
             $competitionIds = array();
@@ -353,7 +297,6 @@
                 return true;
             
             return false;
-
         }
     }
 

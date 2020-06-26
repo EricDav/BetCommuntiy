@@ -33,6 +33,7 @@ CREATE TABLE predictions (
     created_at DATETIME NOT NULL,
     total_odds VARCHAR(100),
     approved boolean NOT NULL,
+    scores_finished boolean,
     approved_by int,
     type VARCHAR(30),
     PRIMARY KEY(id)

@@ -35,5 +35,6 @@
         <?php
             include 'Pages/common/Footer.php';
         ?>
+        <?php include 'Pages/common/Script.php'?>
     </body>
 </html>

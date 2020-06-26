@@ -1,12 +1,17 @@
 <?php
 
 class BetCommunity {
+    const IMAGES_PATH = "/bet_community/Public/images/users/";
+    const DEFAULT_ADD_PROFILE = 180191;
     const routes = [
         '/login' => "LoginController",
         '/api/web/create-prediction' => "CreatePredictionController",
         '/api/web/users-action' => "UserController",
         '/api/web/bet-games' => "BetGamesController",
         '/api/web/fixtures' => "FixturesController",
+        '/api/web/results' => "ResultsController",
+        '/users/profile' => "UserProfileController",
+        '/api/web/update-profile' => "UpdateUserProfileController",
         '/' => "HomeController"
     ];
 
@@ -26,6 +31,9 @@ class BetCommunity {
         'UserController' => 'Controllers/User.Controller.php',
         'BetGamesController' => 'Controllers/BetGames.Controller.php',
         'FixturesController' => 'Controllers/Fixtures.Controller.php',
+        'ResultsController' => 'Controllers/Results.Controller.php',
+        'UserProfileController' => 'Controllers/UserProfile.Controller.php',
+        'UpdateUserProfileController' => 'Controllers/UpdateUserProfile.Controller.php',
     ];
 
     const OUTCOMES = array('1', '2', 'X', '1X', '2X', '12', 'GG', 'NG', 'Over 0.5', 'Over 1.5',

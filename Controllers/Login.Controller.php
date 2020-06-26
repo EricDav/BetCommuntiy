@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * @Route /login
+ * 
  * This class handles both the signup and 
  * the signin or login action. The difference between the two 
  * is by the parameter `type`. if login the parmeter will ne `login`
@@ -98,7 +100,7 @@ class LoginController extends Controller {
                 if (!$user || !password_verify($this->request->postData['password'], $user['password']))
                     $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_UNAUTHORIZED_CODE,  'message' => 'Invalid username or password'));
                 
-                $this->setUserSession($user['name'], $user['email'], $user['special_id'], $user['id'], $user['role'], $user['image_path']);
+                $this->setUserSession($user['name'], $user['email'], $user['special_id'], $user['id'], $user['role'], $user['image_path'], $user['phoneNumber']);
                 $this->jsonResponse(array('success' => true, 'code' => Controller::HTTP_OKAY_CODE, 'message' => 'User successfuly logs in'));
             }
 
@@ -122,25 +124,12 @@ class LoginController extends Controller {
             
             if ($result) {
                 $imagePath = $sex == 'M' ? UserModel::DEFAULT_IMAGE_PATH_MALE : UserModel::DEFAULT_IMAGE_PATH_FEMALE;
-                $this->setUserSession($name, $this->request->postData['email'], $result['specialId'], $result['id'], 1, $imagePath);
+                $this->setUserSession($name, $this->request->postData['email'], $result['specialId'], $result['id'], 1, $imagePath, null);
                 $this->jsonResponse(array('success' => true, 'code' => Controller::HTTP_OKAY_CODE, 'message' => 'User successfuly signs up'));
             }
 
             $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_SERVER_ERROR_CODE, 'message' => 'Server error'));
         }
-    }
-
-    public function setUserSession($name, $email, $specialId, $id, $role, $imagePath) {
-        $userInfo = array(
-            'id' => $id,
-            'name' => $name,
-            'email' => $email,
-            'specialId' => $specialId,
-            'role' => $role,
-            'imagePath' => $imagePath
-        );
-
-        $_SESSION['userInfo'] = $userInfo;
     }
 }
 

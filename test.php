@@ -1,3 +1,4 @@
 <?php
-    var_dump(file_exists(__DIR__ . '/JsonData/fixtures/b')); exit;
+    $me = null;
+    var_dump(isset($me)); exit;
 ?>

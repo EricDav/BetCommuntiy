@@ -41,7 +41,6 @@ $bookingCodetab = $('#booking-code-tab');
  * Register onclick for the tabs. 
  * It set the current tab
  */
-
 $('#tab-one-id').click(function() {
     if (currentTab == FIXTURES_TAB) {
         $('#fixtures-tab').hide();
@@ -87,9 +86,71 @@ $('#tab-three-id').click(function() {
  * is made. 
  */
 dates.forEach(function(item, index) {
-    date = new Date(item.date_created + ' UTC');
+    date = new Date(item.date_created.replace(/-/g, '/') + ' UTC');
     $('#date-' + item.id.toString()).text(formatDateCreated(date));
 });
+
+
+/**
+ * It displays prediction data
+ */
+__predictionInfo.forEach(function (item, index) {
+    var prediction = JSON.parse(item.prediction);
+    // console.log(prediction);
+    item.prediction = prediction;
+    $('#prediction-info-' + item.prediction_id).append(generatePredictionInfoHtml(prediction, item.prediction_type));
+    $('#prediction-' + item.prediction_id).append(generatePredictionTable(prediction));
+});
+
+console.log(__predictionInfo);
+
+function calculateOdds(odds) {
+    console.log(odds);
+    resultOdds = 1;
+
+    odds.forEach(function(odd) {
+        resultOdds*=Number.parseFloat(odd);
+    });
+
+    console.log(resultOdds);
+
+    return resultOdds.toFixed(2);
+}
+
+function generatePredictionInfoHtml(prediction, predictionType) {
+    console.log(predictionType);
+    $html = '<div>No.Selection:<span><b>' + prediction.leagues.length.toString() + '</b></span></div>';
+    if (prediction.bet_code) {
+        $html +='<div>Selection Type:<span><b>' + predictionType + '</b></span></div>';
+        $html +='<div>Booking Code:<span><b>' + prediction.bet_code + '</b></span></div>';
+        $html +='<div>Total Odds:<span><b>' + calculateOdds(prediction.odds) + '</b></span></div>';
+    }
+    return $html;
+}
+
+function generatePredictionTable(data) {
+    $table = '<table style="width:100%; margin-top: 10px; border:unset;">' +
+                 '<tr style="border:unset;"><th style="border:unset;">Date/Time</th><th style="border:unset;">League</th><th style="border:unset;">Fixture</th><th style="border:unset;">Oucome</th></tr>';
+    
+    data.leagues.forEach(function(item, index) {
+        if (data.dates) {
+            var dateStr = data.dates[index] + ' UTC';
+            var date = new Date(dateStr.replace(/-/g, '/'));
+        }
+
+        $table += '<tr style="border:unset;">' + '<td style="border:unset;">' + (data.dates ? formatDateCreated(date) : 'NS') + '</td>' + '<td style="border:unset;">' + item + '</td>' + '<td style="border:unset;">' + data.fixtures[index] + '</td>' + 
+            '<td style="border:unset;">' + data.outcomes[index] + '</td>';
+    });
+
+    $table += '</table>';
+    return $table;
+}
+
+function diff_minutes(dt2, dt1) {
+    var diff =(dt2.getTime() - dt1.getTime()) / 1000;
+    diff /= 60;
+    return Math.abs(Math.round(diff));
+}
 
 
 $('#prediction-submit').click(function() {
@@ -109,6 +170,7 @@ $('#prediction-submit').click(function() {
 
     if (shouldSubmitPrediction && currentTab == BOOKING_NUMBER_TAB) {
         console.log('Inside FISRT TAB');
+        console.log(predictionRes);
         savePrediction(predictionRes);
     }
 
@@ -126,7 +188,7 @@ $('#prediction-submit').click(function() {
         var endStart = getStartEndDateTime(data.dates);
         var utcArr = getDateTimeStrInUTC(new Date()).split(' ');
         var startDateTimeArr = endStart.startDateTime.split(' ');
-        
+
         var startDateArr = startDateTimeArr[0].split('-');
         var startTimeArr = startDateTimeArr[1].split(':');
 
@@ -137,9 +199,7 @@ $('#prediction-submit').click(function() {
         var nowDateInUTC = new Date(Number.parseInt(dateArr[0]), Number.parseInt(dateArr[1]), Number.parseInt(dateArr[2]), Number.parseInt(timeArr[0]), Number.parseInt(timeArr[1]));
         var dateTimeInUTC = new Date(Number.parseInt(startDateArr[0]), Number.parseInt(startDateArr[1]), Number.parseInt(startDateArr[2]), Number.parseInt(startTimeArr[0]), Number.parseInt(startTimeArr[1]));
 
-        console.log(nowDateInUTC);
-        console.log(dateTimeInUTC);
-        console.log();
+         
         if (nowDateInUTC >= dateTimeInUTC) {
             alert('First match has started');
             return;
@@ -592,7 +652,7 @@ function fetchBet9jaGames(code, target) {
                 bet_code: code
             };
 
-            $('#booking-code-tab').prepend(generateTable(data));
+            $('#booking-code-tab').append(generateTable(data));
             predictionButton.text('Submit Prediction');
             isResultDisplayed = true;
             $('#booking-number').prop('disabled', true);
@@ -688,7 +748,7 @@ function fetchBetKingGames(code) {
                 bet_code: code
             };
 
-            $('#m-body-id').append(generateTable(data));
+            $('#booking-code-tab').append(generateTable(data));
             predictionButton.text('Submit Prediction');
             isResultDisplayed = true;
             $('#booking-number').prop('disabled', true);
@@ -719,6 +779,9 @@ function fetchSportyBetGames(code) {
         return;
     }
 
+    predictionButton.text('Loading games...');
+    predictionButton.prop('disabled', true);
+
     $.ajax('/api/web/bet-games', {
         type: 'GET', data: {code: code, type: PLATFORM_SPORTY_BET, token: localStorage.getItem('$$token'),id: $$id },
          success: function(result) {
@@ -727,6 +790,8 @@ function fetchSportyBetGames(code) {
             var outcomes = [];
             var odds = [];
             var dates = [];
+            predictionButton.text('Submit');
+            predictionButton.prop('disabled', false);
 
             if (result.data.innerMsg != 'success') {
                 modalBodyElem.append('<div class="booking-not-found">Invalid booking code</div>');
@@ -740,7 +805,7 @@ function fetchSportyBetGames(code) {
                 if (item.matchStatus == 'Not start') {
                     leagues.push(item.sport.category.tournament.name);
                     fixtures.push(item.homeTeamName + ' - ' + item.awayTeamName);
-                    outcomes.push(item.markets[0].outcomes[0].desc);
+                    outcomes.push(item.markets[0].desc + ' - ' + item.markets[0].outcomes[0].desc);
                     odds.push(item.markets[0].outcomes[0].odds);
                     var date = new Date(item.estimateStartTime);
                     dates.push(getDateTimeStrInUTC(date));
@@ -767,7 +832,7 @@ function fetchSportyBetGames(code) {
                 bet_code: code
             };
 
-            $('#m-body-id').append(generateTable(data));
+            $('#booking-code-tab').append(generateTable(data));
             predictionButton.text('Submit Prediction');
             isResultDisplayed = true;
             $('#booking-number').prop('disabled', true);
@@ -808,7 +873,7 @@ function getStartEndDateTime(dates) {
 function generateTable(data) {
     // bet 1 ZSSLMKR
     // bet 2 
-    $table = '<div id="table-section"><table style="width:100%; margin-top: 10px;">' +
+    $table = '<div id="booking-code-table-section"><table style="width:100%; margin-top: 10px;">' +
                  '<tr><th>League</th><th>Fixture</th><th>Oucome</th><th>Odd</th></tr>';
     
     data.leagues.forEach(function(item, index) {
@@ -822,7 +887,7 @@ function generateTable(data) {
 }
 
 function removeBookingTable() {
-    bookingCodetabFisrtElement = $('#booking-code-tab').children()[0]; // get the first element
+    bookingCodetabFisrtElement = $('#booking-code-table-section'); // get the first element
     $(bookingCodetabFisrtElement).remove();
     $('#booking-number').prop('disabled', false);
     $('#betting-type').prop('disabled', false);

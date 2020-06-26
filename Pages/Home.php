@@ -151,7 +151,6 @@
               <li><i class="fa fa-spinner"></i><div><a href="<?='/?filter_option=' . $data['predictionInprogressQuery']?>"><?=$controllerObject->formatFilterText('Predictions In-progress', $data['inprogressNum'])?></a></div></li>
             </ul><!--news-feed links ends-->
             <div id="chat-block" class="" style="">
-              
               <label class="odds-label">Min Odds</label>
               <input id="min_odd"  type="text" class="form-control" value="<?=$data['min']?>">
               <p id="min-error-text" class="odd_error"></p>
@@ -201,11 +200,11 @@
               </div>
             </div>
               <div style="padding-top: 10px;" class="post-container">
-              <img src="<?=$prediction['image_path']?>" alt="user" class="profile-photo-md pull-left">
+              <img style="object-fit: cover;" src="<?=BetCommunity::IMAGES_PATH . $prediction['image_path']?>" alt="user" class="profile-photo-md pull-left">
                 <div class="post-detail">
                   <div class="user-info">
                     <h5>
-                      <a href="timeline.html" class="profile-link"><?=$prediction['name']?></a>
+                      <a href="<?='/users/profile?id=' . (string)(BetCommunity::DEFAULT_ADD_PROFILE + $prediction['user_id']) ?>"><?=$prediction['name']?></a>
                       <?php if (!$data['isLogin'] || ($data['isLogin'] && $prediction['user_id'] != $_SESSION['userInfo']['id'])): ?>
                         <a id="<?='follow-' . $prediction['user_id']?>" style="<?= $isFollowing ?  'cursor:default;' : 'cursor:pointer;' ?>" class="following"><?=$isFollowing ? 'Following': 'Follow' ?></a>
                       <?php endif ?>
@@ -216,8 +215,8 @@
                     <a class="btn text-green"><i class="icon ion-thumbsup"></i> 2</a>
                   </div>
                   <div class="line-divider"></div>
-                    <div class="post-text">
-                      <p><?=$prediction['prediction']?></p>
+                    <div id ="<?='prediction-' . $prediction['id']?>" class="post-text">
+                      <div id="<?='prediction-info-' . $prediction['id']?>"  class="bet-info"></div>
                     </div>
                   <div class="line-divider"></div>
 
@@ -229,8 +228,7 @@
                             <span class="status"><b>Status:</b><strong><i><?=$controllerObject->getPredictionStatus($prediction)?></i></strong></span>
                         </div>
                       </div>
-                            
-                    </div>
+                  </div>
                   <!-- <div class="post-comment">
                     <img src="images/users/user-10.jpg" alt="" class="profile-photo-sm">
                     <p><a href="timeline.html" class="profile-link">Julia </a>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga.</p>

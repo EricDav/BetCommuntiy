@@ -17,20 +17,27 @@
           <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav navbar-right main-menu">
               <li class="dropdown">
-                <a href="/" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Home</a>
+                <a href="/">Home</a>
               </li>
               <li class="dropdown">
-                <a href="/about" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">About Us</a>
+                <a href="/about">About Us</a>
               </li>
               <li class="dropdown"><a href="/contact">Contact</a></li>
-              <?php if (!$data['isLogin']): ?>
+              <?php if (!isset($_SESSION['userInfo'])): ?>
                 <li class="dropdown"><a href="/login">Login</a></li>
               <?php endif ?>
 
-              <?php if ($data['isLogin']): ?>
-                <li class="dropdown"><a href="/my-profile">My Profile</a></li>
+              <?php if ($_SESSION['userInfo']): ?>
+                <li class="dropdown">
+                  <a style="margin-top: -2px;" href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    <span style="margin-right: 5px;"><img id="header-image" style="width: 20; height: 20; border-radius: 10px; object-fit: cover;" src="<?=BetCommunity::IMAGES_PATH . $request->session['userInfo']['imagePath']?>" alt=""></span>My Profile
+                  </a>
+                  <ul class="dropdown-menu newsfeed-home">
+                    <li><a href="<?='/users/profile?id=' . (string)(BetCommunity::DEFAULT_ADD_PROFILE + (int)$_SESSION['userInfo']['id']) ?>">View Profile</a></li>
+                    <li><a href="">Logout</a></li>
+                  </ul>
+                </li>
                 <li class="dropdown"><a href="/my-profile"><i style="font-size: 2rem; margin-top: 2px;" class="fa fa-bell"></i></a></li>
-                <li class="dropdown"><a href="/my-profile">Logout</a></li>
               <?php endif ?>
 
             </ul>

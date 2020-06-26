@@ -19,6 +19,10 @@
             if ($this->callApi()) {
                 $page = 1;
                 $data = json_decode(file_get_contents('https://livescore-api.com/api-client/fixtures/matches.json?key=I6AUQWWnzLs6X5Jp&secret=EsdilZDQwoq6EpLnvmhmjeJSZcZXiImW&competition_id=' . $this->competitionId));
+                $next_page = $data->data->next_page;
+
+                $data->data->next_page = null;
+                $data->data->prev_page = null;
                 array_push($results, $data->data);
                 while (true) {
 
@@ -34,11 +38,14 @@
                         break;
                     }
 
-                    if (!$data->data->next_page) {
+                    if (!$next_page) {
                         break;
                     }
-
-                    $data = json_decode(file_get_contents($data->data->next_page));
+                    
+                    $data = json_decode(file_get_contents($next_page));
+                    $next_page = $data->data->next_page;
+                    $data->data->next_page = null;
+                    $data->data->prev_page = null;
                     array_push($results, $data->data);
 
                     $page+=1;

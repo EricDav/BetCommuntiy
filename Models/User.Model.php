@@ -4,17 +4,52 @@
         const DEFAULT_COUNTRY = 'Nigeria';
         const DEFAULT_STATE = null;
         const DEFAULT_ROLE = 1;
-        const DEFAULT_IMAGE_PATH_MALE = '/bet_community/Public/images/default_male.png';
-        const DEFAULT_IMAGE_PATH_FEMALE = '/bet_community/Public/images/default_female.png';
+        const DEFAULT_IMAGE_PATH_MALE = 'default_male.png';
+        const DEFAULT_IMAGE_PATH_FEMALE = 'default_female.png';
 
         public static function getUser($pdoConnection, $email, $password) {
             try {
                 $sql = 'SELECT * FROM users WHERE email=? AND password=?';
                 $stmt= $pdoConnection->pdo->prepare($sql);
                 $stmt->execute([$email, $password]);
-                $stmt->fetch();
+                return $stmt->fetchAll();
             } catch(Exception $e) {
                 return 'Server error';
+            }
+        }
+
+        public static function getUserByEmailPhone($pdoConnection, $email, $phoneNumber) {
+            try {
+                $sql = 'SELECT * FROM users WHERE email=? AND phone_number=?';
+                $stmt= $pdoConnection->pdo->prepare($sql);
+                $stmt->execute([$email, $phoneNumber]);
+                return $stmt->fetchAll();
+            } catch(Exception $e) {
+                return 'Server error';
+            }
+        }
+
+        public static function getUserByPhoneNumber($pdoConnection, $phoneNumber) {
+            try {
+                $sql = 'SELECT * FROM users WHERE phone_number=?';
+                $stmt= $pdoConnection->pdo->prepare($sql);
+                $stmt->execute([$phoneNumber]);
+                return $stmt->fetchAll();
+            } catch(Exception $e) {
+                return 'Server error';
+            }
+        }
+
+        public static function getUserById($pdoConnection, $id) {
+            try {
+                $sql = 'SELECT * FROM users WHERE id=?';
+                $stmt= $pdoConnection->pdo->prepare($sql);
+                $stmt->execute([$id]);
+                return $stmt->fetchAll();
+            }
+            catch(Exception $e) {
+                var_dump($e->getMessage());
+                return false;
             }
         }
 
@@ -50,7 +85,53 @@
                 $temp = $stmt->fetch(PDO::FETCH_ASSOC);
                 return ['specialId' => $specialId, 'id' => $pdoConnection->pdo->lastInsertId()];
             } catch(Exception $e) {
-                var_dump($e); exit;
+                var_dump($e);
+                return false;
+            }
+        }
+
+        public static function updateUserDetails($pdoConnection, $name, $email, $sex,
+            $country, $city, $phoneNumber, $userId) {
+            
+            if ($country == null) {
+                $country = UserModel::DEFAULT_COUNTRY;
+            }
+
+            try {
+                $sql = 'UPDATE users SET name=?, email=?, sex=?, country=?, city=?, phone_number=? WHERE id=' . $userId;
+                $stmt = $pdoConnection->pdo->prepare($sql);
+
+                $stmt->execute([$name, $email, $sex, $country, $city, $phoneNumber]);
+                return true;
+            } catch(Exception $e) {
+                var_dump($e);
+                return false;
+            }
+        }
+
+        public static function updateUserPassword($pdoConnection, $password, $userId) {
+            try {
+                $sql = 'UPDATE users SET password=? WHERE id=' . $userId;
+                $stmt = $pdoConnection->pdo->prepare($sql);
+
+                $stmt->execute([$password]);
+                return true;
+            } catch(Exception $e) {
+                var_dump($e);
+                return false;
+            }
+        }
+
+        public static function updateUserProfilePhotoUrl($pdoConnection, $url, $userId) {
+            try {
+                $sql = 'UPDATE users SET image_path=? WHERE id=' . $userId;
+                $stmt = $pdoConnection->pdo->prepare($sql);
+
+                $stmt->execute([$url]);
+                return true;
+            } catch(Exception $e) {
+                var_dump($e);
+                return false;
             }
         }
 
