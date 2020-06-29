@@ -29,7 +29,8 @@ if (in_array($request->route, array_keys(BetCommunity::routes))) {
     $controllerObject->setToken();
     $data = $controllerObject->data;
     $data['isLogin'] = $controllerObject->isLogin();
-    include 'Pages/' . $data['template'];
+    if($controllerObject->responseType == 'html')
+        include 'Pages/' . $data['template'];
 
 } else{
     include './Pages/404.php'; //include error 404 page for undefined routes

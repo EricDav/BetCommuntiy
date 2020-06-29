@@ -27,7 +27,7 @@
                 <li class="dropdown"><a href="/login">Login</a></li>
               <?php endif ?>
 
-              <?php if ($_SESSION['userInfo']): ?>
+              <?php if (isset($_SESSION['userInfo'])): ?>
                 <li class="dropdown">
                   <a style="margin-top: -2px;" href="#" class="dropdown-toggle" data-toggle="dropdown">
                     <span style="margin-right: 5px;"><img id="header-image" style="width: 20; height: 20; border-radius: 10px; object-fit: cover;" src="<?=BetCommunity::IMAGES_PATH . $request->session['userInfo']['imagePath']?>" alt=""></span>My Profile
