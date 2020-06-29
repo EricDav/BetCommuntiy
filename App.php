@@ -40,6 +40,7 @@ if (in_array($request->route, array_keys(BetCommunity::routes))) {
     $controllerObject->setToken();
     $data = $controllerObject->data;
     $data['isLogin'] = $controllerObject->isLogin();
+
     // var_dump($data['template']); exit;
     include 'Pages/' . $data['template'];
 

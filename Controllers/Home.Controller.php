@@ -115,6 +115,7 @@
         public function perform() {
             if ($this->request->method == 'GET') {
                 $competitions = json_decode(file_get_contents(__DIR__  . '/../JsonData/competitions.json'));
+                
                 $this->pdoConnection->open();
                 $isProblemWhileFecthingData = false;
                 $followers = array();

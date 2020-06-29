@@ -84,7 +84,7 @@ abstract class Controller {
     }
 
     public function jsonResponse($response) {
-        header('Content-Type: application/json');
+        // header('Content-Type: application/json');
         echo json_encode($response);
         exit;
     }
@@ -133,6 +133,14 @@ abstract class Controller {
         $_SESSION['userInfo'] = $userInfo;
     }
 
+    public static function isSessionSet(){
+        if(count($_SESSION) > 0 && array_key_exists('userInfo', $_SESSION)){
+            return true;
+        }
+
+        return false;
+    }
+  
     /**
     * Checks if date and time is valid
     * @param {String} date

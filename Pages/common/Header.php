@@ -27,6 +27,7 @@
                 <li class="dropdown"><a href="/login">Login</a></li>
               <?php endif ?>
 
+
               <?php if (isLogin()): ?>
                 <li class="dropdown">
                   <a style="margin-top: -2px;" href="#" class="dropdown-toggle" data-toggle="dropdown">

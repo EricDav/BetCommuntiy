@@ -13,11 +13,11 @@ class BetCommunity {
         '/api/web/results' => "ResultsController",
         '/users/profile' => "UserProfileController",
         '/api/web/update-profile' => "UpdateUserProfileController",
+        '/contact' => "ContactController"
         '/logout' => 'UserController@logout',
         '/api/web/delete-prediction' => "PredictionController@deletePrediction",
         '/forcasters' => "UserController@getForcasters",
         '/' => "HomeController"
-
     ];
 
     // saves class name as key and path as value
@@ -39,6 +39,8 @@ class BetCommunity {
         'ResultsController' => 'Controllers/Results.Controller.php',
         'UserProfileController' => 'Controllers/UserProfile.Controller.php',
         'UpdateUserProfileController' => 'Controllers/UpdateUserProfile.Controller.php',
+        'ContactController' => 'Controllers/Contact.Controller.php',
+        'ContactModel' => 'Models/Contact.Model.php'
         'PredictionController' => 'Controllers/Prediction.Controller.php'
     ];
 
