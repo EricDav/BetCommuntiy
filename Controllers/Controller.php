@@ -8,6 +8,7 @@ abstract class Controller {
     public $error;
 
     const HTTP_BAD_REQUEST_CODE = 400;
+    const HTTP_NOT_FOUND = 404;
     const HTTP_SERVER_ERROR_CODE = 500;
     const HTTP_UNAUTHORIZED_CODE = 401;
     const HTTP_OKAY_CODE = 200;
@@ -21,20 +22,20 @@ abstract class Controller {
         $this->responseType = null;
         $this->pdoConnection = new PDOConnection();
         $this->error = array();
+        $this->currentSideBarFilter = null;
     }
 
     public function authenticate($id=null, $token=null) {
+        // check if user is logged in
+        if (!isset($this->request->session['userInfo'])) {
+            $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_UNAUTHORIZED_CODE, 'message' => 'User not logged in'));
+        }
 
         if (!$token)
             $token = isset($this->request->postData['token']) ? $this->request->postData['token'] : $this->request->query['token'];
         
         if (!$id)
             $id = isset($this->request->postData['id']) ? $this->request->postData['id'] : $this->request->query['id'];
-
-        // check if user is logged in
-        if (!isset($this->request->session['userInfo'])) {
-            $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_UNAUTHORIZED_CODE, 'message' => 'User not logged in'));
-        }
 
         $userId = $this->request->session['userInfo']['specialId'] . $this->request->session['userInfo']['id'];
         // Verify token and id coming from client
@@ -114,6 +115,8 @@ abstract class Controller {
             if ($userId == $follower['user_id']) 
                 return true;
         }
+
+        return false;
     }
 
     public function setUserSession($name, $email, $specialId, $id, $role, $imagePath, $phoneNumber) {
@@ -128,6 +131,47 @@ abstract class Controller {
         );
 
         $_SESSION['userInfo'] = $userInfo;
+    }
+
+    /**
+    * Checks if date and time is valid
+    * @param {String} date
+    * @param {String} time
+    * 
+    * take date and time as parameters in this form Y/m/d H:s
+    */
+    public function isValidateDateTime($date, $time) {
+        $dateArr = explode('-', $date);
+        $timeArr = explode(':', $time);
+        $time = $timeArr[0] . ':' . $timeArr[1]; // Enforce time to be in the format HH:mm
+        $isValiddate = checkdate($dateArr[1], $dateArr[2], $dateArr[0]);
+        $isValidTime = preg_match("/^(?:2[0-3]|[01][0-9]):[0-5][0-9]$/", $time);  // Checks if a time is valid in this format HH:mm
+
+        if ($isValiddate && $isValidTime) 
+            return true;
+        return false;
+    }
+
+    public function getMinutesDiff($dateStr, $otherDateStr){
+        $startDate = new DateTime($dateStr);
+        $sinceStart = $startDate->diff(new DateTime($otherDateStr));
+
+        $minutes = $sinceStart->days * 24 * 60;
+        $minutes += $sinceStart->h * 60;
+        $minutes += $sinceStart->i;
+        
+        return $minutes;
+    }
+
+    /**
+    * It helps to highlight the current filter
+    */
+    public function formatFilterText($text) {
+        if ($this->currentSideBarFilter == $text) {
+            return '<b style="color:black; font-size: 15px;">' . $text . '</b>';
+        }
+
+        return $text;
     }
 
     abstract function validate();

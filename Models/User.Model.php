@@ -14,6 +14,7 @@
                 $stmt->execute([$email, $password]);
                 return $stmt->fetchAll();
             } catch(Exception $e) {
+                // 
                 return 'Server error';
             }
         }
@@ -210,6 +211,17 @@
                 return false;
             }
         }
-    }
 
+        public static function getAllUsers($pdoConnection) {
+            try {
+                $sql = 'SELECT users.name, users.image_path, users.id, (SELECT COUNT(*) FROM predictions WHERE predictions.user_id= users.id) AS total_predictions,
+                (SELECT COUNT(*) FROM predictions WHERE predictions.user_id= users.id AND predictions.won = 1) AS total_predictions_won FROM users';
+                return $pdoConnection->pdo->query($sql)->fetchAll();
+
+            } catch(Exception $e) {
+                var_dump($e);
+                return false;
+            }
+        }
+    }
 ?>

@@ -2,8 +2,10 @@
  * Declare jquary object for About page tabs
  */
 var $profileAboutTab = $('#profile-about');
-var $profileAboutWrapper = $('#profile-about-wrapper');
 var $profilePredictionTab = $('#profile-predictions');
+var $profileAboutTabMobile = $('#profile-about-mobile');
+var $profilePredictionTabMobile = $('#profile-predictions-mobile');
+var $profileAboutWrapper = $('#profile-about-wrapper');
 var $profilePredictionWrapper = $('#profile-prediction-wrapper');
 var $editProfileSideBar = $('#edit-profile-side-bar');
 
@@ -47,6 +49,25 @@ $profileAboutTab.click(function() {
     lastActive.removeClass('active');
 
     $profileAboutTab.addClass('active');
+    $profilePredictionWrapper.hide();
+    lastActive = $profileAboutTab;
+});
+
+$profilePredictionTabMobile.click(function() {
+    $profilePredictionWrapper.show();
+    $profilePredictionTabMobile.addClass('active')
+    lastActive.removeClass('active');
+    $profileAboutWrapper.hide();
+    $editProfileSideBar.hide();
+    lastActive = $profilePredictionTab;
+});
+
+$profileAboutTabMobile.click(function() {
+    $profileAboutWrapper.show();
+    $editProfileSideBar.show();
+    lastActive.removeClass('active');
+
+    $profileAboutTabMobile.addClass('active');
     $profilePredictionWrapper.hide();
     lastActive = $profileAboutTab;
 });
@@ -331,7 +352,6 @@ $('#upload-photo').click(function() {
             // Deletes the cookies by setting the expiring date to the past
             document.cookie = "id=" + $$id + "; expires=Thu, 01 Jan 1970 00:00:00 UTC; " + " path=/";
             document.cookie = "token=" + localStorage.getItem('$$token') + "; expires=Thu, 01 Jan 1970 00:00:00 UTC;" + " path=/";
-            // console.log(response);
             if (response.success) {
                 $('#profile-picture').attr('src', response.url);
                 $('#header-image').attr('src', response.url);

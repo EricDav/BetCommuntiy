@@ -36,6 +36,31 @@ var tabIds = ['#tab-one-id', '#tab-two-id', 'tab-three-id'];
 
 $bookingCodetab = $('#booking-code-tab');
 
+function isLogin() {
+    if ($$id == -1) {
+        return false;
+    }
+
+    return true;
+}
+
+$('#open-prediction-modal').click(function() {
+    if (!isLogin()) {
+        $('#login-modal-txt').html('You need to <a href="/login" style="cursor: pointer;">login or signup</a> to create a prediction');
+        $('#follow-note').text('');
+    }
+});
+
+/**
+ * This is the on click for the modal that
+ * cancel icon that displays when users are 
+ * not logged in. E.g when a user wants to predict 
+ * and he/she isn't logged in the modal that shows up
+ * this is the onclick for closing the modal.
+ */
+$('#close-icon').click(function() {
+    $('#exampleModal').modal('hide');
+});
 
 /**
  * Register onclick for the tabs. 
@@ -96,7 +121,6 @@ dates.forEach(function(item, index) {
  */
 __predictionInfo.forEach(function (item, index) {
     var prediction = JSON.parse(item.prediction);
-    // console.log(prediction);
     item.prediction = prediction;
     $('#prediction-info-' + item.prediction_id).append(generatePredictionInfoHtml(prediction, item.prediction_type));
     $('#prediction-' + item.prediction_id).append(generatePredictionTable(prediction));
@@ -111,8 +135,6 @@ function calculateOdds(odds) {
     odds.forEach(function(odd) {
         resultOdds*=Number.parseFloat(odd);
     });
-
-    console.log(resultOdds);
 
     return resultOdds.toFixed(2);
 }
@@ -130,7 +152,7 @@ function generatePredictionInfoHtml(prediction, predictionType) {
 
 function generatePredictionTable(data) {
     $table = '<table style="width:100%; margin-top: 10px; border:unset;">' +
-                 '<tr style="border:unset;"><th style="border:unset;">Date/Time</th><th style="border:unset;">League</th><th style="border:unset;">Fixture</th><th style="border:unset;">Oucome</th></tr>';
+                 '<tr style="border:unset;"><th style="border:unset;">Date/Time</th><th style="border:unset;">League</th><th style="border:unset;">Fixture</th><th style="border:unset;">Oucome</th>' + (data.hasOwnProperty('scores') && data.scores.length > 0 ? '<th style="border:unset;">Result</th>' : '' ) + '</tr>';
     
     data.leagues.forEach(function(item, index) {
         if (data.dates) {
@@ -139,7 +161,7 @@ function generatePredictionTable(data) {
         }
 
         $table += '<tr style="border:unset;">' + '<td style="border:unset;">' + (data.dates ? formatDateCreated(date) : 'NS') + '</td>' + '<td style="border:unset;">' + item + '</td>' + '<td style="border:unset;">' + data.fixtures[index] + '</td>' + 
-            '<td style="border:unset;">' + data.outcomes[index] + '</td>';
+            '<td style="border:unset;">' + data.outcomes[index] + '</td>' + (data.hasOwnProperty('scores') && data.scores.length > 0 ? '<td style="border:unset;">' + data.scores[index] + '</td>' : '');
     });
 
     $table += '</table>';
@@ -169,8 +191,6 @@ $('#prediction-submit').click(function() {
     }
 
     if (shouldSubmitPrediction && currentTab == BOOKING_NUMBER_TAB) {
-        console.log('Inside FISRT TAB');
-        console.log(predictionRes);
         savePrediction(predictionRes);
     }
 
@@ -183,7 +203,6 @@ $('#prediction-submit').click(function() {
             team_ids: teamIds,
             competition_ids: competitionIds
         };
-        console.log(data);
 
         var endStart = getStartEndDateTime(data.dates);
         var utcArr = getDateTimeStrInUTC(new Date()).split(' ');
@@ -194,7 +213,6 @@ $('#prediction-submit').click(function() {
 
         var dateArr = utcArr[0].split('-');
         var timeArr = utcArr[1].split(':');
-        console.log(dateArr, timeArr);
 
         var nowDateInUTC = new Date(Number.parseInt(dateArr[0]), Number.parseInt(dateArr[1]), Number.parseInt(dateArr[2]), Number.parseInt(timeArr[0]), Number.parseInt(timeArr[1]));
         var dateTimeInUTC = new Date(Number.parseInt(startDateArr[0]), Number.parseInt(startDateArr[1]), Number.parseInt(startDateArr[2]), Number.parseInt(startTimeArr[0]), Number.parseInt(startTimeArr[1]));
@@ -212,6 +230,10 @@ $('#prediction-submit').click(function() {
         });
     }
 });
+
+$('#prediction-login').click(function() {
+    window.location.href = '/login';
+})
 
 
 
@@ -393,7 +415,6 @@ function savePrediction(data) {
     predictionButton.prop('disabled', true);
     $.ajax('/api/web/create-prediction', { data: data,
         type: 'POST',  success: function(result) {
-        console.log(result);
         predictionButton.text('Submit');
         predictionButton.prop('disabled', false);
         if (!result.success) {
@@ -481,10 +502,18 @@ function clearError() {
  * @param {object} The object info we want to update
  * @paramm {int} The calling type 0 for follow  and 1 for dot menu.
  * It used to determine who is calling the function
+ * @param {int} index of the user. 
  * 
  * @return None
  */
-function followUser(userId, isFollowing, info, whoIsCalling, callingElem) {
+function followUser(userId, isFollowing, info, whoIsCalling, callingElem, index) {
+    if (!isLogin()) {
+        var name = $('#follow-' + userId.toString() +  '-' + index.toString()).attr('title')
+        $('#login-modal-txt').html('You need to <a href="/login" style="cursor: pointer;">login or signup</a> to follow ' + name);
+        $('#follow-note').text('Note: following a user means you get notified when they drop predictions');
+        $('#exampleModal').modal('show');
+        return;
+    }
     var isFollowingId = isFollowing ? 1 : 0;
     data = {
         token: localStorage.getItem('$$token'),
@@ -526,22 +555,80 @@ function followUser(userId, isFollowing, info, whoIsCalling, callingElem) {
 }
 
 /**
+ * Deleting prediction section start
+ */
+let DELETE_PREDICTION_ID;
+
+$('.delete-close-icon').click(function() {
+    $('#deleteModal').modal('hide');
+});
+
+$('#delete-cancel').click(function() {
+    $('#deleteModal').modal('hide');
+});
+
+$('#delete-prediction').click(function() {
+    deletePrediction();
+});
+
+function openDeleteConfirmationModal(predictionId) {
+    $('#deleteModal').modal('show');
+    DELETE_PREDICTION_ID = predictionId;
+}
+
+function deletePrediction() {
+    $('#deleteModal').modal('show');
+    data = {
+        token: localStorage.getItem('$$token'),
+        id: $$id,
+        prediction_id: DELETE_PREDICTION_ID, 
+    };
+
+    $('#delete-prediction').prop('disabled', true);
+    $('#delete-prediction').text('Deleting...');
+    $.ajax('/api/web/delete-prediction', { data: data,
+        type: 'POST',  success: function(result) {
+        $('#delete-prediction').prop('disabled', false);
+        $('#delete-prediction').text('Delete');
+        if (result.success) {
+            console.log('success');
+            $('#prediction-box-' + DELETE_PREDICTION_ID.toString()).remove();
+            $('#deleteModal').modal('hide');
+          }
+
+          return false;
+   }});
+}
+/**
+ * Deleting prediction section end
+ */
+
+ 
+
+/**
  * Add click events to menu follow user or unfollow
  * or to the follow link beside author name when login
  * user is not following the author.
 */
 __predictionInfo.forEach(function (item, index) {
+    // Add onclick for deleting predictions you own
+    $('#' + DOT_MENU_ELEMENT_ID_PREFIX + 'delete-' + item.prediction_id.toString() + '-' + index.toString())
+        .click(function() {
+            // alert('Yes I am deleting');
+            openDeleteConfirmationModal(item.prediction_id);
+    });
+
     if (!item.isFollowing_athour) {
-        $('#' + FOLLOW_ELEMENT_ID_PREFIX + item.user_id.toString())
+        $('#' + FOLLOW_ELEMENT_ID_PREFIX + item.user_id.toString() + '-' + index.toString())
             .click(function() {
                 if (!item.isFollowing_author)
-                    followUser(item.user_id, item.isFollowing_author, item, FOLLOW_ELEMENT, this);
+                    followUser(item.user_id, item.isFollowing_author, item, FOLLOW_ELEMENT, this, index);
         });
     }
 
-    $('#' + DOT_MENU_ELEMENT_ID_PREFIX + item.user_id.toString())
+    $('#' + DOT_MENU_ELEMENT_ID_PREFIX + item.user_id.toString() + '-' + index.toString())
         .click(function() {
-            followUser(item.user_id, item.isFollowing_author, item, DOT_MENU, this);
+            followUser(item.user_id, item.isFollowing_author, item, DOT_MENU, this, index);
     });
 });
 var modalBodyElem = $('#m-body-id');

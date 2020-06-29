@@ -61,7 +61,7 @@ $('#signup-button').click(function() {
 
     if (empty.length == 1) {
         message = empty[0] + ' is required';
-        $('#signup-error-message').text(message)
+        $('#signup-error-message').text(message);
     }
 
     if (empty.length > 1) { 
@@ -79,7 +79,6 @@ $('#signup-button').click(function() {
     }
 
     if (empty.length == 0) {
-        console.log(sexMale.attr('checked'));
         var sex = sexMale.is(':checked') ? 'Male' : 'Female';
         var postData = {
             type: 'signup', 
@@ -116,6 +115,7 @@ $('#signup-button').click(function() {
                         }
                     });   
                 }
+                console.log(message);
                 $('#signup-error-message').text(message);
             } else {
                 window.location = '/';

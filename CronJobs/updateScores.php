@@ -70,9 +70,9 @@
     $page = 0;
     $liveScroes = array();
     // $data = json_decode(file_get_contents('http://livescore-api.com/api-client/scores/live.json?key=I6AUQWWnzLs6X5Jp&secret=EsdilZDQwoq6EpLnvmhmjeJSZcZXiImW'));
-    $data = json_decode(file_get_contents(__DIR__ . '/../data.json'));
+    $data = json_decode(file_get_contents(__DIR__ . '/../data2.json'));
     
-    // file_put_contents('data.json', json_encode($data));
+    // file_put_contents('data2.json', json_encode($data));
     $endedMatches = array();
 
     foreach($data->data->match as $match) {
@@ -141,13 +141,14 @@
 
                     if ($dateArr[0] . ':' . $dateArr[1] == $match->scheduled && isMatch($match->home_name, $match->away_name, $fixture)) {
                         array_push($scores, array($fixture => $match->ft_score));
+                       //array_push($scores,  $match->ft_score);
                         break;
                     }
                 }
             }
             var_dump($scores);
             $predictionObj->scores = $scores;
-            $pdoConnection->pdo->query('UPDATE predictions SET prediction='. "'" . json_encode($predictionObj) . "'" . ' WHERE id=' . $prediction['id']);
+            // $pdoConnection->pdo->query('UPDATE predictions SET prediction='. "'" . json_encode($predictionObj) . "'" . ' WHERE id=' . $prediction['id']);
         }
     }
     // echo $counter;

@@ -8,16 +8,20 @@
         const CORRECT_FILTER = 5;
         const LOST_FILTER = 6;
         const INPROGRESS_FILTER = 7;
+        const FORCASTERS_FILTER = 8;
+        const NUM_SECONDS_PERDAY = 86400;
 
         public $offset;
         public function  __construct($request) {
             parent::__construct($request);
             $this->pdoConnection->open();
             $this->pageNum = isset($this->request->query['page']) ? $this->request->query['page'] : Controller::DEFAULT_OFFSET;
-            $this->query = isset($this->request->query['filter_option']) ? $this->request->query['filter_option'] : '';
-            $this->isOddsFilter = ($this->query != '' && $this->query != (string)self::CORRECT_PREDICTION_QUERY && $this->query != (string)self::LOST_PREDICTION_QUERY 
-                 && $this->query != (string)self::INPROGRESS_PREDICTION_QUERY) ? true : false;
-            
+            $this->queryDay = isset($this->request->query['filter_day']) ? $this->request->query['filter_day'] : null;
+            $this->currentDate = isset($this->request->query['current_date']) ? $this->request->query['current_date'] : null; // current date in client timezone
+            $this->startDateInUTC = null; // This is the start date range weather today's, yesterday's or weekend games. 
+            $this->endDateInUTC = null;  // This is the end date range weather today's, yesterday's or weekend games.
+            $this->predictionStatus = isset($this->request->query['filter_status']) ? $this->request->query['filter_status'] : null;
+            $this->currentSideBarFilter = 'All Predictions';
         }
 
         public function validate() {
@@ -30,6 +34,59 @@
                 $minMax = explode('_', $this->query);
                 if (sizeof($minMax) > 2 || !is_numeric($minMax[0]) || !is_numeric($minMax[1]))
                     return false;
+            }
+
+            if ($this->predictionStatus) {
+                if ($this->predictionStatus != 'won') {
+                    $this->predictionStatus = null;
+                } else {
+                    $this->currentSideBarFilter = 'Correct Predictions';
+                }
+            }
+
+            if ($this->queryDay) {
+                 // echo $this->currentDate; exit;
+                 $dateArr = explode(' ', $this->currentDate);
+                 // var_dump($dateArr); exit;
+
+                $beginingDate = $dateArr[0] . ' ' . '00:00';
+                $endingDate = $dateArr[0] . ' ' . '23:59';
+               // var_dump($dateArr);
+               // var_dump($this->isValidateDateTime($dateArr[0], $dateArr[1])); exit;
+
+                if ($this->isValidateDateTime($dateArr[0], $dateArr[1])) {
+                    if ($this->queryDay == 'yesterday') {
+                        $beginingDateDiff = $this->getMinutesDiff($this->currentDate,  $beginingDate);
+                        $timeInUTC = strtotime(gmdate("Y-m-d\ H:i:s"));
+
+                        $startTimeUTC = $timeInUTC - ($beginingDateDiff * 60) - self::NUM_SECONDS_PERDAY;
+                        $endTimeUTC = $timeInUTC - ($beginingDateDiff * 60);
+
+                        $startDateInUTC = date("Y-m-d H:i:s", $startTimeUTC);
+                        $endDateInUTC = date("Y-m-d H:i:s", $endTimeUTC);
+
+                        $this->startDateInUTC = $startDateInUTC;
+                        $this->endDateInUTC  = $endDateInUTC;
+                        $this->currentSideBarFilter = 'Yesterday Predictions';
+                    }
+
+                    if ($this->queryDay == 'today') {
+                        
+                        $beginingDateDiff = $this->getMinutesDiff($this->currentDate,  $beginingDate);
+                        $endingDateDiff = $this->getMinutesDiff($this->currentDate,  $endingDate);
+                        $timeInUTC = strtotime(gmdate("Y-m-d\ H:i:s"));
+
+                        $startTimeUTC = $timeInUTC - ($beginingDateDiff * 60);
+                        $endTimeUTC = $timeInUTC + ($endingDateDiff * 60);
+
+                        $startDateInUTC = date("Y-m-d H:i:s", $startTimeUTC);
+                        $endDateInUTC = date("Y-m-d H:i:s", $endTimeUTC);
+
+                        $this->startDateInUTC = $startDateInUTC;
+                        $this->endDateInUTC  = $endDateInUTC;
+                        $this->currentSideBarFilter = 'Today Predictions';
+                    }
+                }
             }
 
             /**
@@ -62,7 +119,9 @@
                 $isProblemWhileFecthingData = false;
                 $followers = array();
 
-                $predictions = PredictionModel::getPredictions($this->pdoConnection, Controller::DEFAULT_LIMIT, $this->offset, $this->query, $this->isOddsFilter);
+                $predictions = PredictionModel::getPredictions($this->pdoConnection, Controller::DEFAULT_LIMIT,
+                    $this->offset, $this->startDateInUTC, $this->endDateInUTC, $this->predictionStatus);
+
                 $featuredUsers = UserModel::getFeaturedUsers($this->pdoConnection);
 
                 if (!$predictions && !is_array($predictions)) {
@@ -171,30 +230,6 @@
         }
 
         /**
-         * It helps to highlight the current filter
-         */
-        public function formatFilterText($text, $filterNum) {
-            switch ($filterNum) {
-                case self::HOME_FILTER:
-                    if (!$this->query || $this->isOddsFilter)
-                        return '<b style="color:black;">' . $text . '</b>';
-                    return $text;
-                case self::CORRECT_FILTER:
-                    if (!$this->isOddsFilter && (int)$this->query == self::CORRECT_PREDICTION_QUERY)
-                        return '<b style="color:black;">' . $text . '</b>';
-                    return $text;
-                case self::LOST_FILTER:
-                    if (!$this->isOddsFilter && (int)$this->query == self::LOST_PREDICTION_QUERY)
-                        return '<b style="color:black;">' . $text . '</b>';
-                    return $text;
-                case self::INPROGRESS_FILTER:
-                    if (!$this->isOddsFilter && (int)$this->query == self::INPROGRESS_PREDICTION_QUERY)
-                        return '<b style="color:black;">' . $text . '</b>';
-                    return $text;
-            }           
-        }
-
-        /**
          * This functions set the user_i, prediction_id of 
          * the prediction. It is used at the client side to make 
          * onclick events for following and liking users. And also
@@ -224,5 +259,4 @@
             $predictions = json_decode($predictionJson);
         }
     }
-
 ?>

@@ -116,22 +116,6 @@
             $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_SERVER_ERROR_CODE, 'message' => 'Server error'));
         }
 
-        /**
-         * Checks if date and time is valid
-         * 
-         * take date and time as parameters in this form Y/m/d H:s
-         */
-        public function isValidateDateTime($date, $time) {
-            $dateArr = explode('-', $date);
-            $timeArr = explode(':', $time);
-            $time = $timeArr[0] . ':' . $timeArr[1]; // Enforce time to be in the format HH:mm
-            $isValiddate = checkdate($dateArr[1], $dateArr[2], $dateArr[0]);
-            $isValidTime = preg_match("/^(?:2[0-3]|[01][0-9]):[0-5][0-9]$/", $time);  // Checks if a time is valid in this format HH:mm
-
-            if ($isValiddate && $isValidTime) 
-                return true;
-            return false;
-        }
 
         /**
          * It checks weather a data is a valid json
