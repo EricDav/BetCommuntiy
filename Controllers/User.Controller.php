@@ -99,5 +99,29 @@
                 $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_SERVER_ERROR_CODE, 'message' => 'Server error'));
             }
         }
+
+        public function logout() {
+            if ($this->request->method != 'GET') {
+                // 500 error
+            } 
+
+            if (!$this->isLogin()) {
+                header('Location: /');
+            } else {
+                session_destroy();
+                header('Location: /');
+            }
+        }
+
+        public function getForcasters() {
+            if ($this->request->method == 'GET') {
+                $this->pdoConnection->open();
+                $forcasters = UserModel::getAllUsers($this->pdoConnection);
+
+                $this->data['template'] = 'Forcasters.php';
+                $this->data['title'] = 'Forcasters';
+                $this->data['forcasters'] = $forcasters;
+            }
+        }
     }
 ?>

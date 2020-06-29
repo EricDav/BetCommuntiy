@@ -73,5 +73,15 @@
    }
    .overlay-image .hover {
     background-color: rgba(0,0,0,0.5);
-   }   
+   }
+
+   @media only screen and (max-width: 800px) {
+    .timeline-cover {
+        width: 110%;
+        margin-left: -5%;
+    }
+    .navbar-toggle {
+        margin-right: 20px;
+    }
+  }
 

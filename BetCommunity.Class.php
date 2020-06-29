@@ -3,6 +3,7 @@
 class BetCommunity {
     const IMAGES_PATH = "/bet_community/Public/images/users/";
     const DEFAULT_ADD_PROFILE = 180191;
+    const DEFAULT_METHOD = -1;
     const routes = [
         '/login' => "LoginController",
         '/api/web/create-prediction' => "CreatePredictionController",
@@ -12,8 +13,11 @@ class BetCommunity {
         '/api/web/results' => "ResultsController",
         '/users/profile' => "UserProfileController",
         '/api/web/update-profile' => "UpdateUserProfileController",
-        '/' => "HomeController",
         '/contact' => "ContactController"
+        '/logout' => 'UserController@logout',
+        '/api/web/delete-prediction' => "PredictionController@deletePrediction",
+        '/forcasters' => "UserController@getForcasters",
+        '/' => "HomeController"
     ];
 
     // saves class name as key and path as value
@@ -22,7 +26,7 @@ class BetCommunity {
         'Request' => 'Request.php',
         'Controller' => 'Controllers/Controller.php',
         'LoginController' => 'Controllers/Login.Controller.php',
-        'Validation' => 'Helper/validation.php',
+        'Validation' => 'Helper/Validation.php',
         'UserModel' => 'Models/User.Model.php',
         'DBConfig' => 'Config/Config.php',
         'PDOConnection' => 'DB/DBConnection.php',
@@ -37,6 +41,7 @@ class BetCommunity {
         'UpdateUserProfileController' => 'Controllers/UpdateUserProfile.Controller.php',
         'ContactController' => 'Controllers/Contact.Controller.php',
         'ContactModel' => 'Models/Contact.Model.php'
+        'PredictionController' => 'Controllers/Prediction.Controller.php'
     ];
 
     const OUTCOMES = array('1', '2', 'X', '1X', '2X', '12', 'GG', 'NG', 'Over 0.5', 'Over 1.5',

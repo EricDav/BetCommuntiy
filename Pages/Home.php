@@ -15,6 +15,10 @@
     return $competition->name;
   }
 
+  function isSelf($userId) {
+    return isLogin() && $_SESSION['userInfo']['id'] == $userId;
+  }
+
 ?>
 
 <html class="js sizes customelements history pointerevents postmessage webgl websockets cssanimations csscolumns csscolumns-width csscolumns-span csscolumns-fill csscolumns-gap csscolumns-rule csscolumns-rulecolor csscolumns-rulestyle csscolumns-rulewidth csscolumns-breakbefore csscolumns-breakafter csscolumns-breakinside flexbox picture srcset webworkers" lang="en">
@@ -26,6 +30,7 @@
 <?php include 'Pages/common/Header.php';?>
 
 <div id="page-contents" style="position: relative;">
+<?php if (isLogin()): ?>
 <!-- Modal start -->
   <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
@@ -40,7 +45,6 @@
     <ul class="nav nav-tabs ul-navs-tabs">
       <li id="tab-one-id" class="active"><a id="tab-one" data-toggle="tab" href="">Booking Number</a></li>
       <li id="tab-two-id"><a id="tab-two" data-toggle="tab" href="">Fixtures</a></li>
-      <li id="tab-three-id"><a id="tab" data-toggle="tab" href="">Text</a></li>
     </ul>
     
       <!-- <div class="">
@@ -70,8 +74,8 @@
 
       <!-- This section begins displays for the first tab for creating prediction through booking code-->
       <div id="booking-code-tab" id="data-entry" style="margin-top: 15px;">
-        <div class="flex-input">
-          <div class="input-wrapper">
+        <div class="row">
+          <div class="col-md-6">
           <div style="margin-top: 5px;"><b>Betting Platform: </b></div>
             <select id="betting-type" type="time" class="form-control">
               <?php foreach($data['supportedBettingPlatforms'] as $platform): ?>
@@ -79,7 +83,7 @@
               <?php endforeach; ?>
             </select>
           </diV>
-          <div class="input-wrapper input-wrapper-code">
+          <div class="col-md-6">
             <div style="margin-top: 5px;"><b>Booking Number: </b></div>
             <input id="booking-number" type="text" class="form-control">
           </div>
@@ -135,33 +139,55 @@
   </div>
 </div>
 <!-- Model close -->
+
+    <!-- Model start of delete confirmation -->
+       <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+          <span class="delete-close-icon" id="close-icon"><i class="fa fa-close"></i></span>
+          <div style="height: 50px;" id='m-body-id' class="modal-body m-body">
+             <div style="margin-top: 50px;" class="obs-msg">Are you sure you want to delete this prediction?</div><br>
+             <div id="login-modal-txt" style="margin-top: -20px; font-style: oblique;" class="obs-msg"></div>
+             <span id="follow-note"></span>
+          </div>
+          <div class="modal-footer">
+            <a id="delete-cancel" style="margin-right: 20px;">Cancel</a>
+            <button style="background-color: red; width: 150px;" id="delete-prediction" type="button" class="btn btn-primary">Yes Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+<?php endif; ?>
+
+  <?php if (!isLogin()): ?>
+      <!-- Modal start -->
+      <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+          <span id="close-icon"><i class="fa fa-close"></i></span>
+          <div style="height: 220px;" id='m-body-id' class="modal-body m-body">
+             <div style="margin-top: 50px;" class="obs-msg">Sorry for the obstruction!</div><br>
+             <div id="login-modal-txt" style="margin-top: -20px; font-style: oblique;" class="obs-msg"></div>
+             <span id="follow-note"></span>
+             <div class="login-modal-button-wrapper col-md-12">
+              <button style="width: 80%;" id="prediction-login" type="button" class="btn btn-primary">Login/Sign up</button><br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+      <!-- Model close -->
+  <?php endif; ?>
+  
     	<div class="container">
     		<div class="row">
 
           <!-- Newsfeed Common Side Bar Left
           ================================================= -->
     			<div class="col-md-3 static">
-
-            <ul class="nav-news-feed">
-              <li><i class="fa fa-futbol-o"></i><div><a href="/"><?=$controllerObject->formatFilterText('Predictions', $data['homeNum'])?></a></div></li>
-              <li><i class="fa fa-user"></i><div><a href="newsfeed-people-nearby.html">Admin Predictions</a></div></li>
-              <li><i class="icon ion-ios-people-outline"></i><div><a href="newsfeed-friends.html">Forcasters</a></div></li>
-              <li><i style="color: green;" class="fa fa-check"></i><div style="color: black"><a href="<?='/?filter_option=' . $data['predictionWonQuery']?>"><?=$controllerObject->formatFilterText('Correct Predictions', $data['correctNum'])?></a></div></li>
-              <li><i style="color: red;" class="fa fa-close"></i><div><a href="<?='/?filter_option=' . $data['predictionLostQuery']?>"><?=$controllerObject->formatFilterText('Lost Predictions', $data['lostNum'])?></a></div></li>
-              <li><i class="fa fa-spinner"></i><div><a href="<?='/?filter_option=' . $data['predictionInprogressQuery']?>"><?=$controllerObject->formatFilterText('Predictions In-progress', $data['inprogressNum'])?></a></div></li>
-            </ul><!--news-feed links ends-->
-            <div id="chat-block" class="" style="">
-              <label class="odds-label">Min Odds</label>
-              <input id="min_odd"  type="text" class="form-control" value="<?=$data['min']?>">
-              <p id="min-error-text" class="odd_error"></p>
-
-              <label class="odds-label">Max Odds</label>
-              <input id="max_odd"  type="text" class="form-control" value="<?=$data['max']?>">
-              <p id="max-error-text" class="odd_error"></p>
-
-              <div class="title">Search Odd</div>
-            </div><!--chat block ends-->
+            <?php include 'Pages/common/LeftSideBar.php';?>
           </div>
+
     			<div class="col-md-7">
 
             <!-- Post Create Box
@@ -178,25 +204,35 @@
             </div>
             <!-- Post Create Box End-->
 
-            <!-- Post Content
-            ================================================= -->
+          <!-- Post Content
+          ================================================= -->
+          <?php $index = 0; ?>
           <?php foreach($data['predictions'] as $prediction): ?>
             <?php $isFollowing = $data['isLogin'] && $controllerObject->isFollowing($prediction['user_id']); ?>
-            <div class="post-content">
+            <div id="<?='prediction-box-' . $prediction['id']?>" class="post-content">
             <div class="dropdown dot-menu">
               <i class="fa fa-ellipsis-h dropdown-toggle" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
               <div id="menu-action" class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                 <?php if($data['isLogin'] && (int)$_SESSION['userInfo']['role'] > 1): ?>
-                  <a class="dropdown-item" href="#"> <i class="fa fa-user"></i>  Action</a>
+                  <a class="dropdown-item"> <i class="fa fa-user"></i>  Action</a>
                 <?php endif ?>
+                
+                <?php if (isSelf($prediction['user_id'])): ?>
+                   <a style="color: red;" id="<?= 'dot-menu-delete-' . $prediction['id'] . '-' . (string)$index?>" class="dropdown-item"> <i class="fa fa-trash"></i>
+                    Delete Prediction
+                  </a>
+                <?php endif; ?>
 
-                <a  id="<?= 'dot-menu-' . $prediction['user_id']?>" class="dropdown-item" href="#"> <i class="<?= $isFollowing ? 'fa fa-user-times' : 'fa fa-user'; ?>"></i>
-                  <?= !$isFollowing ? '  Follow     ' . explode(' ', $prediction['name'])[0] : '  Unfollow     ' . explode(' ', $prediction['name'])[0]?>
-                </a>
+                <?php if (!isSelf($prediction['user_id'])): ?>
+                  <a  id="<?= 'dot-menu-' . $prediction['user_id'] . '-' . (string)$index?>" class="dropdown-item"> <i class="<?= $isFollowing ? 'fa fa-user-times' : 'fa fa-user'; ?>"></i>
+                    <?= !$isFollowing ? '  Follow     ' . explode(' ', $prediction['name'])[0] : '  Unfollow     ' . explode(' ', $prediction['name'])[0]?>
+                  </a>
+                <?php endif; ?>
+
                 <div class="line-divider"></div>
-                <a class="dropdown-item" href="#"><i class="fa fa-bug"></i> Report Prediction</a>
+                <a class="dropdown-item"><i class="fa fa-bug"></i> Report Prediction</a>
                 <div class="line-divider"></div>
-                <a class="dropdown-item" href="#"><i class="fa fa-share-alt"></i> Copy Prediction Link</a>
+                <a class="dropdown-item"><i class="fa fa-share-alt"></i> Copy Prediction Link</a>
               </div>
             </div>
               <div style="padding-top: 10px;" class="post-container">
@@ -206,7 +242,7 @@
                     <h5>
                       <a href="<?='/users/profile?id=' . (string)(BetCommunity::DEFAULT_ADD_PROFILE + $prediction['user_id']) ?>"><?=$prediction['name']?></a>
                       <?php if (!$data['isLogin'] || ($data['isLogin'] && $prediction['user_id'] != $_SESSION['userInfo']['id'])): ?>
-                        <a id="<?='follow-' . $prediction['user_id']?>" style="<?= $isFollowing ?  'cursor:default;' : 'cursor:pointer;' ?>" class="following"><?=$isFollowing ? 'Following': 'Follow' ?></a>
+                        <a title="<?=$prediction['name']?>" id="<?='follow-' . $prediction['user_id'] . '-' . (string)$index?>" style="<?= $isFollowing ?  'cursor:default;' : 'cursor:pointer;' ?>" class="following"><?=$isFollowing ? 'Following': 'Follow' ?></a>
                       <?php endif ?>
                    </h5>
                     <p id="<?='date-'.$prediction['id']?>" class="text-muted"></p>
@@ -240,6 +276,7 @@
                 </div>
               </div>
             </div>
+            <?php $index = $index + 1; ?>
         <?php endforeach ?>
       </div>
           <!-- Newsfeed Common Side Bar Right
@@ -252,7 +289,7 @@
                   <img src="images/users/user-15.jpg" alt="" class="profile-photo-sm pull-left">
                   <div>
                     <h5><a href="timeline.html"><?=$featuredUser['name']?></a></h5>
-                    <a id="<?=$featuredUser['id']?>" href="#" class="text-green"><?=$controllerObject->isFollowing($prediction['user_id']) ? 'Following': 'Follow' ?></a>
+                    <a id="<?=$featuredUser['id']?>" class="text-green"><?=$controllerObject->isFollowing($prediction['user_id']) ? 'Following': 'Follow' ?></a>
                   </div>
                 </div>
               <?php endforeach ?>
@@ -272,5 +309,6 @@
     <script type="text/javascript">var __predictionInfo=<?=json_encode($data['predictionInfo'])?>;</script>
     <script type="text/javascript">var __outcomes=<?=json_encode($data['outcomes'])?>;</script>
     <script src="/bet_community/Public/js/prediction.js"></script>
+    <script src="/bet_community/Public/js/common-sidebar.js"></script>
   </body>
 </html>

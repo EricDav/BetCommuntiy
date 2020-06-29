@@ -50,10 +50,10 @@
               </div>
               <div class="col-md-9">
                 <ul class="list-inline profile-menu">
-                  <li><a id="profile-predictions" href="#" class="active">Predictions</a></li>
-                  <li><a id="profile-about" href="#">About</a></li>
-                  <li><a id="profile-followers" href="#">Followers</a></li>
-                  <li><a href="#">Packages</a></li>
+                  <li><a id="profile-predictions" class="active">Predictions</a></li>
+                  <li><a id="profile-about">About</a></li>
+                  <li><a id="profile-followers">Followers</a></li>
+                  <li><a>Packages</a></li>
                 </ul>
                 <ul class="follow-me list-inline">
                   <li><?=$data['followingText']?></li>
@@ -64,28 +64,30 @@
               </div>
             </div>
           </div>
-        </div>
-          <!--Timeline Menu for Large Screens End-->
-          
+           <!--Timeline Menu for Large Screens End-->
 
-          <!--Timeline Menu for Small Screens-->
-          <div class="navbar-mobile hidden-lg hidden-md">
-            <div class="profile-info">
-              <img style="object-fit: cover;" src="<?=BetCommunity::IMAGES_PATH . $data['user'][0]['image_path']?>" alt="" class="img-responsive profile-photo">
-              <h4><?=$data['user'][0]['name']?></h4>
-              <p class="text-muted">Creative Director</p>
-            </div>
-            <div class="mobile-menu">
-              <ul class="list-inline">
-                <li id="profile-predictions" class="active"><a href="timline.html">Predictions</a></li>
-                <li id="profile-about"><a href="timeline-about.html">About</a></li>
-                <li id="profile-followers"><a href="timeline-album.html">Followers</a></li>
-                <li><a href="timeline-friends.html">Packages</a></li>
-              </ul>
-              <button class="btn-primary">Add Friend</button>
-            </div>
-          </div>
-          <!--Timeline Menu for Small Screens End-->
+                  <!--Timeline Menu for Small Screens-->
+                    <div class="navbar-mobile hidden-lg hidden-md">
+                      <div class="profile-info">
+                        <img id="profile-picture" style="object-fit: cover;" src="<?=BetCommunity::IMAGES_PATH . $data['user'][0]['image_path']?>" alt="" class="img-responsive profile-photo _b3">
+                        <input style="display: none;" type="file" name="my_file" id="my-file" accept="image/*">
+                        <h4><?=$data['user'][0]['name']?></h4>
+                        <p class="text-muted">Creative Director</p>
+                      </div>
+                      <div class="mobile-menu">
+                        <ul class="list-inline">
+                          <li id="profile-predictions-mobile" class="active"><a>Predictions</a></li>
+                          <li id="profile-about-mobile"><a>About</a></li>
+                          <li id="profile-followers-mobile"><a>Followers</a></li>
+                          <li><a>Packages</a></li>
+                        </ul>
+                        <button class="btn-primary">Follow</button>
+                      </div>
+                    </div>
+                    <!--Timeline Menu for Small Screens End-->
+        </div>
+  
+          
         <div id="page-contents" style="position: relative;">
           <div class="row">
             <div class="col-md-3">
@@ -141,16 +143,16 @@
                   <i class="fa fa-ellipsis-h dropdown-toggle" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
                   <div id="menu-action" class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                     <?php if($data['isLogin'] && (int)$_SESSION['userInfo']['role'] > 1): ?>
-                      <a class="dropdown-item" href="#"> <i class="fa fa-user"></i>  Action</a>
+                      <a class="dropdown-item"> <i class="fa fa-user"></i>  Action</a>
                     <?php endif ?>
 
-                    <a  id="<?= 'dot-menu-' . $prediction['user_id']?>" class="dropdown-item" href="#"> <i class="<?= $isFollowing ? 'fa fa-user-times' : 'fa fa-user'; ?>"></i>
+                    <a  id="<?= 'dot-menu-' . $prediction['user_id']?>" class="dropdown-item"> <i class="<?= $isFollowing ? 'fa fa-user-times' : 'fa fa-user'; ?>"></i>
                       <?= !$isFollowing ? '  Follow     ' . explode(' ', $prediction['name'])[0] : '  Unfollow     ' . explode(' ', $prediction['name'])[0]?>
                     </a>
                     <div class="line-divider"></div>
-                    <a class="dropdown-item" href="#"><i class="fa fa-bug"></i> Report Prediction</a>
+                    <a class="dropdown-item"><i class="fa fa-bug"></i> Report Prediction</a>
                     <div class="line-divider"></div>
-                    <a class="dropdown-item" href="#"><i class="fa fa-share-alt"></i> Copy Prediction Link</a>
+                    <a class="dropdown-item"><i class="fa fa-share-alt"></i> Copy Prediction Link</a>
                   </div>
                 </div>
                   <div style="padding-top: 10px;" class="post-container">

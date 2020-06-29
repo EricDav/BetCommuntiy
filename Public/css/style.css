@@ -2371,7 +2371,12 @@ html, body {
     .faq-cat-list.nav-tabs>li>a{min-width: 150px; padding: 30px 15px;}
     
     .error-page .error-content form .form-group{width: 80%;}
-    
+    .post-content .post-container .post-detail {
+      margin-left: 0px;
+    }
+    img.profile-photo-md {
+      margin-right: 10px;
+    }
   }
   
   

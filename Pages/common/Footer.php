@@ -54,6 +54,6 @@
       	</div>
       </div>
       <div class="copyright">
-        <p>Thunder Team © 2016. All rights reserved</p>
+        <p>BetCommunity © 2020. All rights reserved</p>
       </div>
 </footer>
