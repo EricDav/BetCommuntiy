@@ -83,3 +83,15 @@ CREATE TABLE likes(
     prediction_id int references predictions(id),
 );
 
+
+CREATE TABLE `temp_request` (
+  `id` int(11) NOT NULL,
+  `name` varchar(150) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `special_id` varchar(255) NOT NULL,
+  `request` varchar(200) NOT NULL,
+  `request_time` datetime NOT NULL,
+  `expires` datetime NOT NULL,
+  `identity` varchar(255) NOT NULL,
+  `token` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -13,7 +13,8 @@ class BetCommunity {
         '/users/profile' => "UserProfileController",
         '/api/web/update-profile' => "UpdateUserProfileController",
         '/' => "HomeController",
-        '/contact' => "ContactController"
+        '/contact' => "ContactController",
+        '/forgot-password' => "ForgotPasswordController"
     ];
 
     // saves class name as key and path as value
@@ -36,7 +37,9 @@ class BetCommunity {
         'UserProfileController' => 'Controllers/UserProfile.Controller.php',
         'UpdateUserProfileController' => 'Controllers/UpdateUserProfile.Controller.php',
         'ContactController' => 'Controllers/Contact.Controller.php',
-        'ContactModel' => 'Models/Contact.Model.php'
+        'ContactModel' => 'Models/Contact.Model.php',
+        'ForgotPasswordController' => 'Controllers/ForgotPassword.Controller.php',
+        'ForgotPasswordModel' => 'Models/ForgotPassword.Model.php',
     ];
 
     const OUTCOMES = array('1', '2', 'X', '1X', '2X', '12', 'GG', 'NG', 'Over 0.5', 'Over 1.5',

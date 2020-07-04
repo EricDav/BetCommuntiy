@@ -16,9 +16,12 @@ $request = new Request(); // Create a request object
 $data = null;
 
 
-if (in_array($request->route, array_keys(BetCommunity::routes))) {
+$route = explode('/', $request->route);
+$route = '/'.$route[1];
 
-     $controllerClass = BetCommunity::routes[$request->route];
+if (in_array($route, array_keys(BetCommunity::routes))) {
+
+     $controllerClass = BetCommunity::routes[$route];
      
      $controllerObject = new $controllerClass($request);
 
@@ -29,6 +32,9 @@ if (in_array($request->route, array_keys(BetCommunity::routes))) {
     $controllerObject->setToken();
     $data = $controllerObject->data;
     $data['isLogin'] = $controllerObject->isLogin();
+    if($request->method != 'POST')
+        $message = $data['template'] == 'forgotPassword.php' ? $controllerObject->message: "";
+    
     if($controllerObject->responseType == 'html')
         include 'Pages/' . $data['template'];
 
