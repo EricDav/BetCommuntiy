@@ -22,7 +22,7 @@
                 $this->mail->Host  = "smtp.gmail.com";
                 $this->mail->SMTPAuth   = true;                                 // Enable SMTP authentication
                 $this->mail->Username   = 'pythonboss123@gmail.com';            // SMTP username
-                $this->mail->Password   = 'Iloveodunayo';                       // SMTP password
+                $this->mail->Password   = '';                       // SMTP password
                 // $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;          // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
                 $this->mail->Port       = 25;      
                 $this->mail->SMTPSecure = 'tsl';
@@ -37,6 +37,4 @@
             }
         }
     }
-
-
 ?>

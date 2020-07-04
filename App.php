@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'BetCommunity.class.php';
+include 'BetCommunity.Class.php';
 
 function isLogin() {
     if (isset($_SESSION['userInfo'])) {
