@@ -298,7 +298,6 @@
             $maxPossibelPredictionsWithCheat = BetCommunity::NUM_PREDICTIONS_PER_DAY * 2;
             
             if (sizeof($maxPredictions) < 3) {
-                echo 'I got here!!!'; exit;
                 return true;
             }
 

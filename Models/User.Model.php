@@ -83,10 +83,9 @@
                 $specialId = uniqid();
                 $imagePath = $sex == 'M' ? self::DEFAULT_IMAGE_PATH_MALE : DEFAULT_IMAGE_PATH_FEMALE;
                 $stmt->execute([$name, $email, $password, $sex, $country, $city, UserModel::DEFAULT_ROLE, $specialId, $imagePath]);
-                $temp = $stmt->fetch(PDO::FETCH_ASSOC);
                 return ['specialId' => $specialId, 'id' => $pdoConnection->pdo->lastInsertId()];
             } catch(Exception $e) {
-                var_dump($e);
+                var_dump($e->getMessage());
                 return false;
             }
         }

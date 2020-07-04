@@ -2,7 +2,8 @@
     class Enviroment {
         public static function getEnv() {
             $host = explode(':', $_SERVER['HTTP_HOST']);
-            return $host == 'localhost' ? 'development' : 'production';
+            // echo $host; exit;
+            return $host[0] == 'localhost' ? 'development' : 'production';
         }
     }
 ?>
