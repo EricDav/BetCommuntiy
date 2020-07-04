@@ -29,6 +29,26 @@
       </div>
     <!-- Modal end for uploading profile image-->
 
+    <?php if (!isLogin()): ?>
+      <!-- Modal start -->
+      <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+          <span id="close-icon"><i class="fa fa-close"></i></span>
+          <div style="height: 220px;" id='m-body-id' class="modal-body m-body">
+             <div style="margin-top: 50px;" class="obs-msg">Sorry for the obstruction!</div><br>
+             <div id="login-modal-txt" style="margin-top: -20px; font-style: oblique;" class="obs-msg"></div>
+             <span id="follow-note"></span>
+             <div class="login-modal-button-wrapper col-md-12">
+              <button style="width: 80%;" id="prediction-login" type="button" class="btn btn-primary">Login/Sign up</button><br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+      <!-- Model close -->
+  <?php endif; ?>
+
     <div class="timeline">
         <div class="timeline-cover">
           <!--Timeline Menu for Large Screens-->
@@ -38,12 +58,17 @@
                 <div class="profile-info">
                   <div class=" overlay-image _b1 ">
                     <img style="object-fit: cover;" id="profile-picture" src="<?=BetCommunity::IMAGES_PATH . $data['user'][0]['image_path']?>" alt="" class="image _b2 img-responsive profile-photo">
-                    <div class="hover _b3">
-                      <div class=" text _2 ">Change Profile Picture</div>
-                    </div>
+                    <?php if ($data['isSelf']): ?>
+                      <div class="hover _b3">
+                        <div class=" text _2 ">Change Profile Picture</div>
+                      </div>
+                    <?php endif ?>
                   </div>
+                  
+                  <?php if ($data['isSelf']): ?>
+                    <input style="display: none;" type="file" name="my_file" id="my-file" accept="image/*">
+                  <?php endif ?>
 
-                   <input style="display: none;" type="file" name="my_file" id="my-file" accept="image/*">
                   <h3><?=$data['user'][0]['name']?></h3>
                   <p class="text-muted">Creative Director</p>
                 </div>
@@ -52,13 +77,12 @@
                 <ul class="list-inline profile-menu">
                   <li><a id="profile-predictions" class="active">Predictions</a></li>
                   <li><a id="profile-about">About</a></li>
-                  <li><a id="profile-followers">Followers</a></li>
+                  <li><a id="profile-followers">Followers<span data="<?=$data['user'][0]['num_followers']?>" id="num-followers">(<?=$data['user'][0]['num_followers']?>)</a></li>
                   <li><a>Packages</a></li>
                 </ul>
                 <ul class="follow-me list-inline">
-                  <li><?=$data['followingText']?></li>
                   <?php if (!$data['isSelf']): ?>
-                    <li><button class="btn-primary">Follow</button></li>
+                    <li><button id="profile-follow" class="btn-primary"><?=isLogin() && $data['isFollowing'] ? 'Unfollow' : 'Follow' ?></button></li>
                   <?php endif; ?>
                 </ul>
               </div>
@@ -70,7 +94,10 @@
                     <div class="navbar-mobile hidden-lg hidden-md">
                       <div class="profile-info">
                         <img id="profile-picture" style="object-fit: cover;" src="<?=BetCommunity::IMAGES_PATH . $data['user'][0]['image_path']?>" alt="" class="img-responsive profile-photo _b3">
-                        <input style="display: none;" type="file" name="my_file" id="my-file" accept="image/*">
+                        <?php if ($data['isSelf']): ?>
+                          <input style="display: none;" type="file" name="my_file" id="my-file" accept="image/*">
+                        <?php endif ?>
+                        
                         <h4><?=$data['user'][0]['name']?></h4>
                         <p class="text-muted">Creative Director</p>
                       </div>
@@ -78,14 +105,16 @@
                         <ul class="list-inline">
                           <li id="profile-predictions-mobile" class="active"><a>Predictions</a></li>
                           <li id="profile-about-mobile"><a>About</a></li>
-                          <li id="profile-followers-mobile"><a>Followers</a></li>
+                          <li id="profile-followers-mobile"><a>Followers<span data="<?=$data['user'][0]['num_followers']?>" id="num-followers-mobile">(<?=$data['user'][0]['num_followers']?>)</a></li>
                           <li><a>Packages</a></li>
                         </ul>
-                        <button class="btn-primary">Follow</button>
+                        <?php if (!$data['isSelf']): ?>
+                          <button id="profile-follow-mobile" class="btn-primary"><?= isLogin() && $data['isFollowing'] ? 'Unfollow' : 'Follow' ?></button>
+                        <?php endif; ?>
                       </div>
                     </div>
                     <!--Timeline Menu for Small Screens End-->
-        </div>
+          </div>
   
           
         <div id="page-contents" style="position: relative;">
@@ -115,6 +144,9 @@
               <?php endif ?>
             </div>
 
+            <div id="followers-wrapper" style="display: none">
+                <?php include 'Pages/common/Forecaster.php'; ?>
+            </div>
               <!-- Post Create Box
               ================================================= -->
             <div id="profile-prediction-wrapper">
@@ -210,10 +242,14 @@
     </div>
     <?php include 'Pages/common/Script.php'?>
     <script type="text/javascript">var dates=<?=json_encode($data['dates'])?>;</script>
+    <script type="text/javascript">var __userId=<?=json_encode($data['user'][0]['id'])?>;</script>
+    <script type="text/javascript">var __name=<?=json_encode($data['user'][0]['name'])?>;</script>
     <script type="text/javascript">var __allCompetitions=<?=json_encode($data['competitions'])?>;</script>
     <script type="text/javascript">var __predictionInfo=<?=json_encode($data['predictionInfo'])?>;</script>
     <script type="text/javascript">var __outcomes=<?=json_encode($data['outcomes'])?>;</script>
+    <script type="text/javascript">var isFollowing=<?=json_encode($data['isFollowing'])?>;</script>
     <script src="/bet_community/Public/js/prediction.js"></script>
     <script src="/bet_community/Public/js/profile.js"></script>
+    <script src="/bet_community/Public/js/follow.js"></script>
 </body>
 <body>

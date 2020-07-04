@@ -22,6 +22,7 @@
             $this->endDateInUTC = null;  // This is the end date range weather today's, yesterday's or weekend games.
             $this->predictionStatus = isset($this->request->query['filter_status']) ? $this->request->query['filter_status'] : null;
             $this->currentSideBarFilter = 'All Predictions';
+            $this->isOddsFilter = null;
         }
 
         public function validate() {
@@ -45,7 +46,7 @@
             }
 
             if ($this->queryDay) {
-                 // echo $this->currentDate; exit;
+                 //echo $this->currentDate; exit;
                  $dateArr = explode(' ', $this->currentDate);
                  // var_dump($dateArr); exit;
 
@@ -71,7 +72,7 @@
                     }
 
                     if ($this->queryDay == 'today') {
-                        
+
                         $beginingDateDiff = $this->getMinutesDiff($this->currentDate,  $beginingDate);
                         $endingDateDiff = $this->getMinutesDiff($this->currentDate,  $endingDate);
                         $timeInUTC = strtotime(gmdate("Y-m-d\ H:i:s"));
@@ -84,6 +85,7 @@
 
                         $this->startDateInUTC = $startDateInUTC;
                         $this->endDateInUTC  = $endDateInUTC;
+                        // var_dump($this->endDateInUTC); exit;
                         $this->currentSideBarFilter = 'Today Predictions';
                     }
                 }
@@ -93,14 +95,14 @@
              * Validates for predictions query checks if
              * the query are both win and lost
              */
-            if ($this->query && !$this->isOddsFilter) {
-                if (!is_numeric($this->query))
-                    return false;
-                if ((int)$this->query != self::CORRECT_PREDICTION_QUERY && (int)$this->query != self::LOST_PREDICTION_QUERY
-                    && (int)$this->query != self::INPROGRESS_PREDICTION_QUERY) {
-                    return false;
-                }
-            }
+            // if ($this->query && !$this->isOddsFilter) {
+            //     if (!is_numeric($this->query))
+            //         return false;
+            //     if ((int)$this->query != self::CORRECT_PREDICTION_QUERY && (int)$this->query != self::LOST_PREDICTION_QUERY
+            //         && (int)$this->query != self::INPROGRESS_PREDICTION_QUERY) {
+            //         return false;
+            //     }
+            // }
 
             /**
              * Validates that page number is numeric
@@ -123,6 +125,7 @@
                 $predictions = PredictionModel::getPredictions($this->pdoConnection, Controller::DEFAULT_LIMIT,
                     $this->offset, $this->startDateInUTC, $this->endDateInUTC, $this->predictionStatus);
 
+                
                 $featuredUsers = UserModel::getFeaturedUsers($this->pdoConnection);
 
                 if (!$predictions && !is_array($predictions)) {
@@ -146,25 +149,10 @@
                     $this->setDateCreatedUTC($predictions);
                     $this->setPredictionInfo($predictions);
                     $this->data['template'] = 'Home.php';
-                    $this->data['title'] = 'Home';
-                    $this->data['predictionLostQuery'] = self::LOST_PREDICTION_QUERY;
-                    $this->data['predictionWonQuery'] = self::CORRECT_PREDICTION_QUERY;
-                    $this->data['predictionInprogressQuery'] = self::INPROGRESS_PREDICTION_QUERY;
-                    $this->data['homeNum'] = self::HOME_FILTER;
-                    $this->data['correctNum'] = self::CORRECT_FILTER;
-                    $this->data['lostNum'] = self::LOST_FILTER;
+                    $this->data['title'] = 'BetCommunity';
                     $this->data['supportedBettingPlatforms'] = BetGamesController::SUPPORTED_BETTING_PLATFORMS;
                     $this->data['competitions'] = $competitions->data->competition;
                     $this->data['outcomes'] = BetCommunity::OUTCOMES;
-                    if ($this->isOddsFilter) {
-                        $minMax = explode('_', $this->query);
-                        $this->data['min'] = $minMax[0];
-                        $this->data['max'] = $minMax[1];
-                    } else {
-                        $this->data['min'] = '';
-                        $this->data['max'] = '';                       
-                    }
-                    $this->data['inprogressNum'] = self::INPROGRESS_FILTER;
                     $this->responseType = 'html';
                 }
 
@@ -230,31 +218,6 @@
             return $html;
         }
 
-        /**
-         * This functions set the user_i, prediction_id of 
-         * the prediction. It is used at the client side to make 
-         * onclick events for following and liking users. And also
-         * used for displaying prediciton data
-         * 
-         * Note: This function should come after the when we 
-         * have all the followers, or we have called the getFollowers method.
-         */
-        public function setPredictionInfo($predictions) {
-            $predictionInfo = array();
-
-            foreach($predictions as $prediction):
-                $firstName = explode(' ', $prediction['name'])[0];
-                array_push($predictionInfo, array('user_id' => $prediction['user_id'], 
-                    'prediction_id' => $prediction['id'],
-                    'isFollowing_author' => $this->isFollowing($prediction['user_id']),
-                    'first_name' => $firstName,
-                    'prediction' => $prediction['prediction'],
-                    'prediction_type' => $prediction['type']
-                ));
-            endforeach;
-
-            $this->data['predictionInfo'] = $predictionInfo;
-        }
 
         public function formatPredictionJson($predictionJson) {
             $predictions = json_decode($predictionJson);

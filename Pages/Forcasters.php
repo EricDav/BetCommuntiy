@@ -32,26 +32,7 @@
             <!-- Post Create Box End-->
 
           <!-- Friend List =================================================  Start-->
-          <div class="friend-list">
-            <div class="row">
-              <?php foreach($data['forcasters'] as $forcaster): ?>
-                <div class="col-md-6 col-sm-6">
-                  <div class="friend-card">
-                  	<img src="bet_community/Public/images/covers/champions.jpg" alt="profile-cover" class="img-responsive cover">
-                  	<div class="card-info">
-                      <img style="object-fit: cover;" src="<?=BetCommunity::IMAGES_PATH . $forcaster['image_path']?>" alt="user" class="profile-photo-lg">
-                      <div class="friend-info">
-                        <a class="pull-right text-green">Follow</a>
-                      	<h5><a href="<?='/users/profile?id=' . (string)(BetCommunity::DEFAULT_ADD_PROFILE + $forcaster['id']) ?>" class="profile-link"><?=$forcaster['name']?></a></h5>
-                        <p>Total Predictions: <b><?=$forcaster['total_predictions']?></b></p>
-                        <span>Correct Predictions: <b><?=$forcaster['total_predictions_won']?> </b><i style="color: green;" class="fa fa-check"></i></span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              <?php endforeach ?>
-            </div>
-          </div>
+            <?php include 'Pages/common/Forecaster.php'; ?>
           <!-- Friend List =================================================  End-->
 
         </div>
@@ -65,7 +46,7 @@
                   <img src="images/users/user-15.jpg" alt="" class="profile-photo-sm pull-left">
                   <div>
                     <h5><a href="timeline.html"><?=$featuredUser['name']?></a></h5>
-                    <a id="<?=$featuredUser['id']?>" class="text-green"><?=$controllerObject->isFollowing($prediction['user_id']) ? 'Following': 'Follow' ?></a>
+                    <a id="<?=$featuredUser['id']?>" class="text-green"><?=isLogin() && $controllerObject->isFollowing($prediction['user_id']) ? 'Following': 'Follow' ?></a>
                   </div>
                 </div>
               <?php endforeach ?>
@@ -79,5 +60,6 @@
     <?php  include 'Pages/common/Footer.php';?>
     <?php include 'Pages/common/Script.php'?>
     <script src="/bet_community/Public/js/common-sidebar.js"></script>
+    <script src="/bet_community/Public/js/follow.js"></script>
   </body>
 </html>

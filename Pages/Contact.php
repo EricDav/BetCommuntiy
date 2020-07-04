@@ -7,7 +7,7 @@
              */
             include 'Pages/common/Head.php';
         ?>
-
+        <link rel="stylesheet" href="/bet_community/Public/css/contact.css">
     </head>
     <body>
         <?php
@@ -80,6 +80,7 @@
         </div>
         <?php include 'Pages/common/Footer.php';?>
         <?php include 'Pages/common/Script.php'?>
+        <script src = '/bet_community/Public/js/contact.js'></script>
        
     </body>
 </html>

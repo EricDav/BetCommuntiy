@@ -14,6 +14,20 @@
         return $minutes;
     }
 
+    function checkFixture($fixture, $scores) {
+        foreach($scores as $score) {
+            // var_dump($score);
+            // var_dump($fixture);
+            var_dump(property_exists($score, $fixture));
+            // exit;
+            if (property_exists($score, $fixture)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * This function takes two team from two 
      * different platform API and boking number and try 
@@ -26,11 +40,27 @@
         if ($fromApi == $fromBooking) 
             return true;
         
+        // return strpos($fromApi, $fromBooking) !== false || strpos($fromBooking, $fromApi) !== false;
+
         $fromAPiArr = explode(' ', $fromApi);
         $fromBookingArr = explode(' ', $fromBooking);
 
-        if (sizeof($fromAPiArr) == 1) {
-            return strpos($fromApi, $fromBooking) !== false || strpos($fromApi, $fromBooking) !== false;
+        // Loop to find empty elements and 
+        // unset the empty elements 
+        foreach($fromAPiArr as $key => $value)          
+            if(empty($value)) 
+                unset($fromAPiArr[$key]);
+
+        foreach($fromBookingArr as $key => $value)          
+            if(empty($value))
+                unset($fromBookingArr[$key]);
+
+        
+        // var_dump($fromAPiArr);
+        // var_dump($fromBookingArr);
+
+        if (sizeof($fromAPiArr) == 1 || sizeof($fromBookingArr) == 1) {
+            return strpos($fromApi, $fromBooking) !== false || strpos($fromBooking, $fromApi) !== false;
         }
 
         if (sizeof($fromAPiArr) != sizeof($fromBookingArr)) {
@@ -38,6 +68,9 @@
         }
 
         for($i = 0; $i < sizeof($fromBookingArr); $i++) {
+            // echo '<<<<=======>>>';
+            // var_dump($fromAPiArr[$i]);
+            // var_dump($fromBookingArr[$i]);
             if (strpos($fromAPiArr[$i], $fromBookingArr[$i]) !== false || strpos($fromBookingArr[$i], $fromAPiArr[$i]) !== false) {
                 continue;
             }
@@ -69,10 +102,11 @@
    // while (true) {
     $page = 0;
     $liveScroes = array();
-    // $data = json_decode(file_get_contents('http://livescore-api.com/api-client/scores/live.json?key=I6AUQWWnzLs6X5Jp&secret=EsdilZDQwoq6EpLnvmhmjeJSZcZXiImW'));
-    $data = json_decode(file_get_contents(__DIR__ . '/../data2.json'));
+    $data = json_decode(file_get_contents('http://livescore-api.com/api-client/scores/live.json?key=vjH0jEKGt48c6wTK&secret=GNFDi4dIM8MdfuuLNcL7QvNkzWwFtqq9'));
+    // var_dump($data);
+    // $data = json_decode(file_get_contents(__DIR__ . '/../data2.json'));
     
-    // file_put_contents('data2.json', json_encode($data));
+    file_put_contents('data4.json', json_encode($data));
     $endedMatches = array();
 
     foreach($data->data->match as $match) {
@@ -81,11 +115,12 @@
     }
 
 
-    if (!$data->data->match || sizeof($data->data->match) == 0) {
+    if (!$data->data->match || sizeof($endedMatches) == 0) {
         echo $counter;
         $counter +=1;
         // sleep(1800);
        //  continue;
+       exit;
     }
 
     $sql = 'SELECT id, prediction FROM predictions WHERE scores_finished=0';
@@ -93,10 +128,8 @@
         $predictions = $pdoConnection->pdo->query($sql)->fetchAll();
     } catch (Exception $e) {
         var_dump($e);
-        // Log error;
     }
 
-    // var_dump($endedMatches);  exit;
     foreach($predictions as $prediction) {
         $predictionObj = json_decode($prediction['prediction']);
         $scores = property_exists($predictionObj, 'scores') ? $predictionObj->scores : [];
@@ -114,62 +147,42 @@
                 }
                 
                 foreach($endedMatches as $match) {
-                   // var_dump($match); exit;
                     if ($match->home_id == $homeId && $match->away_id == $awayId) {
-                        array_push($scores, $match->ft_score);
-                        echo 'Break';
+                        array_push($scores, array($predictionObj->fixtures[$index] => $match->ft_score));
                         break;
                     }
                 }
             }
-            // var_dump($scores);
             $predictionObj->scores = $scores;
             $pdoConnection->pdo->query('UPDATE predictions SET prediction='. "'" . json_encode($predictionObj) . "'" . ' WHERE id=' . $prediction['id']);
         } else if(property_exists($predictionObj, 'dates')) {
-            for ($index = sizeof($scores); $index < sizeof($predictionObj->dates); $index++) {
-                $dateArr = explode(' ', $predictionObj->dates[$index]);
-                $fixture = explode(' - ', $predictionObj->fixtures[$index]);
+
+            for ($index = 0; $index < sizeof($predictionObj->dates); $index++) {
+
+                // checks if fixture scores has been updated.
+                if (checkFixture($predictionObj->fixtures[$index], $scores))
+                    continue;
+                $dateArr = explode(' ', $predictionObj->dates[$index]); // Get's the date arr e.g ['2020-07-01', '6:20'] 
+                $fixture = explode(' - ', $predictionObj->fixtures[$index]); // Get's the fixtures in array e.g ['Chelsea', 'Barca']
+                
 
                 // Checks if game has not started or in progress
                 if ($predictionObj->dates[$index] > gmdate("Y-m-d\ H:i:s") || getMinutesDiffFromNow($predictionObj->dates[$index]) < 90)
                     continue;
                 
                 foreach($endedMatches as $match) {
-                    if ($dateArr[1] == $match->scheduled) {
-                        array_push($scores, $match->ft_score);
-                    }
-
-                    if ($dateArr[0] . ':' . $dateArr[1] == $match->scheduled && isMatch($match->home_name, $match->away_name, $fixture)) {
-                        array_push($scores, array($fixture => $match->ft_score));
-                       //array_push($scores,  $match->ft_score);
-                        break;
+                    if ($dateArr[1] == $match->scheduled && isMatch($match->home_name, $match->away_name, $fixture)) {
+                        array_push($scores, array($predictionObj->fixtures[$index] => $match->ft_score));
                     }
                 }
             }
-            var_dump($scores);
+
             $predictionObj->scores = $scores;
-            // $pdoConnection->pdo->query('UPDATE predictions SET prediction='. "'" . json_encode($predictionObj) . "'" . ' WHERE id=' . $prediction['id']);
+            if (sizeof($predictionObj->dates) == sizeof($predictionObj->scores)) {
+                $pdoConnection->pdo->query('UPDATE predictions SET scores_finished=1 WHERE id=' . $prediction['id']);
+            }
+            $pdoConnection->pdo->query('UPDATE predictions SET prediction='. "'" . json_encode($predictionObj) . "'" . ' WHERE id=' . $prediction['id']);
         }
     }
-    // echo $counter;
-    // $counter +=1;
-    // sleep(1800);
-
-    // while (true) {
-    //     if (!$data) {
-    //         // TODO
-    //         break;
-    //         // log error like time
-    //     }
-
-    //     if (!$data->data->next_page) {
-    //         break;
-    //     }
-                    
-    //     $data = json_decode(file_get_contents($data->data->next_page));
-    //     array_push($results, $data->data->match);
-    //     $page+=1;
-    // }
-  //  }
-
+ // }
 ?>

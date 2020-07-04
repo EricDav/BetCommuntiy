@@ -9,6 +9,7 @@
 ================================================= -->
 <link rel="stylesheet" href="/bet_community/Public/css/bootstrap.min.css">
 <link rel="stylesheet" href="/bet_community/Public/css/style.css">
+<link rel="shortcut icon" href="/bet_community/Public/images/logo.png" type="image/x-icon"/>
 <link rel="stylesheet" href="/bet_community/Public/css/ionicons.min.css">
 <link rel="stylesheet" href="/bet_community/Public/css/font-awesome.min.css">
 <link href="/bet_community/Public/css/emoji.css" rel="stylesheet">

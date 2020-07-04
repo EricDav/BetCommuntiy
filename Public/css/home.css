@@ -338,7 +338,7 @@ table {
   .login-modal-button-wrapper {
       display: flex;
       justify-content: center;
-      margin-top: 30px;
+      margin-top: 40px;
   }
 
   #follow-note {
@@ -349,7 +349,7 @@ table {
     font-style: italic;
   }
 
-  #close-icon {
+  .close-icon {
     display: inline-block;
     width: 100%;
     text-align: end;
@@ -360,6 +360,21 @@ table {
     cursor: pointer;
   }
 
-  #close-icon > i {
+  .close-icon > i {
       margin-right: 10px;;
   }
+
+  .confirm-prediction-create-txt {
+    margin-top: 30px;
+    text-align: center;
+    color: green;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .copied-txt {
+    text-align: center;
+    margin-top: 5px;
+    color: green;
+    font-style: oblique;
+}

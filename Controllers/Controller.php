@@ -84,7 +84,7 @@ abstract class Controller {
     }
 
     public function jsonResponse($response) {
-        // header('Content-Type: application/json');
+        header('Content-Type: application/json');
         echo json_encode($response);
         exit;
     }
@@ -152,12 +152,40 @@ abstract class Controller {
         $dateArr = explode('-', $date);
         $timeArr = explode(':', $time);
         $time = $timeArr[0] . ':' . $timeArr[1]; // Enforce time to be in the format HH:mm
+        
         $isValiddate = checkdate($dateArr[1], $dateArr[2], $dateArr[0]);
+
         $isValidTime = preg_match("/^(?:2[0-3]|[01][0-9]):[0-5][0-9]$/", $time);  // Checks if a time is valid in this format HH:mm
 
         if ($isValiddate && $isValidTime) 
             return true;
         return false;
+    }
+
+    /**
+    * This functions set the user_i, prediction_id of 
+    * the prediction. It is used at the client side to make 
+    * onclick events for following and liking users. And also
+    * used for displaying prediciton data
+    * 
+    * Note: This function should come after the when we 
+    * have all the followers, or we have called the getFollowers method.
+    */
+    public function setPredictionInfo($predictions) {
+            $predictionInfo = array();
+
+            foreach($predictions as $prediction):
+                $firstName = explode(' ', $prediction['name'])[0];
+                array_push($predictionInfo, array('user_id' => $prediction['user_id'], 
+                    'prediction_id' => $prediction['id'],
+                    'isFollowing_author' => $this->isFollowing($prediction['user_id']),
+                    'first_name' => $firstName,
+                    'prediction' => $prediction['prediction'],
+                    'prediction_type' => $prediction['type']
+                ));
+            endforeach;
+
+            $this->data['predictionInfo'] = $predictionInfo;
     }
 
     public function getMinutesDiff($dateStr, $otherDateStr){
@@ -180,6 +208,12 @@ abstract class Controller {
         }
 
         return $text;
+    }
+
+    public function set404Page() {
+        $this->data['template'] = '404.php';
+        $this->data['title'] = '404 | Not found';
+        $this->responseType = 'html';
     }
 
     abstract function validate();

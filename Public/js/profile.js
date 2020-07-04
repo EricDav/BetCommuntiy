@@ -1,13 +1,16 @@
 /**
- * Declare jquary object for About page tabs
+ * Declare jquary object for Profile page tabs
  */
 var $profileAboutTab = $('#profile-about');
+var $profileFollowersTab = $('#profile-followers');
+var $profileFollowersTabMobile = $('#profile-followers-mobile');
 var $profilePredictionTab = $('#profile-predictions');
 var $profileAboutTabMobile = $('#profile-about-mobile');
 var $profilePredictionTabMobile = $('#profile-predictions-mobile');
 var $profileAboutWrapper = $('#profile-about-wrapper');
 var $profilePredictionWrapper = $('#profile-prediction-wrapper');
 var $editProfileSideBar = $('#edit-profile-side-bar');
+var $profileFollowersWrapper = $('#followers-wrapper');
 
 /**
  * Declare jquery object for edit profile side
@@ -43,23 +46,51 @@ var $editProfileSideBar = $('#edit-profile-side-bar');
 
 
 var lastActive = $profilePredictionTab;
+var lastWrapper = $profilePredictionWrapper;
+
 $profileAboutTab.click(function() {
     $profileAboutWrapper.show();
     $editProfileSideBar.show();
     lastActive.removeClass('active');
 
     $profileAboutTab.addClass('active');
-    $profilePredictionWrapper.hide();
+    lastWrapper.hide();
     lastActive = $profileAboutTab;
+    lastWrapper = $profileAboutWrapper;
+});
+
+$profileFollowersTab.click(function() {
+    $profileFollowersWrapper.show()
+    lastActive.removeClass('active');
+
+    $profileFollowersTab.addClass('active');
+    lastWrapper.hide();
+    $editProfileSideBar.hide();
+    lastActive = $profileFollowersTab;
+    lastWrapper = $profileFollowersWrapper;
 });
 
 $profilePredictionTabMobile.click(function() {
     $profilePredictionWrapper.show();
-    $profilePredictionTabMobile.addClass('active')
+    $profilePredictionTabMobile.addClass('active');
+
     lastActive.removeClass('active');
-    $profileAboutWrapper.hide();
+    lastWrapper.hide();
+    // $profileAboutWrapper.hide();
     $editProfileSideBar.hide();
     lastActive = $profilePredictionTab;
+    lastWrapper = $profilePredictionWrapper;
+});
+
+$profileFollowersTabMobile.click(function() {
+    $profileFollowersWrapper.show()
+    lastActive.removeClass('active');
+
+    $profileFollowersTab.addClass('active');
+    lastWrapper.hide();
+    $editProfileSideBar.hide();
+    lastActive = $profileFollowersTab;
+    lastWrapper = $profileFollowersWrapper;
 });
 
 $profileAboutTabMobile.click(function() {
@@ -68,17 +99,20 @@ $profileAboutTabMobile.click(function() {
     lastActive.removeClass('active');
 
     $profileAboutTabMobile.addClass('active');
-    $profilePredictionWrapper.hide();
+    lastWrapper.hide();
     lastActive = $profileAboutTab;
+    lastWrapper = $profileAboutWrapper;
 });
 
 $profilePredictionTab.click(function() {
     $profilePredictionWrapper.show();
     $profilePredictionTab.addClass('active')
     lastActive.removeClass('active');
-    $profileAboutWrapper.hide();
+
+    lastWrapper.hide();
     $editProfileSideBar.hide();
     lastActive = $profilePredictionTab;
+    lastWrapper = $profilePredictionWrapper;
 });
 
 var lastActiveForEditProfileTab = $editProfileBasic;

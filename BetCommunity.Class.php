@@ -4,6 +4,7 @@ class BetCommunity {
     const IMAGES_PATH = "/bet_community/Public/images/users/";
     const DEFAULT_ADD_PROFILE = 180191;
     const DEFAULT_METHOD = -1;
+    const NUM_PREDICTIONS_PER_DAY = 3;
     const routes = [
         '/login' => "LoginController",
         '/api/web/create-prediction' => "CreatePredictionController",
@@ -13,11 +14,22 @@ class BetCommunity {
         '/api/web/results' => "ResultsController",
         '/users/profile' => "UserProfileController",
         '/api/web/update-profile' => "UpdateUserProfileController",
-        '/contact' => "ContactController"
+        '/contact' => "ContactController",
         '/logout' => 'UserController@logout',
         '/api/web/delete-prediction' => "PredictionController@deletePrediction",
         '/forcasters' => "UserController@getForcasters",
+        '/api/web/report-prediction' => "PredictionController@reportPrediction",
+        '/predictions' => "PredictionController@getPrediction",
         '/' => "HomeController"
+    ];
+
+    const BUGS = [
+        'Invalid booking number',
+        'Some results are not correct',
+        'Failed Prediction marks as success',
+        'Success prediction marks as failure',
+        'Invalid outcome',
+        'Other'
     ];
 
     // saves class name as key and path as value
@@ -40,7 +52,7 @@ class BetCommunity {
         'UserProfileController' => 'Controllers/UserProfile.Controller.php',
         'UpdateUserProfileController' => 'Controllers/UpdateUserProfile.Controller.php',
         'ContactController' => 'Controllers/Contact.Controller.php',
-        'ContactModel' => 'Models/Contact.Model.php'
+        'ContactModel' => 'Models/Contact.Model.php',
         'PredictionController' => 'Controllers/Prediction.Controller.php'
     ];
 

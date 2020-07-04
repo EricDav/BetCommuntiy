@@ -78,6 +78,15 @@
                 if (is_array($follower) && sizeof($follower) > 0)
                     $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_BAD_REQUEST_CODE, 'messages' => 'Already following'));
 
+                $followersCount = UserModel::getUserFollowersCount($this->pdoConnection, $this->request->postData['user_id']);
+                
+                if ($followersCount['total_followers'] >= 1000) {
+                    $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_BAD_REQUEST_CODE, 'messages' => 'User already reached maximum followers'));
+                }
+
+                if (is_array($follower) && sizeof($follower) > 0)
+                    $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_BAD_REQUEST_CODE, 'messages' => 'Already following'));
+                
                 if (UserModel::addFollower($this->pdoConnection, $this->request->session['userInfo']['id'], 
                     $this->request->postData['user_id'])) {
                         $this->jsonResponse(array('success' => true, 'code' => Controller::HTTP_OKAY_CODE, 'messages' => 'Followed successfully'));
@@ -115,9 +124,14 @@
 
         public function getForcasters() {
             if ($this->request->method == 'GET') {
+                $followers = array();
                 $this->pdoConnection->open();
                 $forcasters = UserModel::getAllUsers($this->pdoConnection);
+                if ($this->isLogin()) {
+                    $followers = UserModel::getFollowers($this->pdoConnection, $this->request->session['userInfo']['id']);
+                }
 
+                $this->data['followers'] = $followers;
                 $this->data['template'] = 'Forcasters.php';
                 $this->data['title'] = 'Forcasters';
                 $this->data['forcasters'] = $forcasters;

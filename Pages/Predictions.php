@@ -66,7 +66,6 @@
             <div class="create-post">
             	<div class="row">
             		<div class="col-md-7 col-sm-7">
-                    <?=$data['paginationHtml']?>
                 </div>
             		<div  class="col-md-5 col-sm-9">
                     <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#createPredictionModal" id="open-prediction-modal">Create Prediction</button>
@@ -77,8 +76,8 @@
 
           <!-- Post Content
           ================================================= -->
+          <?php $prediction = $data['prediction'][0] ?>
           <?php $index = 0; ?>
-          <?php foreach($data['predictions'] as $prediction): ?>
             <?php $isFollowing = $data['isLogin'] && $controllerObject->isFollowing($prediction['user_id']); ?>
             <div id="<?='prediction-box-' . $prediction['id']?>" class="post-content">
             <div class="dropdown dot-menu">
@@ -147,8 +146,6 @@
                 </div>
               </div>
             </div>
-            <?php $index = $index + 1; ?>
-        <?php endforeach ?>
       </div>
           <!-- Newsfeed Common Side Bar Right
           ================================================= -->

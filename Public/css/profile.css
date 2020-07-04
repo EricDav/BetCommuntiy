@@ -85,3 +85,10 @@
     }
   }
 
+#profile-followers > span {
+    margin-left: 5px;
+    font-size: 11px;
+    font-style: oblique;
+    font-weight: 700;
+}
+

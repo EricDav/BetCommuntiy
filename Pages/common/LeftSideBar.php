@@ -8,11 +8,11 @@
 </ul><!--news-feed links ends-->
 <div id="chat-block" class="" style="">
     <label class="odds-label">Min Odds</label>
-    <input id="min_odd"  type="text" class="form-control" value="<?=$data['min']?>">
+    <input id="min_odd"  type="text" class="form-control" value="">
     <p id="min-error-text" class="odd_error"></p>
 
     <label class="odds-label">Max Odds</label>
-    <input id="max_odd"  type="text" class="form-control" value="<?=$data['max']?>">
+    <input id="max_odd"  type="text" class="form-control" value="">
     <p id="max-error-text" class="odd_error"></p>
     <div class="title">Search Odd</div>
 </div><!--chat block ends-->

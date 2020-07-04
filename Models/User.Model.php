@@ -43,7 +43,7 @@
 
         public static function getUserById($pdoConnection, $id) {
             try {
-                $sql = 'SELECT * FROM users WHERE id=?';
+                $sql = 'SELECT *, (SELECT COUNT(*) FROM followers WHERE user_id =' . $id . ') AS num_followers  FROM users WHERE id=?';
                 $stmt= $pdoConnection->pdo->prepare($sql);
                 $stmt->execute([$id]);
                 return $stmt->fetchAll();
@@ -143,6 +143,31 @@
             } catch(Exception $e) {
                 var_dump($e); exit;
                 return null;
+            }
+        }
+
+        public static function getUserFollowersCount($pdoConnection, $userId) {
+            try {
+                $sql = 'SELECT COUNT(*) AS total_followers  FROM followers WHERE user_id=' . $userId;
+                return $pdoConnection->pdo->query($sql)->fetch();
+            } catch(Exception $e) {
+                var_dump($e); exit;
+                return false;
+            }
+        }
+
+        public static function getUsersFollowers($pdoConnection, $userId) {
+            try {
+                $sql = 'SELECT followers.user_id, followers.follower_id, users.name, users.image_path,
+                (SELECT COUNT(*) FROM predictions WHERE predictions.user_id= users.id) AS total_predictions,
+                (SELECT COUNT(*) FROM predictions WHERE predictions.user_id= users.id AND predictions.won = 1) AS total_predictions_won
+                FROM followers INNER JOIN users ON followers.follower_id = users.id
+                WHERE followers.user_id=' . $userId;
+                
+                return $pdoConnection->pdo->query($sql)->fetchAll();
+            } catch(Exception $e) {
+                var_dump($e);
+                return false;
             }
         }
 

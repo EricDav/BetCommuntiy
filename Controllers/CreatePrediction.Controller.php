@@ -6,16 +6,12 @@
             $this->endDateTime = isset($request->postData['end_date_time']) ? $request->postData['end_date_time'] : '';
             $this->prediction = $this->request->postData['prediction'];
             $this->totalOdds =  '0';
-            $this->type = $request->postData['type'] ? $request->postData['type'] : '';
+            $this->type = isset($request->postData['type']) ? $request->postData['type'] : '';
+            $this->currentDate = isset($request->postData['current_date']) ? $request->postData['current_date'] : null;
         }
 
         public function validate() {
             $this->authenticate();
-
-            // Validate odds
-            if (!is_numeric($this->totalOdds)) {
-                $this->error['odds'] = 'Invalid odd odds should be in numbers';
-            }
 
             if (!$this->startDateTime) {
                 $this->error['start_date_time'] = 'Start date time is required';
@@ -36,6 +32,18 @@
 
             if (!$this->isValidateDateTime($startDate, $startTime)) {
                 $this->error['start_date_time'] = 'Invalid game start date time';
+            }
+
+            /**
+             * Validates current date
+             */
+            if (!$this->currentDate) { // checks if currentdate is added
+                $this->error['current_date'] = 'Current date is required';
+            } else {
+                $currentDateTime = explode(' ', $this->currentDate);
+                if (!$this->isValidateDateTime($currentDateTime[0], $currentDateTime[1])) {
+                    $this->error['current_date'] = 'Invalid current date';
+                }
             }
 
             if (!$this->isValidateDateTime($endDate, $endTime)) {
@@ -76,7 +84,7 @@
                 // }
 
                 if (sizeof($this->error) == 0 && $this->type == 'fixtures') {
-                    if($this->validateFixtureJson($this->prediction)['']) {
+                    if(!$this->validateFixtureJson($this->prediction)['success']) {
                         $this->error['prediction'] = 'Something is wrong with prediction json';
                     }
                 }
@@ -105,13 +113,17 @@
 
         public function perform() {
             $this->pdoConnection->open();
+            if (!$this->validatePredictionsPerDay($this->pdoConnection, $this->currentDate)) {
+                $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_BAD_REQUEST_CODE, 'messages' => 'Maximum prediction reached for the day. You only make three predictions per day'));
+            }
+
             $approved = $this->type == BetGamesController::PLATFORM_BET9JA ? 0 : 1;
             $userId = $this->request->session['userInfo']['id'];
             $result = PredictionModel::createPrediction($this->pdoConnection, $this->startDateTime, $this->endDateTime, $userId, $this->totalOdds, 
                 $this->prediction, $approved, $this->type);
 
             if ($result)
-                $this->jsonResponse(array('success' => true, 'code' => Controller::HTTP_OKAY_CODE, 'messages' => 'Prediction created successfully'));
+                $this->jsonResponse(array('success' => true, 'code' => Controller::HTTP_OKAY_CODE, 'messages' => 'Prediction created successfully', 'prediction_id' => $result));
 
             $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_SERVER_ERROR_CODE, 'message' => 'Server error'));
         }
@@ -219,7 +231,7 @@
                  * Checks the array of fixtures if we have already load it
                  * Else fecth it from file and add to the array
                  */
-                if (array_key_exists($competitionsFixturesFromFile, $competitionIdFromClient)) {
+                if (array_key_exists($competitionIdFromClient, $competitionsFixturesFromFile)) {
                     $competitionFixturesFromFile = $competitionsFixturesFromFile[$competitionIdFromClient];
                 } else {
                     $competitionFixturesFromFile = $this->getFixturesFromFile($competitionIdFromClient);
@@ -267,6 +279,60 @@
             }
 
             return json_decode(file_get_contents($filePath));
+        }
+
+        /**
+         * Function that determines if a user has made the maximum 
+         * match per day.
+         * 
+         * @param $predictionsPerDay - The maximum number of predictions per day
+         * @return It returns true if the logged in user has not gotten 
+         * to the maximum prediction for the day else returns false
+         * 
+         */
+        public function validatePredictionsPerDay($predictionsPerDay, $currentDateTimeInClientTimeZone) {
+            $maxPredictions = PredictionModel::getUsersLastPredictions($this->pdoConnection, $this->request->session['userInfo']['id'],
+                BetCommunity::NUM_PREDICTIONS_PER_DAY * 2);
+            
+            // var_dump($maxPredictions); exit;
+            $maxPossibelPredictionsWithCheat = BetCommunity::NUM_PREDICTIONS_PER_DAY * 2;
+            
+            if (sizeof($maxPredictions) < 3) {
+                echo 'I got here!!!'; exit;
+                return true;
+            }
+
+            
+            if (sizeof($maxPredictions) == $maxPossibelPredictionsWithCheat) {
+                $firstDate = explode(' ', $maxPredictions[0]['created_at'])[0];
+                $sixthDate = explode(' ', $maxPredictions[5]['created_at'])[0];
+    
+                if (explode('-', $firstDate)[2] == explode('-', $sixthDate)[2]) {
+                    // TODO log error here should not get to this
+                    return false;
+                }
+            }
+
+            $currentDateTimeInUTC = gmdate("Y-m-d\ H:i:s");
+
+            $minutesDiff = $currentDateTimeInClientTimeZone > $currentDateTimeInUTC 
+                    ? $this->getMinutesDiff($currentDateTimeInClientTimeZone, $currentDateTimeInUTC) : -1 * $this->getMinutesDiff($currentDateTimeInClientTimeZone, $currentDateTimeInUTC);
+
+            // var_dump($maxPredictions); exit;
+            // last third prediction the user made
+            $thirdPreDateTimeUTC = $maxPredictions[BetCommunity::NUM_PREDICTIONS_PER_DAY - 1]['created_at']; // get created in UTC
+            // var_dump($thirdPreDateTime); exit;
+            $time = strtotime($thirdPreDateTimeUTC) + ($minutesDiff * 60); // converting time to local
+            $thirdPreDateTimeInClientTimeZone = date("Y-m-d H:i:s", $time);
+
+            $thirdPreDate = explode(' ', $thirdPreDateTimeInClientTimeZone)[0];
+            $currentDateInClientTimeZone = explode(' ', $currentDateTimeInClientTimeZone)[0];
+
+            if (explode('-', $thirdPreDate)[2] == explode('-', $currentDateInClientTimeZone)[2]) {
+                return false;
+            }
+
+            return true;
         }
 
         public function determineMatch($homeName, $awayName, $homeAwayArr) {

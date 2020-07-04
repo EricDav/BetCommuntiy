@@ -10,7 +10,7 @@
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-            <a  class="navbar-brand" href="index-register.html"><img style="width: 40; margin-top: -5px; height: 40; border-radius: 10px;" src="bet_community/Public/images/logo.png" alt="logo"></a>
+            <a  class="navbar-brand" href="index-register.html"><img style="width: 200; margin-top: -10px; height: 40; border-radius: 10px;" src="/bet_community/Public/images/logo.png" alt="logo"></a>
           </div>
 
           <!-- Collect the nav links, forms, and other content for toggling -->

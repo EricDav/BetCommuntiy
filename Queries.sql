@@ -83,3 +83,10 @@ CREATE TABLE likes(
     prediction_id int references predictions(id),
 );
 
+CREATE TABLE bugs(
+    problem VARCHAR(100) NOT NULL,
+    note VARCHAR (400),
+    user_id int,
+    prediction_id int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
