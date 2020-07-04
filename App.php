@@ -9,6 +9,8 @@ function isLogin() {
     return false;
 }
 
+
+
 spl_autoload_register(function ($name) {
     $classPaths =  BetCommunity::loads;
     if (file_exists($classPaths[$name])) {
