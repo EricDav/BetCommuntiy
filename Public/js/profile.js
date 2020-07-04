@@ -1,4 +1,5 @@
-/**
+$(document).ready(function() {
+    /**
  * Declare jquary object for Profile page tabs
  */
 var $profileAboutTab = $('#profile-about');
@@ -49,6 +50,11 @@ var lastActive = $profilePredictionTab;
 var lastWrapper = $profilePredictionWrapper;
 
 $profileAboutTab.click(function() {
+    // Do nothing if the last tab is the same as the current 
+    // This means the user clicks the same tab more than once
+    if ($profileAboutTab == lastActive || $profileAboutTabMobile == lastActive) {
+        return;
+    }
     $profileAboutWrapper.show();
     $editProfileSideBar.show();
     lastActive.removeClass('active');
@@ -60,6 +66,11 @@ $profileAboutTab.click(function() {
 });
 
 $profileFollowersTab.click(function() {
+    // Do nothing if the last tab is the same as the current 
+    // This means the user clicks the same tab more than once
+    if ($profileFollowersTab == lastActive || $profileFollowersTabMobile == lastActive) {
+        return;
+    }
     $profileFollowersWrapper.show()
     lastActive.removeClass('active');
 
@@ -71,6 +82,11 @@ $profileFollowersTab.click(function() {
 });
 
 $profilePredictionTabMobile.click(function() {
+    // Do nothing if the last tab is the same as the current 
+    // This means the user clicks the same tab more than once
+    if ($profilePredictionTabMobile == lastActive || $profilePredictionTab == lastActive) {
+        return;
+    }
     $profilePredictionWrapper.show();
     $profilePredictionTabMobile.addClass('active');
 
@@ -78,33 +94,50 @@ $profilePredictionTabMobile.click(function() {
     lastWrapper.hide();
     // $profileAboutWrapper.hide();
     $editProfileSideBar.hide();
-    lastActive = $profilePredictionTab;
+    lastActive = $profilePredictionTabMobile;
     lastWrapper = $profilePredictionWrapper;
 });
 
 $profileFollowersTabMobile.click(function() {
+    // Do nothing if the last tab is the same as the current 
+    // This means the user clicks the same tab more than once
+    if ($profileFollowersTabMobile == lastActive || $profileFollowersTab == lastActive) {
+        return;
+    }
+
     $profileFollowersWrapper.show()
     lastActive.removeClass('active');
 
     $profileFollowersTab.addClass('active');
     lastWrapper.hide();
     $editProfileSideBar.hide();
-    lastActive = $profileFollowersTab;
+    lastActive = $profileFollowersTabMobile;
     lastWrapper = $profileFollowersWrapper;
 });
 
 $profileAboutTabMobile.click(function() {
+    // Do nothing if the last tab is the same as the current 
+    // This means the user clicks the same tab more than once
+    if ($profileAboutTabMobile == lastActive || $profileAboutTab == lastActive) {
+        return;
+    }
     $profileAboutWrapper.show();
     $editProfileSideBar.show();
     lastActive.removeClass('active');
 
     $profileAboutTabMobile.addClass('active');
     lastWrapper.hide();
-    lastActive = $profileAboutTab;
+    lastActive = $profileAboutTabMobile;
     lastWrapper = $profileAboutWrapper;
 });
 
 $profilePredictionTab.click(function() {
+    // Do nothing if the last tab is the same as the current 
+    // This means the user clicks the same tab more than once
+    if ($profilePredictionTab == lastActive) {
+        return;
+    }
+
     $profilePredictionWrapper.show();
     $profilePredictionTab.addClass('active')
     lastActive.removeClass('active');
@@ -416,3 +449,5 @@ $cityInput.focus(removeErrorBorder);
 $oldPasswordInput.focus(removeErrorBorder);
 $newPasswordInput.focus(removeErrorBorder);
 $confirmPasswordInput.focus(removeErrorBorder);
+
+});

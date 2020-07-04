@@ -305,6 +305,10 @@ table {
     #table-section {
         max-height: 300px;
     }
+
+    .static {
+        margin-top: 50px;
+    }
   }
 
   .bet-info {
@@ -377,4 +381,11 @@ table {
     margin-top: 5px;
     color: green;
     font-style: oblique;
+}
+
+.no-prediction {
+    text-align: center;
+    margin-top: 50px;
+    font-size: 17px;
+    font-weight: 700;
 }

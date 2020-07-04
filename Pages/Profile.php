@@ -78,7 +78,7 @@
                   <li><a id="profile-predictions" class="active">Predictions</a></li>
                   <li><a id="profile-about">About</a></li>
                   <li><a id="profile-followers">Followers<span data="<?=$data['user'][0]['num_followers']?>" id="num-followers">(<?=$data['user'][0]['num_followers']?>)</a></li>
-                  <li><a>Packages</a></li>
+                  <!-- <li><a>Packages</a></li> -->
                 </ul>
                 <ul class="follow-me list-inline">
                   <?php if (!$data['isSelf']): ?>
@@ -97,7 +97,7 @@
                         <?php if ($data['isSelf']): ?>
                           <input style="display: none;" type="file" name="my_file" id="my-file" accept="image/*">
                         <?php endif ?>
-                        
+
                         <h4><?=$data['user'][0]['name']?></h4>
                         <p class="text-muted">Creative Director</p>
                       </div>
@@ -106,7 +106,7 @@
                           <li id="profile-predictions-mobile" class="active"><a>Predictions</a></li>
                           <li id="profile-about-mobile"><a>About</a></li>
                           <li id="profile-followers-mobile"><a>Followers<span data="<?=$data['user'][0]['num_followers']?>" id="num-followers-mobile">(<?=$data['user'][0]['num_followers']?>)</a></li>
-                          <li><a>Packages</a></li>
+                          <!-- <li><a>Packages</a></li> -->
                         </ul>
                         <?php if (!$data['isSelf']): ?>
                           <button id="profile-follow-mobile" class="btn-primary"><?= isLogin() && $data['isFollowing'] ? 'Unfollow' : 'Follow' ?></button>
@@ -145,7 +145,13 @@
             </div>
 
             <div id="followers-wrapper" style="display: none">
-                <?php include 'Pages/common/Forecaster.php'; ?>
+                <?php if (sizeof($data['followers']) == 0): ?>
+                  <div class="no-prediction"><?=$data['user'][0]['name'] . ' do not have any followers yet' ?></div>
+                <?php endif ?>
+
+                <?php if (sizeof($data['followers'] > 0)): ?>
+                  <?php include 'Pages/common/Forecaster.php'; ?>
+                <?php endif ?>
             </div>
               <!-- Post Create Box
               ================================================= -->
@@ -164,6 +170,11 @@
 
               <!-- Post Content
               ================================================= -->
+              <?php if(sizeof($data['predictions']) == 0): ?>
+                <div class="no-prediction"> No Predictions Found </div>
+              <?php endif ?>
+
+
               <?php foreach($data['predictions'] as $prediction): ?>
                 <?php $isFollowing = $data['isLogin'] && $controllerObject->isFollowing($prediction['user_id']); ?>
                 <div class="post-content">

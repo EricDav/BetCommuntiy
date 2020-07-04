@@ -77,6 +77,10 @@
 
           <!-- Post Content
           ================================================= -->
+          <?php if(sizeof($data['predictions']) == 0): ?>
+            <div class="no-prediction"> No Predictions Found </div>
+          <?php endif ?>
+
           <?php $index = 0; ?>
           <?php foreach($data['predictions'] as $prediction): ?>
             <?php $isFollowing = $data['isLogin'] && $controllerObject->isFollowing($prediction['user_id']); ?>
