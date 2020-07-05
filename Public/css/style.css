@@ -46,7 +46,8 @@
 
 html, body {
     height: 100%;
-    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
   
   body{
@@ -1101,10 +1102,10 @@ html, body {
   
   /*Chat Block CSS*/
   
-  #chat-block{
+  /* #chat-block{
     margin: 0 0 40px 0;
     text-align: center;
-  }
+  } */
   
   #chat-block .title{
     background: #8dc63f;
@@ -2371,7 +2372,12 @@ html, body {
     .faq-cat-list.nav-tabs>li>a{min-width: 150px; padding: 30px 15px;}
     
     .error-page .error-content form .form-group{width: 80%;}
-    
+    .post-content .post-container .post-detail {
+      margin-left: 0px;
+    }
+    img.profile-photo-md {
+      margin-right: 10px;
+    }
   }
   
   

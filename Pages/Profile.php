@@ -18,16 +18,24 @@
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
-            <div style="display: flex; justify-content: center;"  class="modal-body">
-              <image style="width: 280px; height: 280px; object-fit: cover;" id="image-preview" src="" alt="" class="img-responsive profile-photo"/>
+            <div style="display: flex; justify-content: center; margin-top: 0px; flex-direction: column;"  class="modal-body">
+            <div style="display: none;" class="alert alert-success" role="alert"></div>
+            <div style="display: none;" class="alert alert-danger" role="alert"></div>
+              <div style="display: flex; justify-content: center;"><image style="width: 280px; height: 280px; object-fit: cover;" id="image-preview" src="" alt="" class="img-responsive profile-photo"/></div>
             </div>
             <div class="modal-footer">
-              <button id="upload-photo" type="button"  style="width: 150px" class="btn btn-primary">Upload</button>
+              <button id="upload-photo" type="button"  style="width: 150px; outline: none;" class="btn btn-primary">Upload</button>
             </div>
           </div>
         </div>
       </div>
     <!-- Modal end for uploading profile image-->
+
+    <?php if (!isLogin()): ?>
+      <!-- Modal start -->
+      <?php  include 'Pages/modals/ObstructionModal.php';?>
+      <!-- Model close -->
+  <?php endif; ?>
 
     <div class="timeline">
         <div class="timeline-cover">
@@ -38,54 +46,65 @@
                 <div class="profile-info">
                   <div class=" overlay-image _b1 ">
                     <img style="object-fit: cover;" id="profile-picture" src="<?=BetCommunity::IMAGES_PATH . $data['user'][0]['image_path']?>" alt="" class="image _b2 img-responsive profile-photo">
-                    <div class="hover _b3">
-                      <div class=" text _2 ">Change Profile Picture</div>
-                    </div>
+                    <?php if ($data['isSelf']): ?>
+                      <div class="hover _b3">
+                        <div class=" text _2 ">Change Profile Picture</div>
+                      </div>
+                    <?php endif ?>
                   </div>
+                  
+                  <?php if ($data['isSelf']): ?>
+                    <input style="display: none;" type="file" name="my_file" id="my-file" accept="image/*">
+                  <?php endif ?>
 
-                   <input style="display: none;" type="file" name="my_file" id="my-file" accept="image/*">
                   <h3><?=$data['user'][0]['name']?></h3>
                   <p class="text-muted">Creative Director</p>
                 </div>
               </div>
               <div class="col-md-9">
                 <ul class="list-inline profile-menu">
-                  <li><a id="profile-predictions" href="#" class="active">Predictions</a></li>
-                  <li><a id="profile-about" href="#">About</a></li>
-                  <li><a id="profile-followers" href="#">Followers</a></li>
-                  <li><a href="#">Packages</a></li>
+                  <li><a id="profile-predictions" class="active">Predictions</a></li>
+                  <li><a id="profile-about">About</a></li>
+                  <li><a id="profile-followers">Followers<span data="<?=$data['user'][0]['num_followers']?>" id="num-followers">(<?=$data['user'][0]['num_followers']?>)</a></li>
+                  <!-- <li><a>Packages</a></li> -->
                 </ul>
                 <ul class="follow-me list-inline">
-                  <li><?=$data['followingText']?></li>
                   <?php if (!$data['isSelf']): ?>
-                    <li><button class="btn-primary">Follow</button></li>
+                    <li><button id="profile-follow" class="btn-primary"><?=isLogin() && $data['isFollowing'] ? 'Unfollow' : 'Follow' ?></button></li>
                   <?php endif; ?>
                 </ul>
               </div>
             </div>
           </div>
-        </div>
-          <!--Timeline Menu for Large Screens End-->
-          
+           <!--Timeline Menu for Large Screens End-->
 
-          <!--Timeline Menu for Small Screens-->
-          <div class="navbar-mobile hidden-lg hidden-md">
-            <div class="profile-info">
-              <img style="object-fit: cover;" src="<?=BetCommunity::IMAGES_PATH . $data['user'][0]['image_path']?>" alt="" class="img-responsive profile-photo">
-              <h4><?=$data['user'][0]['name']?></h4>
-              <p class="text-muted">Creative Director</p>
-            </div>
-            <div class="mobile-menu">
-              <ul class="list-inline">
-                <li id="profile-predictions" class="active"><a href="timline.html">Predictions</a></li>
-                <li id="profile-about"><a href="timeline-about.html">About</a></li>
-                <li id="profile-followers"><a href="timeline-album.html">Followers</a></li>
-                <li><a href="timeline-friends.html">Packages</a></li>
-              </ul>
-              <button class="btn-primary">Add Friend</button>
-            </div>
+                  <!--Timeline Menu for Small Screens-->
+                    <div class="navbar-mobile hidden-lg hidden-md">
+                      <div class="profile-info">
+                        <img id="profile-picture-mobile" style="object-fit: cover;" src="<?=BetCommunity::IMAGES_PATH . $data['user'][0]['image_path']?>" alt="" class="img-responsive profile-photo _b3">
+                        <?php if ($data['isSelf']): ?>
+                          <input style="display: none;" type="file" name="my_file" id="my-file" accept="image/*">
+                        <?php endif ?>
+
+                        <h4><?=$data['user'][0]['name']?></h4>
+                        <p class="text-muted">Creative Director</p>
+                      </div>
+                      <div class="mobile-menu">
+                        <ul class="list-inline">
+                          <li id="profile-predictions-mobile" class="active"><a>Predictions</a></li>
+                          <li id="profile-about-mobile"><a>About</a></li>
+                          <li id="profile-followers-mobile"><a>Followers<span data="<?=$data['user'][0]['num_followers']?>" id="num-followers-mobile">(<?=$data['user'][0]['num_followers']?>)</a></li>
+                          <!-- <li><a>Packages</a></li> -->
+                        </ul>
+                        <?php if (!$data['isSelf']): ?>
+                          <button id="profile-follow-mobile" class="btn-primary"><?= isLogin() && $data['isFollowing'] ? 'Unfollow' : 'Follow' ?></button>
+                        <?php endif; ?>
+                      </div>
+                    </div>
+                    <!--Timeline Menu for Small Screens End-->
           </div>
-          <!--Timeline Menu for Small Screens End-->
+  
+          
         <div id="page-contents" style="position: relative;">
           <div class="row">
             <div class="col-md-3">
@@ -113,6 +132,15 @@
               <?php endif ?>
             </div>
 
+            <div id="followers-wrapper" style="display: none">
+                <?php if (sizeof($data['followers']) == 0): ?>
+                  <div class="no-prediction"><?=$data['user'][0]['name'] . ' do not have any followers yet' ?></div>
+                <?php endif ?>
+
+                <?php if (sizeof($data['followers'] > 0)): ?>
+                  <?php include 'Pages/common/Forecaster.php'; ?>
+                <?php endif ?>
+            </div>
               <!-- Post Create Box
               ================================================= -->
             <div id="profile-prediction-wrapper">
@@ -130,6 +158,11 @@
 
               <!-- Post Content
               ================================================= -->
+              <?php if(sizeof($data['predictions']) == 0): ?>
+                <div class="no-prediction"> No Predictions Found </div>
+              <?php endif ?>
+
+
               <?php foreach($data['predictions'] as $prediction): ?>
                 <?php $isFollowing = $data['isLogin'] && $controllerObject->isFollowing($prediction['user_id']); ?>
                 <div class="post-content">
@@ -141,16 +174,16 @@
                   <i class="fa fa-ellipsis-h dropdown-toggle" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
                   <div id="menu-action" class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                     <?php if($data['isLogin'] && (int)$_SESSION['userInfo']['role'] > 1): ?>
-                      <a class="dropdown-item" href="#"> <i class="fa fa-user"></i>  Action</a>
+                      <a class="dropdown-item"> <i class="fa fa-user"></i>  Action</a>
                     <?php endif ?>
 
-                    <a  id="<?= 'dot-menu-' . $prediction['user_id']?>" class="dropdown-item" href="#"> <i class="<?= $isFollowing ? 'fa fa-user-times' : 'fa fa-user'; ?>"></i>
+                    <a  id="<?= 'dot-menu-' . $prediction['user_id']?>" class="dropdown-item"> <i class="<?= $isFollowing ? 'fa fa-user-times' : 'fa fa-user'; ?>"></i>
                       <?= !$isFollowing ? '  Follow     ' . explode(' ', $prediction['name'])[0] : '  Unfollow     ' . explode(' ', $prediction['name'])[0]?>
                     </a>
                     <div class="line-divider"></div>
-                    <a class="dropdown-item" href="#"><i class="fa fa-bug"></i> Report Prediction</a>
+                    <a class="dropdown-item"><i class="fa fa-bug"></i> Report Prediction</a>
                     <div class="line-divider"></div>
-                    <a class="dropdown-item" href="#"><i class="fa fa-share-alt"></i> Copy Prediction Link</a>
+                    <a class="dropdown-item"><i class="fa fa-share-alt"></i> Copy Prediction Link</a>
                   </div>
                 </div>
                   <div style="padding-top: 10px;" class="post-container">
@@ -208,10 +241,14 @@
     </div>
     <?php include 'Pages/common/Script.php'?>
     <script type="text/javascript">var dates=<?=json_encode($data['dates'])?>;</script>
+    <script type="text/javascript">var __userId=<?=json_encode($data['user'][0]['id'])?>;</script>
+    <script type="text/javascript">var __name=<?=json_encode($data['user'][0]['name'])?>;</script>
     <script type="text/javascript">var __allCompetitions=<?=json_encode($data['competitions'])?>;</script>
     <script type="text/javascript">var __predictionInfo=<?=json_encode($data['predictionInfo'])?>;</script>
     <script type="text/javascript">var __outcomes=<?=json_encode($data['outcomes'])?>;</script>
+    <script type="text/javascript">var isFollowing=<?=json_encode($data['isFollowing'])?>;</script>
     <script src="/bet_community/Public/js/prediction.js"></script>
     <script src="/bet_community/Public/js/profile.js"></script>
+    <script src="/bet_community/Public/js/follow.js"></script>
 </body>
 <body>

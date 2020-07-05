@@ -26,7 +26,7 @@ class LoginController extends Controller {
                 return true;
             }
 
-            $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_BAD_REQUEST_CODE, 'messages' => 'Invalid email or password'));
+            $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_BAD_REQUEST_CODE, 'message' => 'Invalid email or password'));
 
         } else if ($this->request->postData['type'] == 'signup') {
            return $this->handleSignupValidation();

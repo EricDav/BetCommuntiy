@@ -28,7 +28,6 @@ class ContactController extends Controller{
                             "field_index" => $field_indicator
                         )
                     );
-                    exit;
                 }
 
 
@@ -50,7 +49,6 @@ class ContactController extends Controller{
                                 "field_index" => $field_indicator
                             )
                         );
-                        exit;
                     }else if($valid_result['isValid'] == true){
                         $this->data['name'] = $value;
                     } 
@@ -93,7 +91,7 @@ class ContactController extends Controller{
     public function perform(){
         if ($this->request->method == 'GET') {
             $this->data['template'] = 'Contact.php';
-            $this->data['title'] = 'Bet | Contact Us';
+            $this->data['title'] = 'BetCommunity | Contact Us';
             $this->responseType = 'html';
         }else if($this->request->method == 'POST'){
             $time = new DateTime('now');
@@ -142,7 +140,6 @@ class ContactController extends Controller{
                             'message' => $register_contact_message,
                         )
                     );
-                    exit;
                 }else{
                     if($register_contact_message === true){
                         $this->jsonResponse(
@@ -152,7 +149,6 @@ class ContactController extends Controller{
                                 'message' => 'Message successfully registered',
                             )
                         );
-                        exit;
                     }else{
                         $this->jsonResponse(
                             array(
@@ -161,7 +157,6 @@ class ContactController extends Controller{
                                 'message' => 'Something went wrong, try again!',
                             )
                         );
-                        exit;
                     }
                 }
             }   

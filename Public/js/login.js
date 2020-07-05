@@ -28,10 +28,12 @@ $("#login_button").click(function(){
     } else {
         $.ajax('/login', { data: {type: 'login', 'email': loginEmail.val(), 'password' :loginPassword.val()},
          type: 'POST',  success: function(result) {
-            console.log(result);
-            // response = JSON.parse(result)
-           if (!result.success) {
-                $('#error-message').text(result.messages);
+            // console.log(result.success);
+            response = result;
+            console.log(response);
+           if (!response.success) {
+               console.log('I got here');
+                $('#error-message').text(response.message);
            } else {
                window.location = '/';
            }
@@ -61,7 +63,7 @@ $('#signup-button').click(function() {
 
     if (empty.length == 1) {
         message = empty[0] + ' is required';
-        $('#signup-error-message').text(message)
+        $('#signup-error-message').text(message);
     }
 
     if (empty.length > 1) { 
@@ -79,7 +81,6 @@ $('#signup-button').click(function() {
     }
 
     if (empty.length == 0) {
-        console.log(sexMale.attr('checked'));
         var sex = sexMale.is(':checked') ? 'Male' : 'Female';
         var postData = {
             type: 'signup', 
@@ -95,7 +96,6 @@ $('#signup-button').click(function() {
         $.ajax('/login', { data: postData,
             type: 'POST',  success: function(result) {
              console.log(result);
-           // response = JSON.parse(result)
             if (!result.success) {
                 message = '';
                 mArr = []
@@ -116,6 +116,7 @@ $('#signup-button').click(function() {
                         }
                     });   
                 }
+                console.log(message);
                 $('#signup-error-message').text(message);
             } else {
                 window.location = '/';

@@ -1,0 +1,23 @@
+a {
+    cursor: pointer !important;
+}
+
+.friend-info > p {
+    margin: unset;
+    font-size: 13px;
+}
+
+.friend-info > span {
+    font-size: 13;
+}
+
+#forecasters {
+    font-weight: 700;
+    font-size: 15px;
+    color: black;
+}
+
+.odds-label {
+    width: 100%;
+    text-align: left;
+}

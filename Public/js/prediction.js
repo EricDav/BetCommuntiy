@@ -19,6 +19,8 @@ const FOLLOW_ELEMENT_ID_PREFIX = 'follow-';
 const DOT_MENU_ELEMENT_ID_PREFIX = 'dot-menu-';
 const USER_ICON = '<i class="fa fa-user"></i>';
 const USER_CANCEL_ICON = '<i class="fa fa-user-times"></i>';
+const COPY_PREDICTION_LINK_PREFIX = 'copy-prediction-';
+const REPORT_PREDICTION_PREFIX = 'report-prediction-';
 const BOOKING_NUMBER_TAB = 1;
 const FIXTURES_TAB = 2;
 const TEXT_TAB = 3;
@@ -28,6 +30,9 @@ const PLATFORM_BET9JA = 'Bet9ja';
 const PLATFORM_BETKING = 'BetKing';
 const PLATFORM_SPORTY_BET = 'SportyBet';
 const DEFAULT_DATE_TIME = '1900-01-01 00:00:00';
+let REPORT_PREDICTION_ID = null;
+let lastcreatedPreditionId = null;
+var isMobile = false;
 
 var currentTab = BOOKING_NUMBER_TAB // Set the default tab to the booking number tab
 
@@ -35,7 +40,40 @@ var tabs = [BOOKING_NUMBER_TAB, TEXT_TAB, FIXTURES_TAB];
 var tabIds = ['#tab-one-id', '#tab-two-id', 'tab-three-id'];
 
 $bookingCodetab = $('#booking-code-tab');
+$('#open-prediction-modal').click(function() {
+    if ($$id == -1) {
+        $('#login-modal-txt').html('You need to <a href="/login" style="cursor: pointer;">login or signup</a> to create a prediction');
+        $('#follow-note').text('');
+    }
+});
 
+if ($(this).width() <= 992) {
+    var isMobile = true;
+    $('#chat-block').attr('style', '');
+    $('#sticky-sidebar').attr('style', '');
+    $('#chat-block').trigger('sticky_kit:detach');
+    $('#sticky-sidebar').trigger('sticky_kit:detach');
+}
+
+/**
+ * This is the on click for the modal that
+ * cancel icon that displays when users are 
+ * not logged in. E.g when a user wants to predict 
+ * and he/she isn't logged in the modal that shows up
+ * this is the onclick for closing the modal.
+ */
+$('#close-icon').click(function() {
+    $('#createPredictionModal').modal('hide');
+});
+
+/**
+ * This is the on click for the modal that
+ * cancel icon that displays when a prediction  
+ * has just been created
+ */
+$('#close-icon-confirm-prediction').click(function() {
+    $('#confirmModalCreate').modal('hide');
+});
 
 /**
  * Register onclick for the tabs. 
@@ -80,6 +118,25 @@ $('#tab-three-id').click(function() {
     predictionButton.text('Submit');
 });
 
+/**
+ * Handles onclick for copying the link of the
+ * just created prediction
+ */
+$('#copy-link-after-prediction-create').click(function() {
+    console.log(lastcreatedPreditionId, '====>>>>');
+    copyToClipboard(lastcreatedPreditionId);
+    $('.copied-txt').text('Link copied to clipboard!');
+});
+
+/**
+ * Handles onclick for viewing the just created
+ * prediction
+ */
+$('#view-link-after-prediction-create').click(function() {
+    window.location.href = window.location.origin + '/predictions?id=' + lastcreatedPreditionId;
+});
+
+
 
 /**
  * It displays the date when each prediction
@@ -90,17 +147,65 @@ dates.forEach(function(item, index) {
     $('#date-' + item.id.toString()).text(formatDateCreated(date));
 });
 
-
+var formatedPredictions = [];
+var scores
 /**
  * It displays prediction data
  */
 __predictionInfo.forEach(function (item, index) {
     var prediction = JSON.parse(item.prediction);
-    // console.log(prediction);
     item.prediction = prediction;
+    scores = prediction.hasOwnProperty('scores') ? prediction.scores : [];
+    formatedPredictions.push(formatPredictionDataForMobile(prediction));
     $('#prediction-info-' + item.prediction_id).append(generatePredictionInfoHtml(prediction, item.prediction_type));
-    $('#prediction-' + item.prediction_id).append(generatePredictionTable(prediction));
+
+    if (isMobile) {
+        $('#prediction-' + item.prediction_id).append(generatePredictionHtmlForMobileView(formatPredictionDataForMobile(prediction), scores));
+    } else {
+        $('#prediction-' + item.prediction_id).append(generatePredictionTable(prediction));
+    }
 });
+
+function generatePredictionHtmlForMobileView(prediction, scores) {
+    console.log(scores);
+    $html = '<div class="mobile-prediction-wrapper">';
+
+    var homeScore;
+    var awayScore;
+    var resultArr 
+    for (league in prediction) {
+        $html+= '<div class="mobile-league">' + league + '</div>';
+        datesFixturesObj = prediction[league];
+        
+        datesFixturesObj.dates.forEach(function(date, index) {
+            $html+= '<div class="mobile-fixture-wrapper">';
+            var dateStr = date + ' UTC';
+            var date = new Date(dateStr.replace(/-/g, '/'));
+            result = getScore(datesFixturesObj.fixtures[index], scores);
+
+            if (result) {
+                resultArr = result.split(' - ');
+                homeScore = '<span style="color: #27aae1; margin-left: 5px;">' + resultArr[0] + '</span>';
+                awayScore = '<span style="color: #27aae1; margin-right: 5px;">' + resultArr[1] + '</span>';
+            } else {
+                homeScore = '';
+                awayScore = '';
+            }
+            fixtureArr = datesFixturesObj.fixtures[index].split(' - ');
+
+            $html+='<div style="font-weight: unset; max-width: 30%;">' + formatDateForPrediction(date) + '</div>';
+            $html+='<div class="mobile-fixture">' + fixtureArr[0] + homeScore.toString() + ' - ' + awayScore.toString() + fixtureArr[1] + '</div>';
+            $html+='<div style="font-weight: 700;">' + datesFixturesObj.outcomes[index] + '</div>';
+            $html+= '</div>';
+        });
+    }
+
+    $html+= '</div>';
+
+    return $html;
+}
+
+console.log(formatedPredictions);
 
 console.log(__predictionInfo);
 
@@ -111,8 +216,6 @@ function calculateOdds(odds) {
     odds.forEach(function(odd) {
         resultOdds*=Number.parseFloat(odd);
     });
-
-    console.log(resultOdds);
 
     return resultOdds.toFixed(2);
 }
@@ -130,7 +233,8 @@ function generatePredictionInfoHtml(prediction, predictionType) {
 
 function generatePredictionTable(data) {
     $table = '<table style="width:100%; margin-top: 10px; border:unset;">' +
-                 '<tr style="border:unset;"><th style="border:unset;">Date/Time</th><th style="border:unset;">League</th><th style="border:unset;">Fixture</th><th style="border:unset;">Oucome</th></tr>';
+                 '<tr style="border:unset;"><th style="border:unset;">Date/Time</th><th style="border:unset;">League</th><th style="border:unset;">Fixture</th><th style="border:unset;">Oucome</th>' + 
+                 (data.hasOwnProperty('scores') && data.scores.length > 0 ? '<th style="border:unset;">Result</th>' : '' ) + '</tr>';
     
     data.leagues.forEach(function(item, index) {
         if (data.dates) {
@@ -139,17 +243,69 @@ function generatePredictionTable(data) {
         }
 
         $table += '<tr style="border:unset;">' + '<td style="border:unset;">' + (data.dates ? formatDateCreated(date) : 'NS') + '</td>' + '<td style="border:unset;">' + item + '</td>' + '<td style="border:unset;">' + data.fixtures[index] + '</td>' + 
-            '<td style="border:unset;">' + data.outcomes[index] + '</td>';
+            '<td style="border:unset;">' + data.outcomes[index] + '</td>' + (data.hasOwnProperty('scores') && data.scores.length > 0 ? '<td style="border:unset;">' + getScore(data.fixtures[index], data.scores) + '</td>' : '');
     });
 
     $table += '</table>';
     return $table;
 }
 
-function diff_minutes(dt2, dt1) {
+function formatPredictionDataForMobile(prediction) {
+    formatedResult = {}
+    prediction.leagues.forEach(function(league, index) {
+        if (league in formatedResult) {
+            formatedResult[league].dates.push(prediction.dates[index]);
+            formatedResult[league].fixtures.push(prediction.fixtures[index]);
+            formatedResult[league].outcomes.push(prediction.outcomes[index]);
+        } else {
+            formatedResult[league] = {dates: [prediction.dates[index]], fixtures: [prediction.fixtures[index]], outcomes: [prediction.outcomes[index]]}
+        }
+    });
+
+    return formatedResult;
+}
+
+function getScore(fixture, scores) {
+    // console.log(scores, fixture);
+    for (let i = 0; i < scores.length; i++) {
+        // console.log(scores[i]);
+        // console.log(scores[i].hasOwnProperty(fixture))
+        if (scores[i].hasOwnProperty(fixture)) {
+            return scores[i][fixture];
+        }
+    }
+
+    return '';
+}
+
+function copyToClipboard(predictionId) {
+    var link = window.location.origin + '/predictions?id=' + predictionId;
+    var $temp = $('<input>');
+    $("html").append($temp);
+    $temp.val(link).select();
+    $temp.focus();
+    document.execCommand("copy");
+    $temp.remove();
+}
+  
+
+function diff_minutes(dt2, dt1) { 
     var diff =(dt2.getTime() - dt1.getTime()) / 1000;
     diff /= 60;
     return Math.abs(Math.round(diff));
+}
+
+function resetCreatePredictionModal() {
+    if (currentTab == BOOKING_NUMBER_TAB) {
+        removeBookingTable();
+        $('#booking-number').val('');
+    } else {
+        $competitionSearch.val('');
+        $searchFixtureInput.val('');
+        $('#outcome').val('');
+        $('#table-section').empty();
+        $('#main-error').val('');
+    }
 }
 
 
@@ -169,8 +325,6 @@ $('#prediction-submit').click(function() {
     }
 
     if (shouldSubmitPrediction && currentTab == BOOKING_NUMBER_TAB) {
-        console.log('Inside FISRT TAB');
-        console.log(predictionRes);
         savePrediction(predictionRes);
     }
 
@@ -183,7 +337,6 @@ $('#prediction-submit').click(function() {
             team_ids: teamIds,
             competition_ids: competitionIds
         };
-        console.log(data);
 
         var endStart = getStartEndDateTime(data.dates);
         var utcArr = getDateTimeStrInUTC(new Date()).split(' ');
@@ -194,7 +347,6 @@ $('#prediction-submit').click(function() {
 
         var dateArr = utcArr[0].split('-');
         var timeArr = utcArr[1].split(':');
-        console.log(dateArr, timeArr);
 
         var nowDateInUTC = new Date(Number.parseInt(dateArr[0]), Number.parseInt(dateArr[1]), Number.parseInt(dateArr[2]), Number.parseInt(timeArr[0]), Number.parseInt(timeArr[1]));
         var dateTimeInUTC = new Date(Number.parseInt(startDateArr[0]), Number.parseInt(startDateArr[1]), Number.parseInt(startDateArr[2]), Number.parseInt(startTimeArr[0]), Number.parseInt(startTimeArr[1]));
@@ -213,6 +365,53 @@ $('#prediction-submit').click(function() {
     }
 });
 
+$('#prediction-login').click(function() {
+    window.location.href = '/login';
+});
+
+$('#report-bug').click(function() {
+    console.log('reporting...');
+    if ($('#problem').val() == '--- Select a Problem ---') {
+        return;
+    }
+
+    var data = {
+        prediction_id: REPORT_PREDICTION_ID,
+        problem: $('#problem').val(),
+        note: $('#extra-note').val()
+    }
+
+    console.log(data);
+
+    $.ajax('/api/web/report-prediction', { data: data,
+        type: 'POST',  success: function(result) {
+        console.log(result);
+        if (!result.success) {
+            console.log('sent')
+        }
+   }});
+});
+
+function getCurrentDateInStr() {
+    let now = new Date();
+
+    var month = now.getMonth() + 1;
+    var minutes = now.getMinutes().toString();
+    var hours = now.getHours().toString();
+
+    if (minutes.length == 1) {
+        minutes = '0' + minutes;
+    }
+
+    if (hours.length == 1) {
+        hours = '0' + hours;
+    }
+
+    date = now.getFullYear() + '-' + month.toString() + '-' + now.getDate() +
+        ' ' + hours + ':' + minutes;
+    
+    return date;
+}
 
 
 function formatDateCreated(date) {
@@ -245,6 +444,30 @@ function formatDateCreated(date) {
    }
     
     return day.toString() + ' ' + monthsArr[month] + ' ' + year.toString() + ' at '  + format(hours) + ':' + format(minutes);
+}
+
+function formatDateForPrediction(date) {
+    var now = new Date();
+
+    var  nowYear = now.getFullYear();
+    var nowMonth = now.getMonth();
+    var nowDay = now.getDate();
+
+    var  year = date.getFullYear();
+    var month = date.getMonth();
+    var day = date.getDate();
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+
+    if (nowYear == year && nowMonth == month && nowDay  == day) {
+        return format(date.getHours()) + ':' + format(date.getMinutes());
+    }
+
+    if (nowYear == year) {
+        return  format(date.getHours()) + ':' + format(date.getMinutes()) + ' ' + monthsArr[month] + ' ' + day.toString() ;
+    }
+    
+    return  format(hours) + ':' + format(minutes) + ' ' + monthsArr[month] + ' ' + day.toString() + ' ' + year.toString();
 }
 
 
@@ -386,6 +609,7 @@ function getDateTimeStrInUTC(date) {
 
 
 function savePrediction(data) {
+    data.current_date = getCurrentDateInStr();
     data.token = localStorage.getItem('$$token');
     data.id = $$id;
 
@@ -393,21 +617,32 @@ function savePrediction(data) {
     predictionButton.prop('disabled', true);
     $.ajax('/api/web/create-prediction', { data: data,
         type: 'POST',  success: function(result) {
-        console.log(result);
         predictionButton.text('Submit');
         predictionButton.prop('disabled', false);
         if (!result.success) {
-            message = '';
-            count = Object.keys(result.messages) - 1;
-            counter = 0;
-            for(property in result.messages) {
-                if (counter != count) {
-                    messages+=result.messages[property] + ', ';
-                } else {
-                    message+=result.messages[property];
+            if (typeof result.messages == 'string') {
+                $('#main-error').text(result.messages);
+            } else {
+                message = '';
+                count = Object.keys(result.messages) - 1;
+                counter = 0;
+                for(property in result.messages) {
+                    if (counter != count) {
+                        message+=result.messages[property] + ', ';
+                    } else {
+                        message+=result.messages[property];
+                    }
                 }
+
+                $('#main-error').text(message);
             }
-            $('#main-error').text(message);
+            
+        } else {
+            lastcreatedPreditionId = result.prediction_id
+            $('#input-prediction-link').val(window.location.origin + '/predictions?id=' + lastcreatedPreditionId);
+            resetCreatePredictionModal();
+            $('#createPredictionModal').modal('hide');
+            $('#confirmModalCreate').modal('show');
         }
    }});
 }
@@ -481,10 +716,19 @@ function clearError() {
  * @param {object} The object info we want to update
  * @paramm {int} The calling type 0 for follow  and 1 for dot menu.
  * It used to determine who is calling the function
+ * @param {int} index of the user. 
  * 
  * @return None
  */
-function followUser(userId, isFollowing, info, whoIsCalling, callingElem) {
+function followUser(userId, isFollowing, info, whoIsCalling, callingElem, index) {
+    if ($$id == -1 ) { // checks if user is not logged in
+        var name = $('#follow-' + userId.toString() +  '-' + index.toString()).attr('title')
+        $('#login-modal-txt').html('You need to <a href="/login" style="cursor: pointer;">login or signup</a> to follow ' + name);
+        $('#follow-note').text('Note: following a user means you get notified when they drop predictions');
+        $('#createPredictionModal').modal('show');
+        return;
+    }
+    // console.log(whoIsCalling, '========>>>>'); return; 
     var isFollowingId = isFollowing ? 1 : 0;
     data = {
         token: localStorage.getItem('$$token'),
@@ -497,27 +741,40 @@ function followUser(userId, isFollowing, info, whoIsCalling, callingElem) {
     $.ajax('/api/web/users-action', { data: data,
          type: 'POST',  success: function(result) {
            if (result.success) {
-                info.isFollowing_author = !info.isFollowing_author;
                 if (whoIsCalling == DOT_MENU) {
-                    var text = info.isFollowing_author ? USER_CANCEL_ICON + ' Unfollow ' + info.first_name : USER_ICON + ' Follow ' + info.first_name;
-                    $(callingElem).text('');
-                    $(callingElem).append(text);
-
-                    // update follow element
-                    var text = info.isFollowing_author ? 'Following' : 'Follow';
-                    $('#' + FOLLOW_ELEMENT_ID_PREFIX + info.user_id.toString()).text(text)
+                    // Update all predictions by the user
+                    __predictionInfo.forEach(function(info, index) {
+                        if (info.user_id == userId) {
+                            info.isFollowing_author = !info.isFollowing_author;
+                            var text = info.isFollowing_author ? USER_CANCEL_ICON + ' Unfollow ' + info.first_name : USER_ICON + ' Follow ' + info.first_name;
+                            var dotElem = $('#' + DOT_MENU_ELEMENT_ID_PREFIX +  info.user_id.toString() + '-' + index.toString())
+                            dotElem.text('');
+                            dotElem.append(text);
+        
+                            // update follow element
+                            var text = info.isFollowing_author ? 'Following' : 'Follow';
+                            $('#' + FOLLOW_ELEMENT_ID_PREFIX + info.user_id.toString() + '-' + index.toString()).text(text)
+                        }
+                    });
                 }
 
                 if (whoIsCalling == FOLLOW_ELEMENT) {
-                    $(callingElem).text('Following');
-                    $(callingElem).css('cursor', 'default');
-
-                    /**
-                     * Update icon and text of dot menu
-                     */
-                    var jqueryElemObj = $('#' + DOT_MENU_ELEMENT_ID_PREFIX +  info.user_id.toString());
-                    jqueryElemObj.text('')
-                    jqueryElemObj.append(USER_CANCEL_ICON + ' Unfollow ' + info.first_name);
+                    // Update all predictions by the user
+                    __predictionInfo.forEach(function(info, index) {
+                        if (info.user_id == userId) {
+                            info.isFollowing_author = !info.isFollowing_author;
+                            var followingJqueryObj = $('#' + FOLLOW_ELEMENT_ID_PREFIX + info.user_id.toString() + '-' + index.toString());
+                            followingJqueryObj.text('Following');
+                            followingJqueryObj.css('cursor', 'default');
+        
+                            /**
+                             * Update icon and text of dot menu
+                             */
+                            var jqueryElemObj = $('#' + DOT_MENU_ELEMENT_ID_PREFIX +  info.user_id.toString() + '-' + index.toString());
+                            jqueryElemObj.text('')
+                            jqueryElemObj.append(USER_CANCEL_ICON + ' Unfollow ' + info.first_name);
+                        }
+                    });
                 }
            }
 
@@ -525,23 +782,93 @@ function followUser(userId, isFollowing, info, whoIsCalling, callingElem) {
     }});
 }
 
+function updateUIAFterFollowOrUnfollow() {
+
+}
+
 /**
- * Add click events to menu follow user or unfollow
+ * Deleting prediction section start
+ */
+let DELETE_PREDICTION_ID;
+
+$('.delete-close-icon').click(function() {
+    $('#deleteModal').modal('hide');
+});
+
+$('#delete-cancel').click(function() {
+    $('#deleteModal').modal('hide');
+});
+
+$('#delete-prediction').click(function() {
+    deletePrediction();
+});
+
+function openDeleteConfirmationModal(predictionId) {
+    $('#deleteModal').modal('show');
+    DELETE_PREDICTION_ID = predictionId;
+}
+
+function deletePrediction() {
+    $('#deleteModal').modal('show');
+    data = {
+        token: localStorage.getItem('$$token'),
+        id: $$id,
+        prediction_id: DELETE_PREDICTION_ID, 
+    };
+
+    $('#delete-prediction').prop('disabled', true);
+    $('#delete-prediction').text('Deleting...');
+    $.ajax('/api/web/delete-prediction', { data: data,
+        type: 'POST',  success: function(result) {
+        $('#delete-prediction').prop('disabled', false);
+        $('#delete-prediction').text('Delete');
+        if (result.success) {
+            $('#prediction-box-' + DELETE_PREDICTION_ID.toString()).remove();
+            $('#deleteModal').modal('hide');
+          }
+
+          return false;
+   }});
+}
+/**
+ * Deleting prediction section end
+ */
+
+ 
+
+/**
+ * Add click events to menu follow user or unfollow, copy link and report bug
  * or to the follow link beside author name when login
  * user is not following the author.
 */
 __predictionInfo.forEach(function (item, index) {
+    // Copy prediction link 
+    $('#' + COPY_PREDICTION_LINK_PREFIX + item.prediction_id.toString()).click(function() {
+        copyToClipboard(item.prediction_id);
+    });
+
+    // Add onclick for clicking report prediction link on prediction menu
+    $('#' + REPORT_PREDICTION_PREFIX + item.prediction_id.toString()).click(function() {
+        REPORT_PREDICTION_ID = item.prediction_id;
+    });
+
+    // Add onclick for deleting predictions you own
+    $('#' + DOT_MENU_ELEMENT_ID_PREFIX + 'delete-' + item.prediction_id.toString() + '-' + index.toString())
+        .click(function() {
+            openDeleteConfirmationModal(item.prediction_id);
+    });
+
     if (!item.isFollowing_athour) {
-        $('#' + FOLLOW_ELEMENT_ID_PREFIX + item.user_id.toString())
+        $('#' + FOLLOW_ELEMENT_ID_PREFIX + item.user_id.toString() + '-' + index.toString())
             .click(function() {
                 if (!item.isFollowing_author)
-                    followUser(item.user_id, item.isFollowing_author, item, FOLLOW_ELEMENT, this);
+                    followUser(item.user_id, item.isFollowing_author, item, FOLLOW_ELEMENT, this, index);
         });
     }
 
-    $('#' + DOT_MENU_ELEMENT_ID_PREFIX + item.user_id.toString())
+    $('#' + DOT_MENU_ELEMENT_ID_PREFIX + item.user_id.toString() + '-' + index.toString())
         .click(function() {
-            followUser(item.user_id, item.isFollowing_author, item, DOT_MENU, this);
+            followUser(item.user_id, item.isFollowing_author, item, DOT_MENU, this, index);
     });
 });
 var modalBodyElem = $('#m-body-id');
@@ -677,10 +1004,13 @@ function fetchBet9jaGames(code, target) {
  */
 function fetchBetKingGames(code) {
     if (isResultDisplayed) {
+        // var bookingTabLastElem = $bookingCodetab.children()[$bookingCodetab.children().length-1]; 
         var bookingLastElem = $bookingCodetab.children()[$bookingCodetab.children().length-1]; // get the last element
         $(bookingLastElem).remove();
         isResultDisplayed = false;
     };
+
+    console.log($('#booking-number').val(), '=====>>>>>>>>>');
 
     if (!$('#booking-number').val()) {
         $bookingCodetab.append('<div class="booking-not-found">Booking code is required, it can not be empty</div>');
@@ -693,7 +1023,6 @@ function fetchBetKingGames(code) {
     $.ajax('/api/web/bet-games', { 
         type: 'GET', data: {code: code, type: PLATFORM_BETKING, token: localStorage.getItem('$$token'),id: $$id },
          success: function(result) {
-            console.log(result);
             var leagues = [];
             var fixtures = [];
             var outcomes = [];
@@ -704,7 +1033,7 @@ function fetchBetKingGames(code) {
             predictionButton.prop('disabled', false);
 
             if (!result.data.BookedCoupon) {
-                modalBodyElem.append('<div class="booking-not-found">Invalid booking code</div>');
+                $bookingCodetab.append('<div class="booking-not-found">Invalid booking code</div>');
                 isResultDisplayed = true;
                 return;
             }
@@ -713,13 +1042,13 @@ function fetchBetKingGames(code) {
             var totalOdds = {maxOdd: result.data.BookedCoupon.MaxOdd, minOdd: result.data.BookedCoupon.MinOdd}
 
             if (!betKingData) {
-                modalBodyElem.append('<div class="booking-not-found">Invalid booking code</div>');
+                $bookingCodetab.append('<div class="booking-not-found">Invalid booking code</div>');
                 isResultDisplayed = true;
                 return;
             }
 
             if (betKingData.length == 0) {
-                modalBodyElem.append('<div class="booking-not-found">All games have started</div>');
+                $bookingCodetab.append('<div class="booking-not-found">All games have started</div>');
                 isResultDisplayed = true;
                 return;
             }
@@ -794,7 +1123,7 @@ function fetchSportyBetGames(code) {
             predictionButton.prop('disabled', false);
 
             if (result.data.innerMsg != 'success') {
-                modalBodyElem.append('<div class="booking-not-found">Invalid booking code</div>');
+                $bookingCodetab.append('<div class="booking-not-found">Invalid booking code</div>');
                 isResultDisplayed = true;
                 return;
             }
@@ -813,7 +1142,7 @@ function fetchSportyBetGames(code) {
             });
 
             if (leagues.length == 0) {
-                modalBodyElem.append('<div class="booking-not-found">All the games have started</div>');
+                $bookingCodetab.append('<div class="booking-not-found">All the games have started</div>');
                 isResultDisplayed = true;
                 return;
             }

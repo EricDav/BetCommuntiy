@@ -103,10 +103,9 @@ $(document).ready(function(){
                     'data' : fields
                 },
                 success: function(result){
-                    console.log(result);
+                    // console.log(result);
                     button.prop('disabled', false);
                     if(result !== ""){
-                        result = JSON.parse(result);
                         if(result['success'] === false){
                             $('.contact_error_user_log').text(result['message']);
                             if('field_index' in result){

@@ -3,6 +3,8 @@
 class BetCommunity {
     const IMAGES_PATH = "/bet_community/Public/images/users/";
     const DEFAULT_ADD_PROFILE = 180191;
+    const DEFAULT_METHOD = -1;
+    const NUM_PREDICTIONS_PER_DAY = 3;
     const routes = [
         '/login' => "LoginController",
         '/api/web/create-prediction' => "CreatePredictionController",
@@ -12,9 +14,23 @@ class BetCommunity {
         '/api/web/results' => "ResultsController",
         '/users/profile' => "UserProfileController",
         '/api/web/update-profile' => "UpdateUserProfileController",
-        '/' => "HomeController",
         '/contact' => "ContactController",
-        '/forgot-password' => "ForgotPasswordController"
+        '/logout' => 'UserController@logout',
+        '/api/web/delete-prediction' => "PredictionController@deletePrediction",
+        '/forcasters' => "UserController@getForcasters",
+        '/api/web/report-prediction' => "PredictionController@reportPrediction",
+        '/predictions' => "PredictionController@getPrediction",
+        '/forgot-password' => "ForgotPasswordController",
+        '/' => "HomeController"
+    ];
+
+    const BUGS = [
+        'Invalid booking number',
+        'Some results are not correct',
+        'Failed Prediction marks as success',
+        'Success prediction marks as failure',
+        'Invalid outcome',
+        'Other'
     ];
 
     // saves class name as key and path as value
@@ -23,7 +39,7 @@ class BetCommunity {
         'Request' => 'Request.php',
         'Controller' => 'Controllers/Controller.php',
         'LoginController' => 'Controllers/Login.Controller.php',
-        'Validation' => 'Helper/validation.php',
+        'Validation' => 'Helper/Validation.php',
         'UserModel' => 'Models/User.Model.php',
         'DBConfig' => 'Config/Config.php',
         'PDOConnection' => 'DB/DBConnection.php',
@@ -38,6 +54,7 @@ class BetCommunity {
         'UpdateUserProfileController' => 'Controllers/UpdateUserProfile.Controller.php',
         'ContactController' => 'Controllers/Contact.Controller.php',
         'ContactModel' => 'Models/Contact.Model.php',
+        'PredictionController' => 'Controllers/Prediction.Controller.php',
         'ForgotPasswordController' => 'Controllers/ForgotPassword.Controller.php',
         'ForgotPasswordModel' => 'Models/ForgotPassword.Model.php',
     ];

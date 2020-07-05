@@ -14,6 +14,7 @@
                 $stmt->execute([$email, $password]);
                 return $stmt->fetchAll();
             } catch(Exception $e) {
+                // 
                 return 'Server error';
             }
         }
@@ -42,7 +43,7 @@
 
         public static function getUserById($pdoConnection, $id) {
             try {
-                $sql = 'SELECT * FROM users WHERE id=?';
+                $sql = 'SELECT *, (SELECT COUNT(*) FROM followers WHERE user_id =' . $id . ') AS num_followers  FROM users WHERE id=?';
                 $stmt= $pdoConnection->pdo->prepare($sql);
                 $stmt->execute([$id]);
                 return $stmt->fetchAll();
@@ -82,10 +83,9 @@
                 $specialId = uniqid();
                 $imagePath = $sex == 'M' ? self::DEFAULT_IMAGE_PATH_MALE : DEFAULT_IMAGE_PATH_FEMALE;
                 $stmt->execute([$name, $email, $password, $sex, $country, $city, UserModel::DEFAULT_ROLE, $specialId, $imagePath]);
-                $temp = $stmt->fetch(PDO::FETCH_ASSOC);
                 return ['specialId' => $specialId, 'id' => $pdoConnection->pdo->lastInsertId()];
             } catch(Exception $e) {
-                var_dump($e);
+                var_dump($e->getMessage());
                 return false;
             }
         }
@@ -142,6 +142,31 @@
             } catch(Exception $e) {
                 var_dump($e); exit;
                 return null;
+            }
+        }
+
+        public static function getUserFollowersCount($pdoConnection, $userId) {
+            try {
+                $sql = 'SELECT COUNT(*) AS total_followers  FROM followers WHERE user_id=' . $userId;
+                return $pdoConnection->pdo->query($sql)->fetch();
+            } catch(Exception $e) {
+                var_dump($e); exit;
+                return false;
+            }
+        }
+
+        public static function getUsersFollowers($pdoConnection, $userId) {
+            try {
+                $sql = 'SELECT followers.user_id, followers.follower_id, users.name, users.image_path,
+                (SELECT COUNT(*) FROM predictions WHERE predictions.user_id= users.id) AS total_predictions,
+                (SELECT COUNT(*) FROM predictions WHERE predictions.user_id= users.id AND predictions.won = 1) AS total_predictions_won
+                FROM followers INNER JOIN users ON followers.follower_id = users.id
+                WHERE followers.user_id=' . $userId;
+                
+                return $pdoConnection->pdo->query($sql)->fetchAll();
+            } catch(Exception $e) {
+                var_dump($e);
+                return false;
             }
         }
 
@@ -210,6 +235,17 @@
                 return false;
             }
         }
-    }
 
+        public static function getAllUsers($pdoConnection) {
+            try {
+                $sql = 'SELECT users.name, users.image_path, users.id, (SELECT COUNT(*) FROM predictions WHERE predictions.user_id= users.id) AS total_predictions,
+                (SELECT COUNT(*) FROM predictions WHERE predictions.user_id= users.id AND predictions.won = 1) AS total_predictions_won FROM users';
+                return $pdoConnection->pdo->query($sql)->fetchAll();
+
+            } catch(Exception $e) {
+                var_dump($e);
+                return false;
+            }
+        }
+    }
 ?>

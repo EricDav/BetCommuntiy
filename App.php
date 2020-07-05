@@ -1,6 +1,15 @@
 <?php
 session_start();
-include 'BetCommunity.class.php';
+include 'BetCommunity.Class.php';
+
+function isLogin() {
+    if (isset($_SESSION['userInfo'])) {
+        return true;
+    }
+    return false;
+}
+
+
 
 spl_autoload_register(function ($name) {
     $classPaths =  BetCommunity::loads;
@@ -15,33 +24,35 @@ $enviroment = Enviroment::getEnv();
 $request = new Request(); // Create a request object
 $data = null;
 
+if (in_array($request->route, array_keys(BetCommunity::routes))) {
 
-$route = explode('/', $request->route);
-$route = '/'.$route[1];
+    $controllerArr = explode('@', BetCommunity::routes[$request->route]);
+    $controllerClass = $controllerArr[0];
+    $method = sizeof($controllerArr) == 2 ? $controllerArr[1] : BetCommunity::DEFAULT_METHOD;
+    $controllerObject = new $controllerClass($request);
 
-if (in_array($route, array_keys(BetCommunity::routes))) {
-
-     $controllerClass = BetCommunity::routes[$route];
-     
-     $controllerObject = new $controllerClass($request);
-
-    if ($controllerObject->validate()) {
-       $controllerObject->perform();
+    if ($method != BetCommunity::DEFAULT_METHOD) {
+        $controllerObject->$method();
+    } else {
+        if ($controllerObject->validate()) {
+            $controllerObject->perform();
+         }
     }
 
     $controllerObject->setToken();
     $data = $controllerObject->data;
     $data['isLogin'] = $controllerObject->isLogin();
+
     if($request->method != 'POST')
         $message = $data['template'] == 'forgotPassword.php' ? $controllerObject->message: "";
     
     if($controllerObject->responseType == 'html')
         include 'Pages/' . $data['template'];
 
+
 } else{
     include './Pages/404.php'; //include error 404 page for undefined routes
  }
-
 
 ?>
 

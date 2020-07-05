@@ -21,8 +21,11 @@
             $this->pdoConnection->open();
             $followers = array();
             $userId = (int)$this->clientId - self::DEFAULT_ADD_PROFILE;
-            $followers = UserModel::getFollowers($this->pdoConnection, $userId);
+            // echo $userId; exit;
+            $followers = UserModel::getUsersFollowers($this->pdoConnection, $userId);
+            // var_dump($followers); exit;
             $user = UserModel::getUserById($this->pdoConnection, $userId);
+            // var_dump($user); exit;
             $names = explode(' ', $user[0]['name']);
             $this->user = $user;
 
@@ -44,13 +47,36 @@
             $this->data['lastName'] = $names[1];
             $this->data['predictions'] = $predictions;
             $this->data['followers'] = $followers;
+            $this->data['isFollowing'] = $this->isFollowing(); // checks if the current user is following the user we are checking the profile
             $this->data['template'] = 'Profile.php';
             $this->data['title'] = 'Profile';
             $this->data['isSelf'] = $this->isSelf();
-            $this->data['followingText'] = $this->getNumberFollowingText(sizeof($followers), $user[0]['sex']);
+            $this->data['followingText'] = $this->getNumberFollowingText($user[0]['num_followers'], $user[0]['sex']);
             $this->responseType = 'html';
             $this->setDateCreatedUTC($predictions);
             $this->setPredictionInfo($predictions);
+        }
+
+        /**
+         * This function overides the isFollowing method in 
+         * the Controller class. This checks if the current user 
+         * is a follower of the user we are checking it's profile
+         * 
+         */
+        public function isFollowing() {
+            if ($this->isSelf() || !$this->isLogin()) {
+                return false;
+            }
+
+            $data = $this->data;
+            if (sizeof($data['followers']) == 0) 
+                return false;
+            foreach($data['followers']  as $follower) {
+                if ($this->request->session['userInfo']['id'] == $follower['follower_id']) 
+                    return true;
+            }
+    
+            return false;
         }
 
         /**
@@ -62,11 +88,16 @@
         }
 
         public function getNumberFollowingText($numFollowers, $sex) {
+            if ($numFollowers == 0) 
+                return '';
+            
             $numFollwers = (string)$numFollowers;
             $text = $numFollwers . ($numFollwers == 1 ? ' person is' : ' people are') . ' following ';
             if ($this->isSelf())
                 return $text . ' you';
-
+            if ($this->isLogin() && !$this->isSelf()) {
+                // 
+            }
             if ($sex == 'M') {
                 return $text . ' him';
             } else {

@@ -95,3 +95,11 @@ CREATE TABLE `temp_request` (
   `identity` varchar(255) NOT NULL,
   `token` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE bugs(
+    problem VARCHAR(100) NOT NULL,
+    note VARCHAR (400),
+    user_id int,
+    prediction_id int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+

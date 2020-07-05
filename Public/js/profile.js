@@ -1,11 +1,17 @@
-/**
- * Declare jquary object for About page tabs
+$(document).ready(function() {
+    /**
+ * Declare jquary object for Profile page tabs
  */
 var $profileAboutTab = $('#profile-about');
-var $profileAboutWrapper = $('#profile-about-wrapper');
+var $profileFollowersTab = $('#profile-followers');
+var $profileFollowersTabMobile = $('#profile-followers-mobile');
 var $profilePredictionTab = $('#profile-predictions');
+var $profileAboutTabMobile = $('#profile-about-mobile');
+var $profilePredictionTabMobile = $('#profile-predictions-mobile');
+var $profileAboutWrapper = $('#profile-about-wrapper');
 var $profilePredictionWrapper = $('#profile-prediction-wrapper');
 var $editProfileSideBar = $('#edit-profile-side-bar');
+var $profileFollowersWrapper = $('#followers-wrapper');
 
 /**
  * Declare jquery object for edit profile side
@@ -41,23 +47,105 @@ var $editProfileSideBar = $('#edit-profile-side-bar');
 
 
 var lastActive = $profilePredictionTab;
+var lastWrapper = $profilePredictionWrapper;
+
 $profileAboutTab.click(function() {
+    // Do nothing if the last tab is the same as the current 
+    // This means the user clicks the same tab more than once
+    if ($profileAboutTab == lastActive || $profileAboutTabMobile == lastActive) {
+        return;
+    }
     $profileAboutWrapper.show();
     $editProfileSideBar.show();
     lastActive.removeClass('active');
 
     $profileAboutTab.addClass('active');
-    $profilePredictionWrapper.hide();
+    lastWrapper.hide();
     lastActive = $profileAboutTab;
+    lastWrapper = $profileAboutWrapper;
+});
+
+$profileFollowersTab.click(function() {
+    // Do nothing if the last tab is the same as the current 
+    // This means the user clicks the same tab more than once
+    if ($profileFollowersTab == lastActive || $profileFollowersTabMobile == lastActive) {
+        return;
+    }
+    $profileFollowersWrapper.show()
+    lastActive.removeClass('active');
+
+    $profileFollowersTab.addClass('active');
+    lastWrapper.hide();
+    $editProfileSideBar.hide();
+    lastActive = $profileFollowersTab;
+    lastWrapper = $profileFollowersWrapper;
+});
+
+$profilePredictionTabMobile.click(function() {
+    // Do nothing if the last tab is the same as the current 
+    // This means the user clicks the same tab more than once
+    if ($profilePredictionTabMobile == lastActive || $profilePredictionTab == lastActive) {
+        return;
+    }
+    $profilePredictionWrapper.show();
+    $profilePredictionTabMobile.addClass('active');
+
+    lastActive.removeClass('active');
+    lastWrapper.hide();
+    // $profileAboutWrapper.hide();
+    $editProfileSideBar.hide();
+    lastActive = $profilePredictionTabMobile;
+    lastWrapper = $profilePredictionWrapper;
+});
+
+$profileFollowersTabMobile.click(function() {
+    // Do nothing if the last tab is the same as the current 
+    // This means the user clicks the same tab more than once
+    if ($profileFollowersTabMobile == lastActive || $profileFollowersTab == lastActive) {
+        return;
+    }
+
+    $profileFollowersWrapper.show()
+    lastActive.removeClass('active');
+
+    $profileFollowersTab.addClass('active');
+    lastWrapper.hide();
+    $editProfileSideBar.hide();
+    lastActive = $profileFollowersTabMobile;
+    lastWrapper = $profileFollowersWrapper;
+});
+
+$profileAboutTabMobile.click(function() {
+    // Do nothing if the last tab is the same as the current 
+    // This means the user clicks the same tab more than once
+    if ($profileAboutTabMobile == lastActive || $profileAboutTab == lastActive) {
+        return;
+    }
+    $profileAboutWrapper.show();
+    $editProfileSideBar.show();
+    lastActive.removeClass('active');
+
+    $profileAboutTabMobile.addClass('active');
+    lastWrapper.hide();
+    lastActive = $profileAboutTabMobile;
+    lastWrapper = $profileAboutWrapper;
 });
 
 $profilePredictionTab.click(function() {
+    // Do nothing if the last tab is the same as the current 
+    // This means the user clicks the same tab more than once
+    if ($profilePredictionTab == lastActive) {
+        return;
+    }
+
     $profilePredictionWrapper.show();
     $profilePredictionTab.addClass('active')
     lastActive.removeClass('active');
-    $profileAboutWrapper.hide();
+
+    lastWrapper.hide();
     $editProfileSideBar.hide();
     lastActive = $profilePredictionTab;
+    lastWrapper = $profilePredictionWrapper;
 });
 
 var lastActiveForEditProfileTab = $editProfileBasic;
@@ -235,9 +323,28 @@ $updatePasswordButton.click(function() {
 });
 
 function updateProfile(data) {
-    console.log(data);
+    if (data.action == 'update_password') {
+        $updatePasswordButton.attr('disabled', true);
+        $updatePasswordButton.text('Saving...');
+    }
+
+    if (data.action == 'update_profile') {
+        $submitButton.attr('disabled', true);
+        $submitButton.text('Saving...');
+    }
+
     $.ajax('/api/web/update-profile', { data: data,
         type: 'POST',  success: function(result) {
+        if (data.action == 'update_password') {
+            $updatePasswordButton.attr('disabled', false);
+            $updatePasswordButton.text('Save Changes');
+        }
+
+        if (data.action == 'update_profile') {
+            $submitButton.attr('disabled', false);
+            $submitButton.text('Save Changes'); 
+        }
+
          if (result.success) {
             if (data.type == 'update_profile') {
                 initialData = {
@@ -255,9 +362,11 @@ function updateProfile(data) {
             $oldPasswordInput.val('');
             $newPasswordInput.val('');
             $confirmPasswordInput.val('');
+            $('.alert-success').show();
 
-            console.log(data);
-            alert(result.message);
+            setTimeout(function() {
+                $('.alert-success').hide();
+            }, 2000)
 
          } else {
             setErrorMessage(result.messages, true);
@@ -287,7 +396,7 @@ function setErrorMessage(message, isPassword=false) {
     }
 
     if (isPassword) {
-        $changePassworErrorMessage.text(msg)
+        $changePassworErrorMessage.text(msg);
     } else {
         $errorMessage.text(msg);
     }
@@ -321,6 +430,8 @@ $('#upload-photo').click(function() {
     document.cookie = "id=" + $$id + "; " + " path=/";
     document.cookie = "token=" + localStorage.getItem('$$token') + "; " + " path=/";
 
+    $('#upload-photo').attr('disabled', true);
+    $('#upload-photo').text('Uploading...');
     $.ajax({
         url: '/api/web/update-profile',
         type: 'post',
@@ -331,10 +442,27 @@ $('#upload-photo').click(function() {
             // Deletes the cookies by setting the expiring date to the past
             document.cookie = "id=" + $$id + "; expires=Thu, 01 Jan 1970 00:00:00 UTC; " + " path=/";
             document.cookie = "token=" + localStorage.getItem('$$token') + "; expires=Thu, 01 Jan 1970 00:00:00 UTC;" + " path=/";
-            // console.log(response);
             if (response.success) {
+                $('#upload-photo').attr('disabled', false);
+                $('#upload-photo').text('Upload');
+
                 $('#profile-picture').attr('src', response.url);
+                $('#profile-picture-mobile').attr('src', response.url);
                 $('#header-image').attr('src', response.url);
+
+                $('.alert-danger').hide();
+                $('.alert-success').show();
+                $('.alert-success').text(response.message)
+                setTimeout(function() {
+                    $('.alert-danger').hide();
+                    $('.alert-success').hide();
+                    $('#myModal').modal('hide');
+                }, 3000);
+
+            } else {
+                $('#alert-success').hide();
+                $('#alert-danger').show();
+                $('#alert-danger').text(response.message)
             }
         },
     });
@@ -362,3 +490,5 @@ $cityInput.focus(removeErrorBorder);
 $oldPasswordInput.focus(removeErrorBorder);
 $newPasswordInput.focus(removeErrorBorder);
 $confirmPasswordInput.focus(removeErrorBorder);
+
+});
