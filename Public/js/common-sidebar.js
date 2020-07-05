@@ -1,3 +1,10 @@
+if ($(this).width() <= 992) {
+    $('#chat-block').attr('style', '');
+    $('#sticky-sidebar').attr('style', '');
+    $('#chat-block').trigger('sticky_kit:detach');
+    $('#sticky-sidebar').trigger('sticky_kit:detach');
+}
+
 $('#today-prediction').click(function() {
     let now = new Date();
 

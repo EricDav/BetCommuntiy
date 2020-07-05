@@ -49,10 +49,6 @@ $('#open-prediction-modal').click(function() {
 
 if ($(this).width() <= 992) {
     var isMobile = true;
-    $('#chat-block').attr('style', '');
-    $('#sticky-sidebar').attr('style', '');
-    $('#chat-block').trigger('sticky_kit:detach');
-    $('#sticky-sidebar').trigger('sticky_kit:detach');
 }
 
 /**
