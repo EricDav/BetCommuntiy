@@ -18,7 +18,7 @@
             $results = array();
             if ($this->callApi()) {
                 $page = 1;
-                $data = json_decode(file_get_contents('https://livescore-api.com/api-client/fixtures/matches.json?key=vjH0jEKGt48c6wTK&secret=GNFDi4dIM8MdfuuLNcL7QvNkzWwFtqq9&competition_id=' . $this->competitionId));
+                $data = json_decode(file_get_contents('https://livescore-api.com/api-client/fixtures/matches.json?key=Smmc7JtHTTNqcoAN&secret=kSQahwWDPT2qm6AfsXrAGVhAO511tCON&competition_id=' . $this->competitionId));
                 // var_dump()
                 $next_page = $data->data->next_page;
 

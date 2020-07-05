@@ -13,7 +13,6 @@
                 $sql = 'INSERT INTO predictions (start_date, end_date, prediction, total_odds, user_id, approved, created_at, type, scores_finished) VALUES(?,?,?,?,?,?,?,?,?)';
                 $stmt= $pdoConnection->pdo->prepare($sql);
                 $stmt->execute([$startDate, $endDate, $prediction, $odds, $userId, $approved, gmdate("Y-m-d\ H:i:s"), $type, self::DEFAULT_SCROES_FINISHED]);
-                $temp = $stmt->fetch(PDO::FETCH_ASSOC);
                 return $pdoConnection->pdo->lastInsertId();
             } catch(Exception $e) {
                 var_dump($e->getMessage()); exit;

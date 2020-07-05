@@ -2,7 +2,8 @@
     include __DIR__  . '/../Enviroment/Enviroment.php';
     include __DIR__  . '/../Config/Config.php';
     include __DIR__  . '/../DB/DBConnection.php';
-
+    
+    mail("alienyidavid4christ@gmail.com","My Script Verify",'Inside script');
     function getMinutesDiffFromNow($dateStr){
         $startDate = new DateTime($dateStr);
         $sinceStart = $startDate->diff(new DateTime(gmdate("Y-m-d\ H:i:s")));
@@ -102,7 +103,7 @@
    // while (true) {
     $page = 0;
     $liveScroes = array();
-    $data = json_decode(file_get_contents('http://livescore-api.com/api-client/scores/live.json?key=vjH0jEKGt48c6wTK&secret=GNFDi4dIM8MdfuuLNcL7QvNkzWwFtqq9'));
+    $data = json_decode(file_get_contents('http://livescore-api.com/api-client/scores/live.json?key=Smmc7JtHTTNqcoAN&secret=kSQahwWDPT2qm6AfsXrAGVhAO511tCON'));
     // var_dump($data);
     // $data = json_decode(file_get_contents(__DIR__ . '/../data2.json'));
     
@@ -127,7 +128,7 @@
     try {
         $predictions = $pdoConnection->pdo->query($sql)->fetchAll();
     } catch (Exception $e) {
-        var_dump($e);
+        exit($e->getMessage());
     }
 
     foreach($predictions as $prediction) {
@@ -184,5 +185,7 @@
             $pdoConnection->pdo->query('UPDATE predictions SET prediction='. "'" . json_encode($predictionObj) . "'" . ' WHERE id=' . $prediction['id']);
         }
     }
+
+    exit(1);
  // }
 ?>
