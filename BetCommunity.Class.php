@@ -20,6 +20,7 @@ class BetCommunity {
         '/forcasters' => "UserController@getForcasters",
         '/api/web/report-prediction' => "PredictionController@reportPrediction",
         '/predictions' => "PredictionController@getPrediction",
+        '/forgot-password' => "ForgotPasswordController",
         '/' => "HomeController"
     ];
 
@@ -53,7 +54,9 @@ class BetCommunity {
         'UpdateUserProfileController' => 'Controllers/UpdateUserProfile.Controller.php',
         'ContactController' => 'Controllers/Contact.Controller.php',
         'ContactModel' => 'Models/Contact.Model.php',
-        'PredictionController' => 'Controllers/Prediction.Controller.php'
+        'PredictionController' => 'Controllers/Prediction.Controller.php',
+        'ForgotPasswordController' => 'Controllers/ForgotPassword.Controller.php',
+        'ForgotPasswordModel' => 'Models/ForgotPassword.Model.php',
     ];
 
     const OUTCOMES = array('1', '2', 'X', '1X', '2X', '12', 'GG', 'NG', 'Over 0.5', 'Over 1.5',
