@@ -1102,10 +1102,10 @@ html, body {
   
   /*Chat Block CSS*/
   
-  #chat-block{
+  /* #chat-block{
     margin: 0 0 40px 0;
     text-align: center;
-  }
+  } */
   
   #chat-block .title{
     background: #8dc63f;

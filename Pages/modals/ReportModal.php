@@ -9,7 +9,7 @@
             </button>
           </div>
           </div>
-          <div class="modal-body">
+          <div style="margin-top: 0px;" class="modal-body">
             <div class="form-group">
               <label>Please Select a problem</label>
               <select id="problem" class="form-control" id="exampleFormControlSelect1">

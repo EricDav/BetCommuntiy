@@ -323,9 +323,28 @@ $updatePasswordButton.click(function() {
 });
 
 function updateProfile(data) {
-    console.log(data);
+    if (data.action == 'update_password') {
+        $updatePasswordButton.attr('disabled', true);
+        $updatePasswordButton.text('Saving...');
+    }
+
+    if (data.action == 'update_profile') {
+        $submitButton.attr('disabled', true);
+        $submitButton.text('Saving...');
+    }
+
     $.ajax('/api/web/update-profile', { data: data,
         type: 'POST',  success: function(result) {
+        if (data.action == 'update_password') {
+            $updatePasswordButton.attr('disabled', false);
+            $updatePasswordButton.text('Save Changes');
+        }
+
+        if (data.action == 'update_profile') {
+            $submitButton.attr('disabled', false);
+            $submitButton.text('Save Changes'); 
+        }
+
          if (result.success) {
             if (data.type == 'update_profile') {
                 initialData = {
@@ -343,9 +362,11 @@ function updateProfile(data) {
             $oldPasswordInput.val('');
             $newPasswordInput.val('');
             $confirmPasswordInput.val('');
+            $('.alert-success').show();
 
-            console.log(data);
-            alert(result.message);
+            setTimeout(function() {
+                $('.alert-success').hide();
+            }, 2000)
 
          } else {
             setErrorMessage(result.messages, true);
@@ -375,7 +396,7 @@ function setErrorMessage(message, isPassword=false) {
     }
 
     if (isPassword) {
-        $changePassworErrorMessage.text(msg)
+        $changePassworErrorMessage.text(msg);
     } else {
         $errorMessage.text(msg);
     }
@@ -409,6 +430,8 @@ $('#upload-photo').click(function() {
     document.cookie = "id=" + $$id + "; " + " path=/";
     document.cookie = "token=" + localStorage.getItem('$$token') + "; " + " path=/";
 
+    $('#upload-photo').attr('disabled', true);
+    $('#upload-photo').text('Uploading...');
     $.ajax({
         url: '/api/web/update-profile',
         type: 'post',
@@ -420,8 +443,26 @@ $('#upload-photo').click(function() {
             document.cookie = "id=" + $$id + "; expires=Thu, 01 Jan 1970 00:00:00 UTC; " + " path=/";
             document.cookie = "token=" + localStorage.getItem('$$token') + "; expires=Thu, 01 Jan 1970 00:00:00 UTC;" + " path=/";
             if (response.success) {
+                $('#upload-photo').attr('disabled', false);
+                $('#upload-photo').text('Upload');
+
                 $('#profile-picture').attr('src', response.url);
+                $('#profile-picture-mobile').attr('src', response.url);
                 $('#header-image').attr('src', response.url);
+
+                $('.alert-danger').hide();
+                $('.alert-success').show();
+                $('.alert-success').text(response.message)
+                setTimeout(function() {
+                    $('.alert-danger').hide();
+                    $('.alert-success').hide();
+                    $('#myModal').modal('hide');
+                }, 3000);
+
+            } else {
+                $('#alert-success').hide();
+                $('#alert-danger').show();
+                $('#alert-danger').text(response.message)
             }
         },
     });

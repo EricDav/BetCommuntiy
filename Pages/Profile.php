@@ -18,11 +18,13 @@
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
-            <div style="display: flex; justify-content: center;"  class="modal-body">
-              <image style="width: 280px; height: 280px; object-fit: cover;" id="image-preview" src="" alt="" class="img-responsive profile-photo"/>
+            <div style="display: flex; justify-content: center; margin-top: 0px; flex-direction: column;"  class="modal-body">
+            <div style="display: none;" class="alert alert-success" role="alert"></div>
+            <div style="display: none;" class="alert alert-danger" role="alert"></div>
+              <div style="display: flex; justify-content: center;"><image style="width: 280px; height: 280px; object-fit: cover;" id="image-preview" src="" alt="" class="img-responsive profile-photo"/></div>
             </div>
             <div class="modal-footer">
-              <button id="upload-photo" type="button"  style="width: 150px" class="btn btn-primary">Upload</button>
+              <button id="upload-photo" type="button"  style="width: 150px; outline: none;" class="btn btn-primary">Upload</button>
             </div>
           </div>
         </div>
@@ -31,21 +33,7 @@
 
     <?php if (!isLogin()): ?>
       <!-- Modal start -->
-      <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-          <div class="modal-content">
-          <span id="close-icon"><i class="fa fa-close"></i></span>
-          <div style="height: 220px;" id='m-body-id' class="modal-body m-body">
-             <div style="margin-top: 50px;" class="obs-msg">Sorry for the obstruction!</div><br>
-             <div id="login-modal-txt" style="margin-top: -20px; font-style: oblique;" class="obs-msg"></div>
-             <span id="follow-note"></span>
-             <div class="login-modal-button-wrapper col-md-12">
-              <button style="width: 80%;" id="prediction-login" type="button" class="btn btn-primary">Login/Sign up</button><br>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+      <?php  include 'Pages/modals/ObstructionModal.php';?>
       <!-- Model close -->
   <?php endif; ?>
 
@@ -93,7 +81,7 @@
                   <!--Timeline Menu for Small Screens-->
                     <div class="navbar-mobile hidden-lg hidden-md">
                       <div class="profile-info">
-                        <img id="profile-picture" style="object-fit: cover;" src="<?=BetCommunity::IMAGES_PATH . $data['user'][0]['image_path']?>" alt="" class="img-responsive profile-photo _b3">
+                        <img id="profile-picture-mobile" style="object-fit: cover;" src="<?=BetCommunity::IMAGES_PATH . $data['user'][0]['image_path']?>" alt="" class="img-responsive profile-photo _b3">
                         <?php if ($data['isSelf']): ?>
                           <input style="display: none;" type="file" name="my_file" id="my-file" accept="image/*">
                         <?php endif ?>

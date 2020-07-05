@@ -2,12 +2,13 @@
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div style="display: flex;" class="modal-header">
+        <i data-dismiss="modal"  id="arrow-back" class="fa fa-arrow-left" aria-hidden="true"></i>
         <h4 style="width: 95%; font-size: 2rem;" class="modal-title" id="exampleModalLongTitle">Create Prediction Using: </h4>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button id="cancel-create-prediction-button" type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-    <div id='m-body-id' class="modal-body m-body">
+    <div style="margin-top: 0px;" id='m-body-id' class="modal-body m-body">
     <p style="color: red; font-style: oblique;"  id="main-error"></p>
     <ul class="nav nav-tabs ul-navs-tabs">
       <li id="tab-one-id" class="active"><a id="tab-one" data-toggle="tab" href="">Booking Number</a></li>

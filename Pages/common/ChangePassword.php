@@ -2,6 +2,7 @@
               <!-- Change Password
               ================================================= -->
               <div class="edit-profile-container">
+                <div style="display: none;" class="alert alert-success" role="alert">Changes updated successfully</div>
                 <div class="block-title">
                   <h4 class="grey"><i class="icon ion-ios-locked-outline"></i>Change Password</h4>
                   <div class="line"></div>

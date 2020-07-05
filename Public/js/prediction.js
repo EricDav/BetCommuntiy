@@ -32,6 +32,7 @@ const PLATFORM_SPORTY_BET = 'SportyBet';
 const DEFAULT_DATE_TIME = '1900-01-01 00:00:00';
 let REPORT_PREDICTION_ID = null;
 let lastcreatedPreditionId = null;
+var isMobile = false;
 
 var currentTab = BOOKING_NUMBER_TAB // Set the default tab to the booking number tab
 
@@ -45,6 +46,14 @@ $('#open-prediction-modal').click(function() {
         $('#follow-note').text('');
     }
 });
+
+if ($(this).width() <= 992) {
+    var isMobile = true;
+    $('#chat-block').attr('style', '');
+    $('#sticky-sidebar').attr('style', '');
+    $('#chat-block').trigger('sticky_kit:detach');
+    $('#sticky-sidebar').trigger('sticky_kit:detach');
+}
 
 /**
  * This is the on click for the modal that
@@ -138,16 +147,65 @@ dates.forEach(function(item, index) {
     $('#date-' + item.id.toString()).text(formatDateCreated(date));
 });
 
-
+var formatedPredictions = [];
+var scores
 /**
  * It displays prediction data
  */
 __predictionInfo.forEach(function (item, index) {
     var prediction = JSON.parse(item.prediction);
     item.prediction = prediction;
+    scores = prediction.hasOwnProperty('scores') ? prediction.scores : [];
+    formatedPredictions.push(formatPredictionDataForMobile(prediction));
     $('#prediction-info-' + item.prediction_id).append(generatePredictionInfoHtml(prediction, item.prediction_type));
-    $('#prediction-' + item.prediction_id).append(generatePredictionTable(prediction));
+
+    if (isMobile) {
+        $('#prediction-' + item.prediction_id).append(generatePredictionHtmlForMobileView(formatPredictionDataForMobile(prediction), scores));
+    } else {
+        $('#prediction-' + item.prediction_id).append(generatePredictionTable(prediction));
+    }
 });
+
+function generatePredictionHtmlForMobileView(prediction, scores) {
+    console.log(scores);
+    $html = '<div class="mobile-prediction-wrapper">';
+
+    var homeScore;
+    var awayScore;
+    var resultArr 
+    for (league in prediction) {
+        $html+= '<div class="mobile-league">' + league + '</div>';
+        datesFixturesObj = prediction[league];
+        
+        datesFixturesObj.dates.forEach(function(date, index) {
+            $html+= '<div class="mobile-fixture-wrapper">';
+            var dateStr = date + ' UTC';
+            var date = new Date(dateStr.replace(/-/g, '/'));
+            result = getScore(datesFixturesObj.fixtures[index], scores);
+
+            if (result) {
+                resultArr = result.split(' - ');
+                homeScore = '<span style="color: #27aae1; margin-left: 5px;">' + resultArr[0] + '</span>';
+                awayScore = '<span style="color: #27aae1; margin-right: 5px;">' + resultArr[1] + '</span>';
+            } else {
+                homeScore = '';
+                awayScore = '';
+            }
+            fixtureArr = datesFixturesObj.fixtures[index].split(' - ');
+
+            $html+='<div style="font-weight: unset; max-width: 30%;">' + formatDateForPrediction(date) + '</div>';
+            $html+='<div class="mobile-fixture">' + fixtureArr[0] + homeScore.toString() + ' - ' + awayScore.toString() + fixtureArr[1] + '</div>';
+            $html+='<div style="font-weight: 700;">' + datesFixturesObj.outcomes[index] + '</div>';
+            $html+= '</div>';
+        });
+    }
+
+    $html+= '</div>';
+
+    return $html;
+}
+
+console.log(formatedPredictions);
 
 console.log(__predictionInfo);
 
@@ -190,6 +248,21 @@ function generatePredictionTable(data) {
 
     $table += '</table>';
     return $table;
+}
+
+function formatPredictionDataForMobile(prediction) {
+    formatedResult = {}
+    prediction.leagues.forEach(function(league, index) {
+        if (league in formatedResult) {
+            formatedResult[league].dates.push(prediction.dates[index]);
+            formatedResult[league].fixtures.push(prediction.fixtures[index]);
+            formatedResult[league].outcomes.push(prediction.outcomes[index]);
+        } else {
+            formatedResult[league] = {dates: [prediction.dates[index]], fixtures: [prediction.fixtures[index]], outcomes: [prediction.outcomes[index]]}
+        }
+    });
+
+    return formatedResult;
 }
 
 function getScore(fixture, scores) {
@@ -371,6 +444,30 @@ function formatDateCreated(date) {
    }
     
     return day.toString() + ' ' + monthsArr[month] + ' ' + year.toString() + ' at '  + format(hours) + ':' + format(minutes);
+}
+
+function formatDateForPrediction(date) {
+    var now = new Date();
+
+    var  nowYear = now.getFullYear();
+    var nowMonth = now.getMonth();
+    var nowDay = now.getDate();
+
+    var  year = date.getFullYear();
+    var month = date.getMonth();
+    var day = date.getDate();
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+
+    if (nowYear == year && nowMonth == month && nowDay  == day) {
+        return format(date.getHours()) + ':' + format(date.getMinutes());
+    }
+
+    if (nowYear == year) {
+        return  format(date.getHours()) + ':' + format(date.getMinutes()) + ' ' + monthsArr[month] + ' ' + day.toString() ;
+    }
+    
+    return  format(hours) + ':' + format(minutes) + ' ' + monthsArr[month] + ' ' + day.toString() + ' ' + year.toString();
 }
 
 

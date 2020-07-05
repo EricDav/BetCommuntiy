@@ -65,10 +65,10 @@
             ================================================= -->
             <div class="create-post">
             	<div class="row">
-            		<div class="col-md-7 col-sm-7">
+            		<div class="col-md-7">
                     <?=$data['paginationHtml']?>
                 </div>
-            		<div  class="col-md-5 col-sm-9">
+            		<div id="create-but-wrapper"  class="col-md-5">
                     <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#createPredictionModal" id="open-prediction-modal">Create Prediction</button>
                 </div>
             	</div>
@@ -156,7 +156,7 @@
       </div>
           <!-- Newsfeed Common Side Bar Right
           ================================================= -->
-    			<div class="col-md-2 static">
+    			<div class="col-md-2 static static-featured">
             <div class="suggestions is_stuck" id="sticky-sidebar" style="position: fixed; top: -3px; width: 155px;">
               <h4 class="grey"><b>Featured Users</b></h4>
               <?php foreach($data['featuredUsers'] as $featuredUser): ?>
