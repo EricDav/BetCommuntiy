@@ -14,6 +14,11 @@ CREATE TABLE users (
     phone_number VARCHAR(100),
     sex VARCHAR(2),
     image_path VARCHAR(125),
+    date_created DATETIME NOT NULL,
+    code_token VARCHAR(9),
+    password_count TINYINT DEFAULT 0,
+    token_count TINYINT DEFAULT 0,
+    settings VARCHAR(3000),
     PRIMARY KEY(id)
 );
 

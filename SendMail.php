@@ -8,32 +8,76 @@
     require __DIR__ . '/PHPMailer/SMTP.php';
 
     class SendMail {
+        
         public function __construct($to, $subject, $message) {
             $this->to = $to;
             $this->subject = $subject;
-            $this->message = $message;
+            $this->message = '';
             $this->mail = new PHPMailer(true);
+            $this->setMessage($message);
+        }
+
+        public function getEmailHeader() {
+            $emailHeader = '<html><body style="font-size: 0.9rem;"><center>
+                    <div style="width: 100%; background-color: #f5f6f7; padding-top: 50px; padding-bottom: 50px;">';
+            $emailHeader .= '<div style="width: 80%; border-width: 1px;  border-style: solid; height: fit-content; background-color: #fff;">';
+
+            $emailHeader .= '<div style="width: 100%;border-top: 0px;border-left: 0px;border-bottom: 1px;border-right: 0px;border-style: solid;height: 50px; background-color: rgb(35, 31, 32)">
+
+                                <center><img width =60%; height=40;" src="http://betcommunity.net/bet_community/Public/images/logo1.png" alt="logo"></center>
+                            </div>';
+
+            return $emailHeader;
+        }
+
+        public function getEmailFooter() {
+            $emailFooter .='<div style="text-align: center; margin-top: 50px; height: 50px; margin-bottom: -5;">
+                                <center>
+                                    <div style="color: #27aae1;font-weight: 700;">Contact Us</div>
+                                    <span style="color: black; font-weight: 700;">+1 (234) 222 0754</span> 
+                                    <span style="color: black;font-weight: 700;margin-left: 10px;">info@betcommunity.com</span>
+                                    <div style="color: black; font-weight: 600; font-style: oblique;">Visit our <a href="http://www.betcommunity.net">website</a> to view our latest predictions</div>
+                                </center>
+                            </div>';
+
+
+            $emailFooter .='<div style="background: #231F20;text-align: center;color: #fff;top: 457;width: 100%; height: 45px; border-bottom: 0px;">
+                                <center>
+                                    <p style="padding-top: 10px;">BetCommunity © 2020. All rights reserved</p>
+                                </center>
+                            </div>';
+            $emailFooter .='</div>';
+            $emailFooter .='</div></center><html><body>';
+            
+            return $emailFooter;
+        }
+
+        public function setMessage($message) {
+            $this->message = $this->getEmailHeader() . $message .  $this->getEmailFooter();
+            // echo $this->message; exit;
         }
 
         public function send() {
+            // echo $this->message; exit;
             try {
-                $this->mail->SMTPDebug = SMTP::DEBUG_SERVER;
+                $this->mail->isHTML(true); 
                 $this->mail->isSMTP();
                 $this->mail->Host  = "smtp.gmail.com";
                 $this->mail->SMTPAuth   = true;                                 // Enable SMTP authentication
                 $this->mail->Username   = 'pythonboss123@gmail.com';            // SMTP username
-                $this->mail->Password   = '';                       // SMTP password
+                $this->mail->Password   = 'Iloveodunayo';                    // SMTP password
                 // $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;          // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
                 $this->mail->Port       = 25;      
                 $this->mail->SMTPSecure = 'tsl';
                 $this->mail->setFrom('info@betcommunity.com', 'BetCommunity');
-                $this->mail->addAddress($this->to);
-                $this->mail->isHTML(true);                                  // Set email format to HTML
+                $this->mail->addAddress($this->to);                        // Set email format to HTML
                 $this->mail->Subject = $this->subject;
                 $this->mail->Body    = $this->message;
                 $this->mail->send();
+                return true;
             } catch (Exception $e) {
-                echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+                echo "Message could not be sent. Mailer Error: {$this->mail->ErrorInfo}";
+                return false;
             }
         }
     }

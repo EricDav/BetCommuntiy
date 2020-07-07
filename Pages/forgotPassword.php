@@ -26,12 +26,12 @@
                * page content
                */
               $alert = "";
-              if($message !== true){
+              if($request->route == '/forgot-password'){
                 /**
                  * Display error message
                  */
                 
-                if($message != "" && $message !== true){
+                if($data['message'] != "" && $message !== true){
                   $alert = "<div style = 'padding: 5px !important' class = 'alert alert-danger'>
                               <span class = 'fa fa-exclamation-circle'></span>
                               <span>".$message."</span>
@@ -41,8 +41,11 @@
 
                 echo "<div class=\"tab-pane\" id=\"login\">
                         <h3>Forgot password</h3>
-                        <p class=\"text-muted\">Enter a registred email address</p>
-                        <p id=\"error-message\"></p>
+                        <p class=\"text-muted\">Enter the email address associated with your account. We will send you 
+                        a code that you will use to reset your password</p>
+                        <div id = 'info_container' class = 'alert'>
+                        ".$alert."
+                      </div>
                         <!--forgot password form-->
                         <form name=\"Login_form\" id=\"Login_form\">
                             <div class=\"row\">
@@ -50,17 +53,18 @@
                                 <label for=\"myEmail\" class=\"sr-only\">Email</label>
                                 <input id=\"myEmail\" class=\"form-control input-group-lg\" type=\"email\" name=\"email\" title=\"Enter Email\" placeholder=\"Your Email\" style=\"background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAkCAYAAADo6zjiAAAAAXNSR0IArs4c6QAAAbNJREFUWAntV8FqwkAQnaymUkpChB7tKSfxWCie/Yb+gbdeCqGf0YsQ+hU95QNyDoWCF/HkqdeiIaEUqyZ1ArvodrOHxanQOiCzO28y781skKwFW3scPV1/febP69XqarNeNTB2KGs07U3Ttt/Ozp3bh/u7V7muheQf6ftLUWyYDB5yz1ijuPAub2QRDDunJsdGkAO55KYYjl0OUu1VXOzQZ64Tr+IiPXedGI79bQHdbheCIAD0dUY6gV6vB67rAvo6IxVgWVbFy71KBKkAFaEc2xPQarXA931ot9tyHphiPwpJgSbfe54Hw+EQHMfZ/msVEEURjMfjCjbFeG2dFxPo9/sVOSYzxmAwGIjnTDFRQLMQAjQ5pJAQkCQJ5HlekeERxHEsiE0xUUCzEO9AmqYQhiF0Oh2Yz+ewWCzEY6aYKKBZCAGYs1wuYTabKdNNMWWxnaA4gp3Yry5JBZRlWTXDvaozUgGTyQSyLAP0dbb3DtQlmcan0yngT2ekE9ARc+z4AvC7nauh9iouhpcGamJeX8XF8MaClwaeROWRA7nk+tUnyzGvZrKg0/40gdME/t8EvgG0/NOS6v9NHQAAAABJRU5ErkJggg==&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%;\" autocomplete=\"off\" required>
                               </div>
+                              <div style=\"display: none;\" id=\"token-wrapper\" class=\"form-group col-xs-12\">
+                                <label for=\"myCode\" class=\"sr-only\">Email</label>
+                                <input id=\"myCode\" class=\"form-control input-group-lg\" type=\"email\" name=\"code\" title=\"code\" placeholder=\"Enter 6 digit code sent\" style=\"background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAkCAYAAADo6zjiAAAAAXNSR0IArs4c6QAAAbNJREFUWAntV8FqwkAQnaymUkpChB7tKSfxWCie/Yb+gbdeCqGf0YsQ+hU95QNyDoWCF/HkqdeiIaEUqyZ1ArvodrOHxanQOiCzO28y781skKwFW3scPV1/febP69XqarNeNTB2KGs07U3Ttt/Ozp3bh/u7V7muheQf6ftLUWyYDB5yz1ijuPAub2QRDDunJsdGkAO55KYYjl0OUu1VXOzQZ64Tr+IiPXedGI79bQHdbheCIAD0dUY6gV6vB67rAvo6IxVgWVbFy71KBKkAFaEc2xPQarXA931ot9tyHphiPwpJgSbfe54Hw+EQHMfZ/msVEEURjMfjCjbFeG2dFxPo9/sVOSYzxmAwGIjnTDFRQLMQAjQ5pJAQkCQJ5HlekeERxHEsiE0xUUCzEO9AmqYQhiF0Oh2Yz+ewWCzEY6aYKKBZCAGYs1wuYTabKdNNMWWxnaA4gp3Yry5JBZRlWTXDvaozUgGTyQSyLAP0dbb3DtQlmcan0yngT2ekE9ARc+z4AvC7nauh9iouhpcGamJeX8XF8MaClwaeROWRA7nk+tUnyzGvZrKg0/40gdME/t8EvgG0/NOS6v9NHQAAAABJRU5ErkJggg==&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%;\" autocomplete=\"off\" required>
+                            </div>
                             </div>
                         </form><!--forgot password form ends--> 
                         <button id=\"send_reset_link_button\" class=\"btn btn-primary\">Send</button>
                         <br>
                         <br>
-                        <div id = 'info_container' class = 'alert'>
-                          ".$alert."
-                        </div>
                       </div>";
               }else{
-                $name = $_SESSION['name'];
+                $name = $_SESSION['temp_user']['name'];
                 echo "<div class=\"tab-pane\" id=\"login\">
                         <h3>Reset Password</h3>
                         
@@ -68,16 +72,17 @@
                           <span>Set new password </span>
                           <span style = 'font-size: 12px' class=\"text-primary\">(".$name.")</span>
                         </p>                        
-                        <p id=\"error-message\"></p>
+                        <div id = 'info_container' class = 'alert'>
+                        </div>
                         <!--forgot password form-->
                         <form name=\"Login_form\" id=\"Login_form\">
                             <div class=\"row\">
                               <div class=\"form-group col-xs-12\">
-                                <label for=\"myEmail\" class=\"sr-only\">New Password</label>
+                                <label for=\"myPassword\" class=\"sr-only\">New Password</label>
                                 <input id=\"newPassword\" class=\"form-control input-group-lg\" type=\"password\" name=\"password\" title=\"New Password\" placeholder=\"New Password\" style=\"background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAkCAYAAADo6zjiAAAAAXNSR0IArs4c6QAAAbNJREFUWAntV8FqwkAQnaymUkpChB7tKSfxWCie/Yb+gbdeCqGf0YsQ+hU95QNyDoWCF/HkqdeiIaEUqyZ1ArvodrOHxanQOiCzO28y781skKwFW3scPV1/febP69XqarNeNTB2KGs07U3Ttt/Ozp3bh/u7V7muheQf6ftLUWyYDB5yz1ijuPAub2QRDDunJsdGkAO55KYYjl0OUu1VXOzQZ64Tr+IiPXedGI79bQHdbheCIAD0dUY6gV6vB67rAvo6IxVgWVbFy71KBKkAFaEc2xPQarXA931ot9tyHphiPwpJgSbfe54Hw+EQHMfZ/msVEEURjMfjCjbFeG2dFxPo9/sVOSYzxmAwGIjnTDFRQLMQAjQ5pJAQkCQJ5HlekeERxHEsiE0xUUCzEO9AmqYQhiF0Oh2Yz+ewWCzEY6aYKKBZCAGYs1wuYTabKdNNMWWxnaA4gp3Yry5JBZRlWTXDvaozUgGTyQSyLAP0dbb3DtQlmcan0yngT2ekE9ARc+z4AvC7nauh9iouhpcGamJeX8XF8MaClwaeROWRA7nk+tUnyzGvZrKg0/40gdME/t8EvgG0/NOS6v9NHQAAAABJRU5ErkJggg==&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%;\" autocomplete=\"off\" required>
                               </div>
                               <div class=\"form-group col-xs-12\">
-                                <label for=\"myEmail\" class=\"sr-only\">Re-Enter Password</label>
+                                <label for=\"myPasswordDublicate\" class=\"sr-only\">Re-Enter Password</label>
                                 <input id=\"newPasswordDuplicate\" class=\"form-control input-group-lg\" type=\"password\" name=\"re-password\" title=\"Re-Enter Password\" placeholder=\"Re-Enter Password\" style=\"background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAkCAYAAADo6zjiAAAAAXNSR0IArs4c6QAAAbNJREFUWAntV8FqwkAQnaymUkpChB7tKSfxWCie/Yb+gbdeCqGf0YsQ+hU95QNyDoWCF/HkqdeiIaEUqyZ1ArvodrOHxanQOiCzO28y781skKwFW3scPV1/febP69XqarNeNTB2KGs07U3Ttt/Ozp3bh/u7V7muheQf6ftLUWyYDB5yz1ijuPAub2QRDDunJsdGkAO55KYYjl0OUu1VXOzQZ64Tr+IiPXedGI79bQHdbheCIAD0dUY6gV6vB67rAvo6IxVgWVbFy71KBKkAFaEc2xPQarXA931ot9tyHphiPwpJgSbfe54Hw+EQHMfZ/msVEEURjMfjCjbFeG2dFxPo9/sVOSYzxmAwGIjnTDFRQLMQAjQ5pJAQkCQJ5HlekeERxHEsiE0xUUCzEO9AmqYQhiF0Oh2Yz+ewWCzEY6aYKKBZCAGYs1wuYTabKdNNMWWxnaA4gp3Yry5JBZRlWTXDvaozUgGTyQSyLAP0dbb3DtQlmcan0yngT2ekE9ARc+z4AvC7nauh9iouhpcGamJeX8XF8MaClwaeROWRA7nk+tUnyzGvZrKg0/40gdME/t8EvgG0/NOS6v9NHQAAAABJRU5ErkJggg==&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%;\" autocomplete=\"off\" required>
                               </div>
                             </div>
@@ -85,10 +90,7 @@
                         <button id=\"reset_button\" class=\"btn btn-primary\">Reset</button>
                         <br>
                         <br>
-                        <div id = 'info_container' class = 'alert'>
-                          
-                        </div>
-                      </div>";
+                    </div>";
               }
             ?>
           </div>
@@ -112,6 +114,9 @@
       <div class="spinner"></div>
     </div>
     <?php include 'Pages/common/Script.php'?>
+    <?php if (isset($_SESSION['temp_user'])): ?>
+      <script type="text/javascript">var __code=<?=json_encode($data['code'])?>;</script>
+    <?php endif ?>
     <script src="/bet_community/Public/js/forgotPassword.js"></script>
 </body>
 </html>

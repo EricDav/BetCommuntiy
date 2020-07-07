@@ -1,6 +1,9 @@
 <?php
 session_start();
 include 'BetCommunity.Class.php';
+$envObj = json_decode(file_get_contents(__DIR__ .'/.envJson'));
+
+
 
 function isLogin() {
     if (isset($_SESSION['userInfo'])) {
@@ -42,12 +45,8 @@ if (in_array($request->route, array_keys(BetCommunity::routes))) {
     $controllerObject->setToken();
     $data = $controllerObject->data;
     $data['isLogin'] = $controllerObject->isLogin();
-
-    if($request->method != 'POST')
-        $message = $data['template'] == 'forgotPassword.php' ? $controllerObject->message: "";
     
-    if($controllerObject->responseType == 'html')
-        include 'Pages/' . $data['template'];
+    include 'Pages/' . $data['template'];
 
 
 } else{

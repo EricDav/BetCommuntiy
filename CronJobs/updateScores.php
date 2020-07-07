@@ -2,8 +2,8 @@
     include __DIR__  . '/../Enviroment/Enviroment.php';
     include __DIR__  . '/../Config/Config.php';
     include __DIR__  . '/../DB/DBConnection.php';
+    $envObj = json_decode(file_get_contents(__DIR__ .'/../.envJson'));
     
-    mail("alienyidavid4christ@gmail.com","My Script Verify",'Inside script');
     function getMinutesDiffFromNow($dateStr){
         $startDate = new DateTime($dateStr);
         $sinceStart = $startDate->diff(new DateTime(gmdate("Y-m-d\ H:i:s")));
@@ -57,8 +57,6 @@
                 unset($fromBookingArr[$key]);
 
         
-        // var_dump($fromAPiArr);
-        // var_dump($fromBookingArr);
 
         if (sizeof($fromAPiArr) == 1 || sizeof($fromBookingArr) == 1) {
             return strpos($fromApi, $fromBooking) !== false || strpos($fromBooking, $fromApi) !== false;
@@ -69,9 +67,6 @@
         }
 
         for($i = 0; $i < sizeof($fromBookingArr); $i++) {
-            // echo '<<<<=======>>>';
-            // var_dump($fromAPiArr[$i]);
-            // var_dump($fromBookingArr[$i]);
             if (strpos($fromAPiArr[$i], $fromBookingArr[$i]) !== false || strpos($fromBookingArr[$i], $fromAPiArr[$i]) !== false) {
                 continue;
             }
@@ -103,7 +98,7 @@
    // while (true) {
     $page = 0;
     $liveScroes = array();
-    $data = json_decode(file_get_contents('http://livescore-api.com/api-client/scores/live.json?key=Smmc7JtHTTNqcoAN&secret=kSQahwWDPT2qm6AfsXrAGVhAO511tCON'));
+    $data = json_decode(file_get_contents('http://livescore-api.com/api-client/scores/live.json?key='. $envObj->LIVESCORE_API_KEY . '&secret=' . $envObj->LIVESCORE_API_SECRET));
     // var_dump($data);
     // $data = json_decode(file_get_contents(__DIR__ . '/../data2.json'));
     

@@ -89,6 +89,7 @@
                 }
             }
 
+            
             if ($this->type == 'update_profile') {
                 $name = $this->firstName . ' ' . $this->lastName;
                 $sex = $this->sex == 'Male' ? 'M' : 'F';

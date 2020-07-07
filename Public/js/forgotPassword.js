@@ -7,8 +7,10 @@ $(document).ready(function(){
     /**
      * variables
      */
-    emailField = $('#myEmail');
-    info = $('#info_container');//variables
+    var emailField = $('#myEmail');
+    var codeField = $('#myCode');
+    var info = $('#info_container');//variables
+    var isCodeSent = false;
 
 
 
@@ -80,31 +82,45 @@ $(document).ready(function(){
     /**
      * Handle ajax request
      */
-    $.fn.ajaxSendResetRequest = function(email, package){
+    $.fn.ajaxSendResetRequest = function(email, package, url, text, button){
+        button.prop('disabled', true);
+        button.text(text + 'ing...');
+
         $.ajax({
             type:'POST',
-            url:'/forgot-password',
+            url:url,
             data: package, 
             success: function(result){
-                console.log(result);
-                
-                if(result.trim() !== ''){
-                    result = JSON.parse(result);
-                    if(result['success'] === true){
-                        message = result['messages'];
+               button.prop('disabled', false);
+               button.text(text);
+
+                if(result.success){
+                    if (url == '/forgot-password/reset') {
                         status = 'success';
-                        $.fn.setReturnInformation(message, status);
-                        if('url' in result){
-                            window.location.replace('/login')
+                        $.fn.setReturnInformation(result.message, status);
+                        isCodeSent = true;
+                        setTimeout(function() {
+                            window.location.href = '/login';
+                        }, 3000);
+                    } else {
+                        if (!isCodeSent) {
+                            $('#token-wrapper').show();
+                            $('#myEmail').attr('disabled', true);
+                            message = result['message'];
+                            status = 'success';
+                            $.fn.setReturnInformation(message, status);
+                            isCodeSent = true;
+                        } else {
+                            window.location.href = '/forgot-password/reset';
                         }
-                    }else{
-                        message = result['messages'];
-                        status = 'failure';
-                        $.fn.setReturnInformation(message, status);
-                    }   
-                }
+                    }
+                } else{
+                    message = result['message'];
+                    status = 'failure';
+                    $.fn.setReturnInformation(message, status);
+                }   
             }
-        })
+        });
     }
 
 
@@ -118,30 +134,34 @@ $(document).ready(function(){
     $('#send_reset_link_button').unbind().click(function(){
         $.fn.clearReturnInformation();
         sendButton = $(this);
-        sendButton.prop('disabled', true);
-
-
 
         if($.fn.isEmailEmpty(emailField.val())){
             message = " Email field cannot be left empty"
             status = 'warning'
-            $.fn.setReturnInformation(message, status)
-            sendButton.prop('disabled', false);
-        }else{
-            package = {
-                'request':'send_reset_link',
-                'email': emailField.val()
-            };
-            $.fn.ajaxSendResetRequest(emailField.val(), package);
-            sendButton.prop('disabled', false);
+        } else {
+            if (isCodeSent) {
+                if (!codeField.val()) {
+                    message = " Code field cannot be left empty";
+                    status = 'warning';
+                    $.fn.setReturnInformation(message, status);
+                    return;
+                }
+
+                package = {
+                    'request':'validate_code',
+                    'email': emailField.val(),
+                    'code': codeField.val()
+                };
+
+            } else {
+                package = {
+                    'request':'send_reset_link',
+                    'email': emailField.val()
+                };
+            }
+            $.fn.ajaxSendResetRequest(emailField.val(), package, '/forgot-password', 'Send', sendButton);
         }
-
-
-    })
-
-
-
-
+    });
 
     /**
      * Bind click event to  reset button
@@ -149,9 +169,6 @@ $(document).ready(function(){
     $('#reset_button').click(function(){
         $.fn.clearReturnInformation();
         var resetButton = $(this);
-        resetButton.prop('disabled', true);
-        $('#newPassword').prop('disabled', true);
-        $('#newPasswordDuplicate').prop('disabled', true);
         var newPassword = $('#newPassword').val();
         var newPasswordDuplicate = $('#newPasswordDuplicate').val();
         
@@ -159,27 +176,23 @@ $(document).ready(function(){
             message = " Password Required"
             status = 'warning'
             $.fn.setReturnInformation(message, status)
-            resetButton.prop('disabled', false);
-            $('#newPassword').prop('disabled', false);
-            $('#newPasswordDuplicate').prop('disabled', false);
         }else if($.fn.isEmailEmpty(newPasswordDuplicate)){
             message = " Retype Password"
             status = 'warning'
             $.fn.setReturnInformation(message, status)
-            resetButton.prop('disabled', false);
-            $('#newPassword').prop('disabled', false);
-            $('#newPasswordDuplicate').prop('disabled', false);
-        }else{
+        }else if (newPassword != newPasswordDuplicate) {
+            message = " Password doesn't match"
+            status = 'warning'
+            $.fn.setReturnInformation(message, status)
+        } else{
             package = {
                 'request':'reset_password',
                 'password': newPassword,
-                'passwordDuplicate': newPasswordDuplicate
+                'passwordDuplicate': newPasswordDuplicate,
+                'code': __code
             };
-            $.fn.ajaxSendResetRequest(emailField.val(), package);
-            resetButton.prop('disabled', false);
-            $('#newPassword').prop('disabled', false);
-            $('#newPasswordDuplicate').prop('disabled', false);
 
+            $.fn.ajaxSendResetRequest(emailField.val(), package, '/forgot-password/reset', 'Reset', resetButton);
         }
     })
 });

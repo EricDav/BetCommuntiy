@@ -109,9 +109,9 @@
             }
         }
 
-        public static function updateUserPassword($pdoConnection, $password, $userId) {
+        public static function updateUserPassword($pdoConnection, $password, $userId, $code=null) {
             try {
-                $sql = 'UPDATE users SET password=? WHERE id=' . $userId;
+                $sql = 'UPDATE users SET password=?' . ($code ? ', code_token=NULL, token_count=0' : '') . ' WHERE id=' . $userId;
                 $stmt = $pdoConnection->pdo->prepare($sql);
 
                 $stmt->execute([$password]);
@@ -246,6 +246,18 @@
                 var_dump($e);
                 return false;
             }
+        }
+
+        public static function updateUserResetCode($pdoConnection, $email, $code, $count) {
+            try {
+                $sql = 'UPDATE users SET code_token=' . "'" . $code . "'" . ', token_count=' . $count . ' WHERE email=' . "'" . $email . "'";
+                // echo $sql; exit;
+                return $pdoConnection->pdo->query($sql);
+
+            } catch(Exception $e) {
+                var_dump($e);
+                return false;
+            }   
         }
     }
 ?>
