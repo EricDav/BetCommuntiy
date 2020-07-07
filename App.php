@@ -2,7 +2,7 @@
 session_start();
 include 'BetCommunity.Class.php';
 $envObj = json_decode(file_get_contents(__DIR__ .'/.envJson'));
-
+// var_dump($envObj); exit;
 
 
 function isLogin() {
@@ -32,7 +32,7 @@ if (in_array($request->route, array_keys(BetCommunity::routes))) {
     $controllerArr = explode('@', BetCommunity::routes[$request->route]);
     $controllerClass = $controllerArr[0];
     $method = sizeof($controllerArr) == 2 ? $controllerArr[1] : BetCommunity::DEFAULT_METHOD;
-    $controllerObject = new $controllerClass($request);
+    $controllerObject = new $controllerClass($request, $envObj);
 
     if ($method != BetCommunity::DEFAULT_METHOD) {
         $controllerObject->$method();

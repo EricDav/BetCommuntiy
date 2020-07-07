@@ -16,13 +16,14 @@ abstract class Controller {
     const DEFAULT_OFFSET = 1;
 
 
-    public function __construct($request) {
+    public function __construct($request, $envObj=null) {
         $this->data = array();
         $this->request = $request;
         $this->responseType = null;
         $this->pdoConnection = new PDOConnection();
         $this->error = array();
         $this->currentSideBarFilter = null;
+        $this->envObj = $envObj;
     }
 
     public function authenticate($id=null, $token=null) {

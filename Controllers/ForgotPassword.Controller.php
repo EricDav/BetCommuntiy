@@ -6,10 +6,10 @@ class ForgotPasswordController extends Controller{
     public $request;
     public $message;
 
-    public function __construct($request){
+    public function __construct($request) {
         parent::__construct($request);
         $this->requestMethod = $request->method;
-        $this->email = $request->postData['email'] ? $request->postData['email'] : null;
+        $this->email = isset($request->postData['email']) ? $request->postData['email'] : null;
         $this->pdoConnection->open();
     }
 

@@ -1,7 +1,7 @@
 <?php 
     class FixturesController extends Controller {
-        public function __construct($request) {
-            parent::__construct($request);
+        public function __construct($request, $envObj) {
+            parent::__construct($request, $envObj);
             $this->competitionId = isset($request->query['competition_id']) ? $request->query['competition_id'] : '';
         }
 
@@ -18,8 +18,7 @@
             $results = array();
             if ($this->callApi()) {
                 $page = 1;
-                $data = json_decode(file_get_contents('https://livescore-api.com/api-client/fixtures/matches.json?key=' . $envObj->LIVESCORE_API_KEY . '&secret=' . $envObj->LIVESCORE_API_SECRET . '&competition_id=' . $this->competitionId));
-                // var_dump()
+                $data = json_decode(file_get_contents('https://livescore-api.com/api-client/fixtures/matches.json?key=' . $this->envObj->LIVESCORE_API_KEY . '&secret=' . $this->envObj->LIVESCORE_API_SECRET . '&competition_id=' . $this->competitionId));
                 $next_page = $data->data->next_page;
 
                 $data->data->next_page = null;
