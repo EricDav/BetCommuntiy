@@ -2,7 +2,6 @@
 session_start();
 include 'BetCommunity.Class.php';
 $envObj = json_decode(file_get_contents(__DIR__ .'/.envJson'));
-// var_dump($envObj); exit;
 
 
 function isLogin() {
@@ -52,6 +51,5 @@ if (in_array($request->route, array_keys(BetCommunity::routes))) {
 } else{
     include './Pages/404.php'; //include error 404 page for undefined routes
  }
-
 ?>
 

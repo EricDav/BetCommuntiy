@@ -77,7 +77,6 @@
         public function getPrediction() {
             $predictionId = isset($this->request->query['id']) ? $this->request->query['id'] : null;
             if (!$predictionId || !is_numeric($predictionId)) {
-                echo 'I got here'; exit;
                 $this->set404Page();
                 return;
             }
@@ -119,6 +118,44 @@
             $this->data['outcomes'] = BetCommunity::OUTCOMES;
             $this->responseType = 'html';
 
+        }
+
+        public function updateWonStatus() {
+            $this->authenticateAdmin();
+            $this->pdoConnection->open();
+            $predictionId = isset($this->request->postData['prediction_id']) ? $this->request->postData['prediction_id'] : null;
+            $wonStatus = isset($this->request->postData['status']) ? $this->request->postData['status'] : null;
+
+            if ($predictionId == null || !is_numeric($predictionId)) {
+                $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_BAD_REQUEST_CODE, 'message' => 'Invalid prediction id'));
+            }
+
+            if ($wonStatus == null || !is_numeric($predictionId)) {
+                $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_BAD_REQUEST_CODE, 'message' => 'Invalid status'));
+            }
+
+            if ((int)$wonStatus !== 1 || (int)$wonStatus != 0) {
+                $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_BAD_REQUEST_CODE, 'message' => 'Invalid status'));
+            }
+
+            // Retrieve the prediction id 
+            $prediction = PredictionModel::getPredictionById($this->pdoConnection, $predictionId);
+
+            // check for server error 
+            if ($prediction === false) {
+                $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_SERVER_ERROR_CODE, 'message' => 'Server error'));
+            }
+            
+            // check if prediction is found
+            if (!$prediction) {
+                $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_NOT_FOUND, 'messages' => 'Prediction not found'));
+            }
+
+            if (PredictionModel::updatePredictionStatus($this->pdoConnection, $predictionId, $wonStatus, $this->request->session['userInfo']['id'])) {
+                $this->jsonResponse(array('success' => true, 'message' => 'Status updated succesfully', 'code' => Controller::HTTP_OKAY_CODE));
+            }
+
+            $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_SERVER_ERROR_CODE, 'message' => 'Server error'));
         }
     }
 

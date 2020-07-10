@@ -1,7 +1,7 @@
 <div class="modal fade" id="confirmModalCreate" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
           <div class="modal-content">
-          <span id="close-icon-confirm-prediction"><i class="fa fa-close close-icon"></i></span>
+          <span style="margin-left: -10;" id="close-icon-confirm-prediction"><i class="fa fa-close close-icon"></i></span>
           <div style="height: 170px;" id='m-body-id' class="modal-body m-body">
              <div class="confirm-prediction-create-txt" style="color: green">Prediction Created successfully!</div><br>
 

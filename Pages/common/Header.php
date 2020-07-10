@@ -38,7 +38,8 @@
                     <li><a href="/logout">Logout</a></li>
                   </ul>
                 </li>
-                <li class="dropdown"><a href="/my-profile"><i style="font-size: 2rem; margin-top: 2px;" class="fa fa-bell"></i></a></li>
+                <li id="" class="dropdown"><a><i style="font-size: 2rem; margin-top: 2px;" class="fa fa-bell"></i></a></li>
+                <li id="notification-bell"><a style="color: #fff;margin-top: 10px;width: fit-content;"><span id="unseen-notification" style="display: inline-block;margin-top: -17;text-align: center;height: 22px;width: 22px;border-radius: 50%;font-size: 12px;"></span></a></li>
               <?php endif ?>
 
             </ul>

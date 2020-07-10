@@ -25,6 +25,7 @@
 <head>
   <?php include 'Pages/common/Head.php'; ?>
   <link rel="stylesheet" href="/bet_community/Public/css/home.css">
+  <link rel="stylesheet" href="/bet_community/Public/css/notification.css">
 </head>
 <body>
 <?php include 'Pages/common/Header.php';?>
@@ -52,7 +53,10 @@
   <?php endif; ?>
     	<div class="container">
     		<div class="row">
-
+        <?php if (isLogin()): ?>
+          <!-- Obstruction modal -->
+          <?php  include 'Pages/common/Notifications.php';?>
+        <?php endif; ?>
           <!-- Newsfeed Common Side Bar Left
           ================================================= -->
     			<div class="col-md-3 static">
@@ -178,6 +182,11 @@
 
   <?php  include 'Pages/common/Footer.php';?>
   <?php include 'Pages/common/Script.php'?>
+  <script>
+    function openNav() {
+    document.getElementById("mySidenav").style.display = 'block'
+  }
+    </script>
   <!-- The core Firebase JS SDK is always required and must be listed first -->
     <script type="text/javascript">var dates=<?=json_encode($data['dates'])?>;</script>
     <script type="text/javascript">var __allCompetitions=<?=json_encode($data['competitions'])?>;</script>
@@ -185,5 +194,8 @@
     <script type="text/javascript">var __outcomes=<?=json_encode($data['outcomes'])?>;</script>
     <script src="/bet_community/Public/js/prediction.js"></script>
     <script src="/bet_community/Public/js/common-sidebar.js"></script>
+    <?php if(isLogin()): ?>
+      <script src="/bet_community/Public/js/notification.js"></script>
+    <?php endif; ?>
   </body>
 </html>

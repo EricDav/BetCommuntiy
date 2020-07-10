@@ -217,6 +217,14 @@ abstract class Controller {
         $this->responseType = 'html';
     }
 
+    public function authenticateAdmin() {
+        $this->authenticate();
+
+        if ($this->request->session['userInfo']['role'] == 1) {
+            $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_UNAUTHORIZED_CODE, 'message' => 'You are not authorize to perform this action'));
+        }
+    }
+
     abstract function validate();
 
     abstract function perform();
