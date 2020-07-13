@@ -17,7 +17,7 @@
         // $predictions = $pdoConnection->pdo->query($sql)->fetchAll();
         // var_dump($predictions);
     } catch (Exception $e) {
-        var_dump($e);
+        ErrorMail::LogError($e);;
     }
 
     foreach ($predictions as $prediction) {

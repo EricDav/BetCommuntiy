@@ -24,7 +24,7 @@ class PDOConnection {
         } catch(Exception $e) {
             // TODO 
             // Determines what to do in catch of open 
-            var_dump($e->getMessage());
+            ErrorMail::LogError($e);
         }
     }
 

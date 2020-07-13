@@ -15,7 +15,7 @@
                 $stmt->execute([$startDate, $endDate, $prediction, $odds, $userId, $approved, gmdate("Y-m-d\ H:i:s"), $type, self::DEFAULT_SCROES_FINISHED]);
                 return $pdoConnection->pdo->lastInsertId();
             } catch(Exception $e) {
-                var_dump($e->getMessage()); exit;
+                ErrorMail::LogError($e);
                 return false;
             }
         }
@@ -38,7 +38,7 @@
                 return $pdoConnection->pdo->query($sql)->fetchAll();
 
             } catch(Exception $e) {
-                var_dump($e->getMessage()); exit;
+                ErrorMail::LogError($e);
                 return false;
             }
         }
@@ -57,7 +57,7 @@
                 return $pdoConnection->pdo->query($sql)->fetchAll();
 
             } catch(Exception $e) {
-                var_dump($e->getMessage()); exit;
+                ErrorMail::LogError($e);
                 return false;
             }
         }
@@ -67,7 +67,7 @@
                 $sql = "SELECT id, prediction FROM predictions WHERE id IN (" . $ids . ")";
                 return $pdoConnection->pdo->query($sql)->fetchAll();
             } catch(Exception $e) {
-                var_dump($e->getMessage()); exit;
+                ErrorMail::LogError($e);
                 return false;
             }  
         }
@@ -77,7 +77,7 @@
                 $sql = "SELECT user_id FROM predictions WHERE id=" . $id;
                 return $pdoConnection->pdo->query($sql)->fetch();
             } catch(Exception $e) {
-                var_dump($e->getMessage());
+                ErrorMail::LogError($e);
                 return false;
             }  
         }
@@ -93,7 +93,7 @@
                WHERE predictions.id= " . $id;
                 return $pdoConnection->pdo->query($sql)->fetchAll();
             } catch(Exception $e) {
-                var_dump($e->getMessage());
+                ErrorMail::LogError($e);
                 return false;
             } 
         }
@@ -104,7 +104,7 @@
                 $pdoConnection->pdo->query($sql);
                 return true;
             } catch(Exception $e) {
-                var_dump($e->getMessage());
+                ErrorMail::LogError($e);
                 return false;
             }  
         }
@@ -132,7 +132,7 @@
                 $stmt= $pdoConnection->pdo->prepare($sql);
                 return $stmt->execute([$predictionId, $userId, $problem, $note]);
             } catch(Exception $e) {
-                var_dump($e->getMessage()); exit;
+                ErrorMail::LogError($e);
                 return false;
             }
         }
@@ -142,7 +142,7 @@
                 $sql = 'SELECT created_at FROM predictions WHERE user_id=' . $userId . ' ORDER BY created_at DESC LIMIT ' . $numLastPredictions;
                 return $pdoConnection->pdo->query($sql)->fetchAll();
             } catch(Exception $e) {
-                var_dump($e->getMessage());
+                ErrorMail::LogError($e);
                 return false;
             }
         }

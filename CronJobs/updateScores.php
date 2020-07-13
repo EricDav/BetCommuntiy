@@ -123,7 +123,7 @@
     try {
         $predictions = $pdoConnection->pdo->query($sql)->fetchAll();
     } catch (Exception $e) {
-        exit($e->getMessage());
+        ErrorMail::LogError($e);
     }
 
     foreach($predictions as $prediction) {

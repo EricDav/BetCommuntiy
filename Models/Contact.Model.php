@@ -19,10 +19,10 @@
                     return false;
                 }
             } catch(Exception $e) {
-                echo $e;
+                ErrorMail::LogError($e);
                 return 'Server error';
             }
-        }
+        } 
 
         public function storeContactMessage($name, $email, $message, $isAUser, $userId, $request_time, $pdoConnection){
             try {
@@ -36,7 +36,7 @@
                     return false;
                 }
             } catch(Exception $e) {
-                echo $e;
+                ErrorMail::LogError($e);
                 return 'Server error';
             }
         }
