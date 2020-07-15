@@ -19,7 +19,7 @@ class ForgotPasswordModel{
             $stmt->execute([$name, $email, $special_id, $request, $request_date_time]);
             return $stmt->fetch();
         }catch(\PDOException $e){
-            echo $e;
+            ErrorMail::LogError($e);
             return "Server error";
         }
     }
@@ -38,7 +38,7 @@ class ForgotPasswordModel{
             $stmt->execute([$identity]);
             return $stmt->fetch();
         }catch(\PDOException $e){
-            echo $e;
+            ErrorMail::LogError($e);
             return 'Server error';
         }
     }
@@ -61,7 +61,7 @@ class ForgotPasswordModel{
                 return false;
             }
         }catch(\PDOException $e){
-            echo $e;
+            ErrorMail::LogError($e);
             return "Server error";
         }
     }
@@ -87,7 +87,7 @@ class ForgotPasswordModel{
                 return false;
             }
         }catch(\PDOException $e){
-            echo $e;
+            ErrorMail::LogError($e);
             return "Server error";
         }
     }
@@ -105,7 +105,7 @@ class ForgotPasswordModel{
             $stmt->execute([$identity]);
             return $stmt->fetch();
         }catch(\PDOException $e){
-            echo $e;
+            ErrorMail::LogError($e);
             return 'Server error';
         }
     }
@@ -124,7 +124,7 @@ class ForgotPasswordModel{
             if($stmt->execute([$password,$specialId])) return true;
             else return false;
         }catch(\PDOException $e){
-            echo $e;
+            ErrorMail::LogError($e);
             return 'Server error';
         }
     }
@@ -141,7 +141,7 @@ class ForgotPasswordModel{
             if($stmt->execute([$identity])) return true;
             else return false;
         }catch(\PDOException $e){
-            echo $e;
+            ErrorMail::LogError($e);
             return 'Server error';
         }
     }
@@ -158,7 +158,7 @@ class ForgotPasswordModel{
             $stmt->execute([$specialId]);
             return $stmt->fetch();
         }catch(\PDOException $e){
-            echo $e;
+            ErrorMail::LogError($e);
             return 'Server error';
         }
     }
@@ -173,7 +173,7 @@ class ForgotPasswordModel{
             $stmt = $pdoConnection->pdo->query($query);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         }catch(\PDOException $e){
-            echo $e;
+            ErrorMail::LogError($e);
             return false;
         }
     }
@@ -188,7 +188,7 @@ class ForgotPasswordModel{
                         WHERE `id` = ".$id;
             $stmt = $pdoConnection->pdo->query($query);
         }catch(\PDOException $e){
-            echo $e;
+            ErrorMail::LogError($e);
             return false;
         }
     }

@@ -14,7 +14,7 @@
                 $stmt->execute([$email, $password]);
                 return $stmt->fetchAll();
             } catch(Exception $e) {
-                $e->getMessage();
+                ErrorMail::LogError($e);
                 return 'Server error';
             }
         }
@@ -26,6 +26,7 @@
                 $stmt->execute([$email, $phoneNumber]);
                 return $stmt->fetchAll();
             } catch(Exception $e) {
+                ErrorMail::LogError($e);
                 return 'Server error';
             }
         }
@@ -37,6 +38,7 @@
                 $stmt->execute([$phoneNumber]);
                 return $stmt->fetchAll();
             } catch(Exception $e) {
+                ErrorMail::LogError($e);
                 return 'Server error';
             }
         }
@@ -49,7 +51,7 @@
                 return $stmt->fetchAll();
             }
             catch(Exception $e) {
-                var_dump($e->getMessage());
+                ErrorMail::LogError($e);
                 return false;
             }
         }
@@ -62,6 +64,7 @@
                 return $stmt->fetch();
 
             } catch(Exception $e) {
+                ErrorMail::LogError($e);
                 return 'Server error';
             }  
         }
@@ -85,7 +88,7 @@
                 $stmt->execute([$name, $email, $password, $sex, $country, $city, UserModel::DEFAULT_ROLE, $specialId, $imagePath]);
                 return ['specialId' => $specialId, 'id' => $pdoConnection->pdo->lastInsertId()];
             } catch(Exception $e) {
-                var_dump($e->getMessage());
+                ErrorMail::LogError($e);
                 return false;
             }
         }
@@ -104,7 +107,7 @@
                 $stmt->execute([$name, $email, $sex, $country, $city, $phoneNumber]);
                 return true;
             } catch(Exception $e) {
-                var_dump($e);
+                ErrorMail::LogError($e);
                 return false;
             }
         }
@@ -117,7 +120,7 @@
                 $stmt->execute([$password]);
                 return true;
             } catch(Exception $e) {
-                var_dump($e);
+                ErrorMail::LogError($e);
                 return false;
             }
         }
@@ -130,7 +133,7 @@
                 $stmt->execute([$url]);
                 return true;
             } catch(Exception $e) {
-                var_dump($e);
+                ErrorMail::LogError($e);
                 return false;
             }
         }
@@ -140,7 +143,7 @@
                 $sql = 'SELECT * FROM followers WHERE follower_id=' . $userId;
                 return $pdoConnection->pdo->query($sql)->fetchAll();
             } catch(Exception $e) {
-                var_dump($e); exit;
+                ErrorMail::LogError($e);
                 return null;
             }
         }
@@ -150,7 +153,7 @@
                 $sql = 'SELECT COUNT(*) AS total_followers  FROM followers WHERE user_id=' . $userId;
                 return $pdoConnection->pdo->query($sql)->fetch();
             } catch(Exception $e) {
-                var_dump($e); exit;
+                ErrorMail::LogError($e);
                 return false;
             }
         }
@@ -165,7 +168,7 @@
                 
                 return $pdoConnection->pdo->query($sql)->fetchAll();
             } catch(Exception $e) {
-                var_dump($e);
+                ErrorMail::LogError($e);
                 return false;
             }
         }
@@ -177,7 +180,7 @@
                 // echo $sql; exit;
                 return $pdoConnection->pdo->query($sql)->fetchAll();
             } catch(Exception $e) {
-                var_dump($e); exit;
+                ErrorMail::LogError($e);
                 return null;
             }
         }
@@ -188,7 +191,7 @@
                 $pdoConnection->pdo->query($sql);
                 return true;
             } catch(Exception $e) {
-                var_dump($e); 
+                ErrorMail::LogError($e); 
                 return false;
             }
         }
@@ -198,7 +201,7 @@
                 $sql = 'SELECT * FROM followers WHERE user_id=' . $userId . ' AND follower_id=' . $followerId;
                 return $pdoConnection->pdo->query($sql)->fetchAll();
             } catch(Exception $e) {
-                var_dump($e);
+                ErrorMail::LogError($e);
                 return false;
             }
         }
@@ -209,7 +212,7 @@
                 $pdoConnection->pdo->query($sql);
                 return true;
             } catch(Exception $e) {
-                var_dump($e);
+                ErrorMail::LogError($e);
                 return false;
             }
         }
@@ -221,7 +224,7 @@
                 $pdoConnection->pdo->query($sql);
                 return true;
             } catch(Exception $e) {
-                var_dump($e->getMessage());
+                ErrorMail::LogError($e);
                 return false;
             }
         }
@@ -233,7 +236,7 @@
                 $pdoConnection->pdo->query($sql)->fetch();
                 return true;
             } catch(Exception $e) {
-                var_dump($e->getMessage()); exit;
+                ErrorMail::LogError($e);
                 return false;
             }
         }
@@ -255,7 +258,7 @@
                 return $pdoConnection->pdo->query($sql)->fetchAll();
 
             } catch(Exception $e) {
-                var_dump($e);
+                ErrorMail::LogError($e);
                 return false;
             }
         }
@@ -267,7 +270,7 @@
                 return $pdoConnection->pdo->query($sql);
 
             } catch(Exception $e) {
-                var_dump($e->getMessage());
+                ErrorMail::LogError($e);
                 return false;
             }   
         }
