@@ -16,6 +16,7 @@ class ErrorMail{
         /**
          * Send mail
          */
+
         $message = "<p>File: ".$file."</p><br/><br/>";
         $message .= "<p>Line: ".$line."</p><br/><br/>";
         $message .= "<p>Code: ".$code."</p><br/><br/>";

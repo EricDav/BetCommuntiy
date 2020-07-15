@@ -33,6 +33,7 @@
         }
 
         public function getEmailFooter() {
+            $emailFooter = "";
             $emailFooter .='<div style="text-align: center; margin-top: 50px; height: 50px; margin-bottom: -5;">
                                 <center>
                                     <div style="color: #27aae1;font-weight: 700;">Contact Us</div>

@@ -22,6 +22,7 @@ class BetCommunity {
         '/predictions' => "PredictionController@getPrediction",
         '/forgot-password' => "ForgotPasswordController",
         '/forgot-password/reset' => "ForgotPasswordController@resetPassword",
+        '/benefits' => "BenefitsController",
         '/api/web/notifications' => "NotificationController",
         '/api/web/notifications/clear-seen' => "NotificationController@clearSeen",
         '/api/web/predictions/like' => "PredictionController@like",
@@ -68,6 +69,7 @@ class BetCommunity {
         'ForgotPasswordController' => 'Controllers/ForgotPassword.Controller.php',
         'ForgotPasswordModel' => 'Models/ForgotPassword.Model.php',
         'SendMail' => 'SendMail.php',
+        'BenefitsController' => 'Controllers/Benefits.Controller.php'
         'NotificationModel' => 'Models/Notification.Model.php',
         'FollowerModel' => 'Models/Follower.Model.php',
         'NotificationController' => 'Controllers/Notification.Controller.php',
