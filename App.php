@@ -2,7 +2,7 @@
 session_start();
 include 'BetCommunity.Class.php';
 $envObj = json_decode(file_get_contents(__DIR__ .'/.envJson'));
-
+var_dump( $_SERVER("REMOTE_ADDR")); exit;
   /**
    * Given a competition object it returns 
    * the name e.g England Premier league

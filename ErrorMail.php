@@ -9,8 +9,8 @@ class ErrorMail{
         $code = $e->getCode();
         $line = $e->getLine();
         $errorMessage = $e->getMessage();
-        $userIp = $_SERVER("REMOTE_ADDR");
-        $browser = $_SERVER("HTTP_USER_AGENT");
+        $userIp = $_SERVER["REMOTE_ADDR"];
+        $browser = $_SERVER["HTTP_USER_AGENT"];
         $browserDetails = get_browser(NULL, TRUE);
 
         /**
