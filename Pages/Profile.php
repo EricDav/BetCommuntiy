@@ -8,6 +8,31 @@
 <?php include 'Pages/common/Header.php';?>
 <div class="container">
 
+<?php  include 'Pages/modals/ReportModal.php';?>
+
+
+<?php if (isLogin()): ?>
+  <!--Import create prediction Modal start -->
+  <?php  include 'Pages/modals/CreatePredictionModal.php';?>
+
+  <!--Import confirm create prediction Modal-->
+  <?php  include 'Pages/modals/ConfirmCreatedPredictionModal.php';?>
+  
+  <!-- Model start of delete confirmation -->
+  <?php  include 'Pages/modals/ConfirmPredictionDeleteModal.php';?>
+
+<?php endif; ?>
+
+<?php if( isAdmin()): ?>
+  <?php  include 'Pages/modals/PredictionOutcomeModal.php';?>
+  <?php  include 'Pages/modals/ConcludedOutcomeModal.php';?>
+<?php endif ?>
+
+  <?php if (!isLogin()): ?>
+      <!-- Obstruction modal -->
+      <?php  include 'Pages/modals/ObstructionModal.php';?>
+  <?php endif; ?>
+
    <!-- Modal start for uploading profile image-->
       <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -30,12 +55,6 @@
         </div>
       </div>
     <!-- Modal end for uploading profile image-->
-
-    <?php if (!isLogin()): ?>
-      <!-- Modal start -->
-      <?php  include 'Pages/modals/ObstructionModal.php';?>
-      <!-- Model close -->
-  <?php endif; ?>
 
     <div class="timeline">
         <div class="timeline-cover">
@@ -136,7 +155,6 @@
                 <?php if (sizeof($data['followers']) == 0): ?>
                   <div class="no-prediction"><?=$data['user'][0]['name'] . ' do not have any followers yet' ?></div>
                 <?php endif ?>
-
                 <?php if (sizeof($data['followers'] > 0)): ?>
                   <?php include 'Pages/common/Forecaster.php'; ?>
                 <?php endif ?>
@@ -150,7 +168,7 @@
                         
                       </div>
                       <div  class="col-md-5 col-sm-9">
-                          <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#exampleModal" id="open-prediction-modal">Create Prediction</button>
+                          <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#createPredictionModal" id="open-prediction-modal">Create Prediction</button>
                       </div>
                     </div>
                   </div>
@@ -162,44 +180,44 @@
                 <div class="no-prediction"> No Predictions Found </div>
               <?php endif ?>
 
-
+              <?php $index = 0; ?>
               <?php foreach($data['predictions'] as $prediction): ?>
                 <?php $isFollowing = $data['isLogin'] && $controllerObject->isFollowing($prediction['user_id']); ?>
-                <div class="post-content">
-                <div class="post-date hidden-xs hidden-sm">
+                <div id="<?='prediction-box-' . $prediction['id']?>" class="post-content">
+                  <div class="post-date hidden-xs hidden-sm">
                       <h5><?=$prediction['name']?></h5>
                       <p class="text-grey">Sometimes ago</p>
                   </div>
-                <div class="dropdown dot-menu">
-                  <i class="fa fa-ellipsis-h dropdown-toggle" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
-                  <div id="menu-action" class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                    <?php if($data['isLogin'] && (int)$_SESSION['userInfo']['role'] > 1): ?>
-                      <a class="dropdown-item"> <i class="fa fa-user"></i>  Action</a>
-                    <?php endif ?>
-
-                    <a  id="<?= 'dot-menu-' . $prediction['user_id']?>" class="dropdown-item"> <i class="<?= $isFollowing ? 'fa fa-user-times' : 'fa fa-user'; ?>"></i>
-                      <?= !$isFollowing ? '  Follow     ' . explode(' ', $prediction['name'])[0] : '  Unfollow     ' . explode(' ', $prediction['name'])[0]?>
-                    </a>
-                    <div class="line-divider"></div>
-                    <a class="dropdown-item"><i class="fa fa-bug"></i> Report Prediction</a>
-                    <div class="line-divider"></div>
-                    <a class="dropdown-item"><i class="fa fa-share-alt"></i> Copy Prediction Link</a>
+                  
+                  <div class="dropdown dot-menu">
+                    <i class="fa fa-ellipsis-h dropdown-toggle" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
+                    <div id="menu-action" class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                      <?php if(isLogin() && (int)$_SESSION['userInfo']['role'] > 1): ?>
+                        <a id="<?= 'action-menu-' . $prediction['id'] . '-' . (string)$index?>" class="dropdown-item"> <i class="fa fa-user"></i>Prediction  Actions</a>
+                        <div class="line-divider"></div>
+                      <?php endif ?>
+                      
+                      <?php if ($data['isSelf']): ?>
+                         <a style="color: red;" id="<?= 'dot-menu-delete-' . $prediction['id'] . '-' . (string)$index?>" class="dropdown-item"> <i class="fa fa-trash"></i>
+                          Delete Prediction
+                        </a>
+                      <?php endif; ?>
+      
+                      <a id="<?='report-prediction-' . $prediction['id']?>"  data-toggle="modal" data-target="#reportBugModal" class="dropdown-item"><i class="fa fa-bug"></i> Report Prediction</a>
+                      <div class="line-divider"></div>
+                      <a id="<?='copy-prediction-' . $prediction['id']?>" class="dropdown-item"><i class="fa fa-share-alt"></i> Copy Prediction Link</a>
+                    </div>
                   </div>
-                </div>
                   <div style="padding-top: 10px;" class="post-container">
                     <div class="post-detail">
                       <div class="user-info">
-                        <h5>
-                          <a href="timeline.html" class="profile-link"><?=$prediction['name']?></a>
-                          <?php if (!$data['isLogin'] || ($data['isLogin'] && $prediction['user_id'] != $_SESSION['userInfo']['id'])): ?>
-                            <a id="<?='follow-' . $prediction['user_id']?>" style="<?= $isFollowing ?  'cursor:default;' : 'cursor:pointer;' ?>" class="following"><?=$isFollowing ? 'Following': 'Follow' ?></a>
-                          <?php endif ?>
-                      </h5>
+                        <h5></h5>
                         <p id="<?='date-'.$prediction['id']?>" class="text-muted"></p>
                       </div>
                       <div class="reaction">
-                        <a class="btn text-green"><i class="icon ion-thumbsup"></i> 2</a>
+                        <a id="<?='like-' . $prediction['id'] . '-' . (string)$index?>" class="btn text-green"><i class="icon ion-thumbsup"></i><?=$prediction['total_likes'] > 0 ? $prediction['total_likes'] : '';  ?></a>
                       </div>
+
                       <div class="line-divider"></div>
                         <div id ="<?='prediction-' . $prediction['id']?>" class="post-text">
                           <div id="<?='prediction-info-' . $prediction['id']?>"  class="bet-info"></div>
@@ -209,9 +227,9 @@
                       <div style="margin-bottom: 20px;" class="post-meta">
                           <div class="post-meta-like">
                             <div>
-                                <i class="fa fa-commenting-o ic"><strong><?=((int)$prediction['total_comments'] == 0 ? '' : $prediction['total_comments'])?></strong></i>
+                                <!-- <i class="fa fa-commenting-o ic"><strong><?php // ((int)$prediction['total_comments'] == 0 ? '' : $prediction['total_comments'])?></strong></i> -->
                                 <!-- <strong>206</strong> -->
-                                <span class="status"><b>Status:</b><strong><i><?=$controllerObject->getPredictionStatus($prediction)?></i></strong></span>
+                                <span class="status"><b>Status:</b><strong id="<?='outcome-status-' . $prediction['id']?>"><?=$controllerObject->getPredictionStatus($prediction)?></strong></span>
                             </div>
                           </div>
                         </div>
@@ -226,6 +244,7 @@
                     </div>
                   </div>
                 </div>
+             <?php $index = $index + 1; ?>
             <?php endforeach ?>
               <!-- Post Content
             ================================================= -->
@@ -247,8 +266,12 @@
     <script type="text/javascript">var __predictionInfo=<?=json_encode($data['predictionInfo'])?>;</script>
     <script type="text/javascript">var __outcomes=<?=json_encode($data['outcomes'])?>;</script>
     <script type="text/javascript">var isFollowing=<?=json_encode($data['isFollowing'])?>;</script>
-    <script src="/bet_community/Public/js/prediction.js"></script>
     <script src="/bet_community/Public/js/profile.js"></script>
     <script src="/bet_community/Public/js/follow.js"></script>
+    <script src="/bet_community/Public/js/prediction.js"></script>
+    <?php if(isAdmin()): ?>
+      <script src="/bet_community/Public/js/outcome.js"></script>
+    <?php endif; ?>
+    <script src="/bet_community/Public/js/script.js"></script>
 </body>
 <body>

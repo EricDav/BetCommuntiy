@@ -20,7 +20,7 @@
             }
         }
 
-        public static function getPredictions($pdoConnection, $limit, $offset, $startDateInUTC, $endDateInUTC, $statusWon) {
+        public static function getPredictions($pdoConnection, $limit, $offset, $startDateInUTC, $endDateInUTC, $statusWon, $isPendingOutcomes, $myApprovedUserId) {
             try {
                 $sql = "SELECT (SELECT COUNT(*) FROM predictions WHERE predictions.approved = 0) AS total, 
                      (SELECT COUNT(*) FROM likes WHERE predictions.id=likes.prediction_id) AS total_likes,
@@ -30,11 +30,13 @@
                     INNER JOIN users ON predictions.user_id = users.id 
                     WHERE predictions.approved = " . self::APPROVED . ($startDateInUTC && $endDateInUTC ? ' AND predictions.start_date >= ' . "'" . $startDateInUTC . "'" . ' AND predictions.start_date <= ' . "'" . $endDateInUTC . "'"
                     . ' AND predictions.end_date >= ' . "'" . $startDateInUTC . "'" . ' AND predictions.end_date <= ' . "'" . $endDateInUTC . "'" : '') . ($statusWon ? ' AND predictions.won =1' : '') . 
+                    ($myApprovedUserId ? ' AND predictions.updated_by=' . $myApprovedUserId : '') .
+                    ($isPendingOutcomes ? ' AND predictions.won IS NULL AND predictions.end_date <' . "'" . gmdate("Y-m-d\ H:i:s") . "'"  : '') .
                     " ORDER BY predictions.start_date desc
                     LIMIT " . $limit . " OFFSET " . $offset . ";";
                     
 
-                //echo $sql; exit;
+                // echo $sql; exit;
                 return $pdoConnection->pdo->query($sql)->fetchAll();
 
             } catch(Exception $e) {
@@ -47,7 +49,7 @@
             try {
                 $sql = "SELECT (SELECT COUNT(*) FROM likes WHERE predictions.id=likes.prediction_id) AS total_likes,
                     predictions.prediction, predictions.id, predictions.created_at, predictions.start_date, 
-                    predictions.end_date, predictions.won, predictions.type, users.id AS user_id, users.name, users.sex, users.image_path
+                    predictions.end_date, predictions.won, predictions.type, users.send_email_notification, users.id AS user_id, users.name, users.sex, users.image_path
                     FROM predictions 
                     INNER JOIN users ON predictions.user_id = users.id 
                     WHERE users.id=" . $userId . ($approved === null ? '' : " AND predictions.approved = " . $approved) . 
@@ -73,7 +75,7 @@
 
         public static function getPredictionById($pdoConnection, $id) {
             try {
-                $sql = "SELECT user_id FROM predictions WHERE id=" . $id;
+                $sql = "SELECT user_id, start_date, won FROM predictions WHERE id=" . $id;
                 return $pdoConnection->pdo->query($sql)->fetch();
             } catch(Exception $e) {
                 var_dump($e->getMessage());
@@ -149,29 +151,11 @@
         public static function updatePredictionStatus($pdoConnection, $predictionId, $predictionStatus, $updatedBy) {
             try {
                 $sql = 'UPDATE predictions SET won=' . $predictionStatus . ', updated_by=' . $updatedBy . ', date_updated=' . '"' . gmdate("Y-m-d\ H:i:s") . '"' . ' WHERE predictions.id=' . $predictionId;
-                return $pdoConnection->pdo->query($sql)->fetchAll();
+                return $pdoConnection->pdo->query($sql);
             } catch(Exception $e) {
-                var_dump($e->getMessage());
+                var_dump($e->getMessage()); exit;
                 return false;
             }
-        }
-
-        /**
-         * It fetches all the predictions an admin as updated
-         */
-        public function getPredictionsUpdated($pdoConnection, $userId) {
-            try {
-                $sql = "SELECT (SELECT COUNT(*) FROM likes WHERE predictions.id=likes.prediction_id) AS total_likes,
-                predictions.prediction, predictions.id, predictions.created_at, predictions.start_date, 
-                predictions.end_date, predictions.won, predictions.type, users.id AS user_id, users.name, users.sex, users.image_path
-                FROM predictions 
-                INNER JOIN users ON predictions.user_id = users.id 
-                WHERE predictions.updated_by=" . $userId;
-                return $pdoConnection->pdo->query($sql)->fetchAll();
-            } catch(Exception $e) {
-                var_dump($e->getMessage());
-                return false;
-            } 
         }
     }
 ?>

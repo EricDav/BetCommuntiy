@@ -5,6 +5,10 @@
     <li><i style="color: green;" class="fa fa-check"></i><div style="color: black"><a id="correct-prediction"><?=$controllerObject->formatFilterText('Correct Predictions')?></a></div></li>
     <li><i class="fa fa-calendar-o"></i><div><a id="today-prediction"><?=$controllerObject->formatFilterText('Today Predictions')?></a></div></li>
     <li><i class="fa fa-calendar-check-o"></i><div><a id="yesterday-prediction"><?=$controllerObject->formatFilterText('Yesterday Predictions')?></a></div></li>
+    <?php if (isAdmin()): ?>
+        <li><i class="fa fa-clock-o"></i><div><a id="pending-outcomes" href="/predictions/pending-outcomes"><?=$controllerObject->formatFilterText('Pending Predictions Outcomes')?></a></div></li>
+        <li><i class="fa fa-check-circle"></i><div><a id="approved-outcomes" href="/predictions/my/approved-outcomes"><?=$controllerObject->formatFilterText('My Approved Outcomes')?></a></div></li>
+    <?php endif; ?>
 </ul><!--news-feed links ends-->
 <!-- <div id="chat-block" class="" >
     <label class="odds-label">Min Odds</label>

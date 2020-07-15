@@ -28,6 +28,7 @@
             // var_dump($user); exit;
             $names = explode(' ', $user[0]['name']);
             $this->user = $user;
+            $competitions = json_decode(file_get_contents(__DIR__  . '/../JsonData/competitions.json'));
 
             if (is_array($user) && !$user) {
                 $this->data['template'] = '404.php';
@@ -50,8 +51,11 @@
             $this->data['isFollowing'] = $this->isFollowing(); // checks if the current user is following the user we are checking the profile
             $this->data['template'] = 'Profile.php';
             $this->data['title'] = 'Profile';
+            $this->data['supportedBettingPlatforms'] = BetGamesController::SUPPORTED_BETTING_PLATFORMS;
             $this->data['isSelf'] = $this->isSelf();
             $this->data['followingText'] = $this->getNumberFollowingText($user[0]['num_followers'], $user[0]['sex']);
+            $this->data['competitions'] = $competitions->data->competition;
+            $this->data['outcomes'] = BetCommunity::OUTCOMES;
             $this->responseType = 'html';
             $this->setDateCreatedUTC($predictions);
             $this->setPredictionInfo($predictions);
@@ -63,7 +67,7 @@
          * is a follower of the user we are checking it's profile
          * 
          */
-        public function isFollowing() {
+        public function isFollowing($userId=null) {
             if ($this->isSelf() || !$this->isLogin()) {
                 return false;
             }
@@ -104,32 +108,5 @@
                 return $text . ' her';
             }
         }
-
-        /**
-         * This functions set the user_i, prediction_id of 
-         * the prediction. It is used at the client side to make 
-         * onclick events for following and liking users. And also
-         * used for displaying prediciton data
-         * 
-         * Note: This function should come after the when we 
-         * have all the followers, or we have called the getFollowers method.
-         */
-        public function setPredictionInfo($predictions) {
-            $predictionInfo = array();
-
-            foreach($predictions as $prediction):
-                $firstName = explode(' ', $prediction['name'])[0];
-                array_push($predictionInfo, array('user_id' => $prediction['user_id'], 
-                    'prediction_id' => $prediction['id'],
-                    'isFollowing_author' => $this->isFollowing($prediction['user_id']),
-                    'first_name' => $firstName,
-                    'prediction' => $prediction['prediction'],
-                    'prediction_type' => $prediction['type']
-                ));
-            endforeach;
-
-            $this->data['predictionInfo'] = $predictionInfo;
-        }
-
     }
 ?>

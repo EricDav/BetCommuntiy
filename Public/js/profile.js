@@ -24,6 +24,10 @@ var $profileFollowersWrapper = $('#followers-wrapper');
  var $accountSettingsSideWrapper = $('#account-settings');
  var $changePasswordWrapper = $('#change-password');
 
+ var $emailSettingsCheckboxInput = $('#email-notification-settings');
+ console.log($emailSettingsCheckboxInput);
+
+
  /**
   * Declare jquery object for edit profile inputs
   */
@@ -482,6 +486,19 @@ function readURL(input, id, showModal=true) {
     }
 }
 
+function updateSettings(settings) {
+    var currentState = $('#email-notification-settings').prop('checked');
+    console.log(currentState);
+    $.ajax('/notifications/email-settings', {
+        data: {settings: settings, id: $$id, token: token},
+        type: 'GET', success: function (result) {
+            if (!result.success) {
+                $('#email-notification-settings').prop('checked', !currentState);
+            }
+        }
+    });
+}
+
 $firstNameInput.focus(removeErrorBorder);
 $lastNameInput.focus(removeErrorBorder);
 $emailInput.focus(removeErrorBorder);
@@ -490,5 +507,14 @@ $cityInput.focus(removeErrorBorder);
 $oldPasswordInput.focus(removeErrorBorder);
 $newPasswordInput.focus(removeErrorBorder);
 $confirmPasswordInput.focus(removeErrorBorder);
+
+
+/**
+ * Settings functions
+ */
+$emailSettingsCheckboxInput.click(function() {
+    var settings = $emailSettingsCheckboxInput.prop('checked') ? 1 : 0;
+    updateSettings(settings);
+});
 
 });

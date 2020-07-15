@@ -48,6 +48,25 @@
                 return false;
             }
         }
-    }
 
+        public static function updateSettingsById($pdoConnection, $userId, $settingsType, $settings) {
+            try {
+                $sql = 'UPDATE users SET ' . $settingsType . '=' . $settings .  ' WHERE id=' . $userId;
+                return $pdoConnection->pdo->query($sql);
+            } catch(Exception $e) {
+                echo $e->getMessage();
+                return false;
+            }
+        }
+
+        public static function updateSettingsByEmail($pdoConnection, $email, $settingsType, $settings, $attr) {
+            try {
+                $sql = 'UPDATE users SET ' . $settingsType . '=' . $settings .  ' WHERE email=' . $email;
+                return $pdoConnection->pdo->query($sql);
+            } catch(Exception $e) {
+                echo $e->getMessage();
+                return false;
+            }
+        }
+    }
 ?>

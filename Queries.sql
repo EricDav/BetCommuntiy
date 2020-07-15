@@ -18,6 +18,8 @@ CREATE TABLE users (
     code_token VARCHAR(9),
     password_count TINYINT DEFAULT 0,
     token_count TINYINT DEFAULT 0,
+    send_email_notification boolean,
+    send_sms_notification boolean,
     settings VARCHAR(3000),
     PRIMARY KEY(id)
 );
@@ -48,6 +50,8 @@ CREATE TABLE predictions (
     approved_by int,
     updated_by int,
     date_updated DATETIME,
+    booking_code VARCHAR(50),
+    
     type VARCHAR(30),
     PRIMARY KEY(id)
 );

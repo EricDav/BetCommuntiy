@@ -3,11 +3,33 @@ session_start();
 include 'BetCommunity.Class.php';
 $envObj = json_decode(file_get_contents(__DIR__ .'/.envJson'));
 
+  /**
+   * Given a competition object it returns 
+   * the name e.g England Premier league
+   */
+  function getCompetitionName($competition) {
+    if (sizeof($competition->countries) > 0) {
+      return $competition->countries[0]->fifa_code ? $competition->countries[0]->fifa_code . ' - ' . $competition->name :  $competition->countries[0]->name . ' - ' . $competition->name;
+    }
+
+    if (sizeof($competition->federations) > 0) {
+      return $competition->federations[0]->name . ' - ' . $competition->name;
+    }
+
+    return $competition->name;
+  }
 
 function isLogin() {
     if (isset($_SESSION['userInfo'])) {
         return true;
     }
+    return false;
+}
+
+function isAdmin() {
+    if (isLogin() && (int)$_SESSION['userInfo']['role'] > 1)
+        return true;
+    
     return false;
 }
 
@@ -46,8 +68,6 @@ if (in_array($request->route, array_keys(BetCommunity::routes))) {
     $data['isLogin'] = $controllerObject->isLogin();
     
     include 'Pages/' . $data['template'];
-
-
 } else{
     include './Pages/404.php'; //include error 404 page for undefined routes
  }
