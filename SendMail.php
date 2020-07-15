@@ -10,6 +10,8 @@
     class SendMail {
         
         public function __construct($to, $subject, $message) {
+            $this->envObj = json_decode(file_get_contents(__DIR__ .'/.envJson'));
+
             $this->to = $to;
             $this->subject = $subject;
             $this->message = '';
@@ -64,8 +66,8 @@
                 $this->mail->isSMTP();
                 $this->mail->Host  = "mail.betcommunity.net";
                 $this->mail->SMTPAuth   = true;                                 // Enable SMTP authentication
-                $this->mail->Username   = 'info@betcommunity.net';            // SMTP username
-                $this->mail->Password   = 'Iloveodunayo123';                    // SMTP password
+                $this->mail->Username   = $this->envObj->email;            // SMTP username
+                $this->mail->Password   = $this->envObj->password;                      // SMTP password
                 // $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;          // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
                 $this->mail->Port       = 25;      
                 $this->mail->SMTPSecure = 'tsl';
