@@ -71,7 +71,8 @@ class BetCommunity {
         'NotificationModel' => 'Models/Notification.Model.php',
         'FollowerModel' => 'Models/Follower.Model.php',
         'NotificationController' => 'Controllers/Notification.Controller.php',
-        'AboutController' => 'Controllers/About.Controller.php'
+        'AboutController' => 'Controllers/About.Controller.php',
+        'ErrorMail' => 'ErrorMail.php',
     ];
 
     const OUTCOMES = array('1', '2', 'X', '1X', '2X', '12', 'GG', 'NG', 'Over 0.5', 'Over 1.5',
