@@ -16,7 +16,6 @@ class ErrorMail{
         /**
          * Send mail
          */
-        $mail = new SendMail();
         $message = "<p>File: ".$file."</p><br/><br/>";
         $message .= "<p>Line: ".$line."</p><br/><br/>";
         $message .= "<p>Code: ".$code."</p><br/><br/>";
@@ -24,9 +23,7 @@ class ErrorMail{
         $message .= "<p>Ip Address: ".$userIp."</p><br/><br/>";
         $message .= "<p>Browser Information: ".$browser."</p><br/><br/>";
         $message .= "<p>Browser Capabilities: ".$browserDetails."</p><br/><br/>";
-        $mail->setMessage($message);
-        $mail->subject = "System Error Information";
-        $mail->to = "info@betcommunity.com";
+        $mail = new SendMail("alienyidavid4christ@gmail.com", "System Error Information", $message);
         $mail->send();
     }
 }
