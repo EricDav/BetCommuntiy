@@ -20,21 +20,23 @@
             }
         }
 
-        public static function getPredictions($pdoConnection, $limit, $offset, $startDateInUTC, $endDateInUTC, $statusWon) {
+        public static function getPredictions($pdoConnection, $limit, $offset, $startDateInUTC, $endDateInUTC, $statusWon, $isPendingOutcomes, $myApprovedUserId) {
             try {
                 $sql = "SELECT (SELECT COUNT(*) FROM predictions WHERE predictions.approved = 0) AS total, 
-                     (SELECT COUNT(*) FROM comments WHERE predictions.id=comments.id) AS total_comments,
+                     (SELECT COUNT(*) FROM likes WHERE predictions.id=likes.prediction_id) AS total_likes,
                     predictions.prediction, predictions.id, predictions.created_at, predictions.start_date, 
                     predictions.end_date, predictions.won, predictions.type, users.id AS user_id, users.name, users.sex, users.image_path
                     FROM predictions 
                     INNER JOIN users ON predictions.user_id = users.id 
                     WHERE predictions.approved = " . self::APPROVED . ($startDateInUTC && $endDateInUTC ? ' AND predictions.start_date >= ' . "'" . $startDateInUTC . "'" . ' AND predictions.start_date <= ' . "'" . $endDateInUTC . "'"
                     . ' AND predictions.end_date >= ' . "'" . $startDateInUTC . "'" . ' AND predictions.end_date <= ' . "'" . $endDateInUTC . "'" : '') . ($statusWon ? ' AND predictions.won =1' : '') . 
+                    ($myApprovedUserId ? ' AND predictions.updated_by=' . $myApprovedUserId : '') .
+                    ($isPendingOutcomes ? ' AND predictions.won IS NULL AND predictions.end_date <' . "'" . gmdate("Y-m-d\ H:i:s") . "'"  : '') .
                     " ORDER BY predictions.start_date desc
                     LIMIT " . $limit . " OFFSET " . $offset . ";";
                     
 
-                //echo $sql; exit;
+                // echo $sql; exit;
                 return $pdoConnection->pdo->query($sql)->fetchAll();
 
             } catch(Exception $e) {
@@ -45,14 +47,13 @@
 
         public static function getPredictionsByUserId($pdoConnection, $userId, $approved) {
             try {
-                $sql = "SELECT (SELECT COUNT(*) FROM comments WHERE predictions.id=comments.id) AS total_comments,
+                $sql = "SELECT (SELECT COUNT(*) FROM likes WHERE predictions.id=likes.prediction_id) AS total_likes,
                     predictions.prediction, predictions.id, predictions.created_at, predictions.start_date, 
-                    predictions.end_date, predictions.won, predictions.type, users.id AS user_id, users.name, users.sex, users.image_path
+                    predictions.end_date, predictions.won, predictions.type, users.send_email_notification, users.id AS user_id, users.name, users.sex, users.image_path
                     FROM predictions 
                     INNER JOIN users ON predictions.user_id = users.id 
                     WHERE users.id=" . $userId . ($approved === null ? '' : " AND predictions.approved = " . $approved) . 
                     " ORDER BY predictions.start_date desc";
-                // echo $sql; exit;
                     
                 return $pdoConnection->pdo->query($sql)->fetchAll();
 
@@ -74,7 +75,7 @@
 
         public static function getPredictionById($pdoConnection, $id) {
             try {
-                $sql = "SELECT user_id FROM predictions WHERE id=" . $id;
+                $sql = "SELECT user_id, start_date, won FROM predictions WHERE id=" . $id;
                 return $pdoConnection->pdo->query($sql)->fetch();
             } catch(Exception $e) {
                 ErrorMail::LogError($e);
@@ -85,7 +86,7 @@
         public static function getPrediction($pdoConnection, $id) {
             try {
                 $sql = "SELECT (SELECT COUNT(*) FROM predictions WHERE predictions.approved = 0) AS total, 
-                (SELECT COUNT(*) FROM comments WHERE predictions.id=comments.id) AS total_comments,
+                (SELECT COUNT(*) FROM likes WHERE predictions.id=likes.prediction_id) AS total_likes,
                predictions.prediction, predictions.id, predictions.created_at, predictions.start_date, 
                predictions.end_date, predictions.won, predictions.type, users.id AS user_id, users.name, users.sex, users.image_path
                FROM predictions 
@@ -141,6 +142,16 @@
             try {
                 $sql = 'SELECT created_at FROM predictions WHERE user_id=' . $userId . ' ORDER BY created_at DESC LIMIT ' . $numLastPredictions;
                 return $pdoConnection->pdo->query($sql)->fetchAll();
+            } catch(Exception $e) {
+                ErrorMail::LogError($e);
+                return false;
+            }
+        }
+
+        public static function updatePredictionStatus($pdoConnection, $predictionId, $predictionStatus, $updatedBy) {
+            try {
+                $sql = 'UPDATE predictions SET won=' . $predictionStatus . ', updated_by=' . $updatedBy . ', date_updated=' . '"' . gmdate("Y-m-d\ H:i:s") . '"' . ' WHERE predictions.id=' . $predictionId;
+                return $pdoConnection->pdo->query($sql);
             } catch(Exception $e) {
                 ErrorMail::LogError($e);
                 return false;

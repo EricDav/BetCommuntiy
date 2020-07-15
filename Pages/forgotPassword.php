@@ -118,5 +118,6 @@
       <script type="text/javascript">var __code=<?=json_encode($data['code'])?>;</script>
     <?php endif ?>
     <script src="/bet_community/Public/js/forgotPassword.js"></script>
+    <script src="/bet_community/Public/js/script.js"></script>
 </body>
 </html>

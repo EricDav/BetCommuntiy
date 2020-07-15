@@ -17,10 +17,13 @@ const DOT_MENU = 1 // It shows that an action is coming from the dot menu
 const FOLLOW_ELEMENT = 0 // It show that an action is coming from the `follow` string 
 const FOLLOW_ELEMENT_ID_PREFIX = 'follow-';
 const DOT_MENU_ELEMENT_ID_PREFIX = 'dot-menu-';
+const ACTION_MENU_ELEMENT_ID_PREFIX = 'action-menu-';
 const USER_ICON = '<i class="fa fa-user"></i>';
+const LIKE_ICON = '<i class="icon ion-thumbsup"></i>';
 const USER_CANCEL_ICON = '<i class="fa fa-user-times"></i>';
 const COPY_PREDICTION_LINK_PREFIX = 'copy-prediction-';
 const REPORT_PREDICTION_PREFIX = 'report-prediction-';
+const LIKE_MENU_ELEMENT_ID_PREFIX = 'like-'
 const BOOKING_NUMBER_TAB = 1;
 const FIXTURES_TAB = 2;
 const TEXT_TAB = 3;
@@ -32,6 +35,7 @@ const PLATFORM_SPORTY_BET = 'SportyBet';
 const DEFAULT_DATE_TIME = '1900-01-01 00:00:00';
 let REPORT_PREDICTION_ID = null;
 let lastcreatedPreditionId = null;
+let selectedOutcomePrediction = null
 var isMobile = false;
 
 var currentTab = BOOKING_NUMBER_TAB // Set the default tab to the booking number tab
@@ -40,12 +44,13 @@ var tabs = [BOOKING_NUMBER_TAB, TEXT_TAB, FIXTURES_TAB];
 var tabIds = ['#tab-one-id', '#tab-two-id', 'tab-three-id'];
 
 $bookingCodetab = $('#booking-code-tab');
-$('#open-prediction-modal').click(function() {
+$('#open-prediction-modal').click(function () {
     if ($$id == -1) {
         $('#login-modal-txt').html('You need to <a href="/login" style="cursor: pointer;">login or signup</a> to create a prediction');
         $('#follow-note').text('');
     }
 });
+
 
 if ($(this).width() <= 992) {
     var isMobile = true;
@@ -58,8 +63,16 @@ if ($(this).width() <= 992) {
  * and he/she isn't logged in the modal that shows up
  * this is the onclick for closing the modal.
  */
-$('#close-icon').click(function() {
+$('#close-icon').click(function () {
     $('#createPredictionModal').modal('hide');
+});
+
+$('#outcome-close-icon').click(function() {
+    $('#predictionOutcomeModal').modal('hide');
+});
+
+$('#outcome-concluded-close-icon').click(function() {
+    $('#concludedOutcomeModal').modal('hide');
 });
 
 /**
@@ -67,7 +80,7 @@ $('#close-icon').click(function() {
  * cancel icon that displays when a prediction  
  * has just been created
  */
-$('#close-icon-confirm-prediction').click(function() {
+$('#close-icon-confirm-prediction').click(function () {
     $('#confirmModalCreate').modal('hide');
 });
 
@@ -75,7 +88,7 @@ $('#close-icon-confirm-prediction').click(function() {
  * Register onclick for the tabs. 
  * It set the current tab
  */
-$('#tab-one-id').click(function() {
+$('#tab-one-id').click(function () {
     if (currentTab == FIXTURES_TAB) {
         $('#fixtures-tab').hide();
     }
@@ -91,7 +104,7 @@ $('#tab-one-id').click(function() {
     }
 });
 
-$('#tab-two-id').click(function() {
+$('#tab-two-id').click(function () {
     if (currentTab == BOOKING_NUMBER_TAB) {
         $bookingCodetab.hide();
     }
@@ -101,7 +114,7 @@ $('#tab-two-id').click(function() {
     predictionButton.text('Submit');
 });
 
-$('#tab-three-id').click(function() {
+$('#tab-three-id').click(function () {
     if (currentTab == BOOKING_NUMBER_TAB) {
         $bookingCodetab.hide();
     }
@@ -118,7 +131,7 @@ $('#tab-three-id').click(function() {
  * Handles onclick for copying the link of the
  * just created prediction
  */
-$('#copy-link-after-prediction-create').click(function() {
+$('#copy-link-after-prediction-create').click(function () {
     console.log(lastcreatedPreditionId, '====>>>>');
     copyToClipboard(lastcreatedPreditionId);
     $('.copied-txt').text('Link copied to clipboard!');
@@ -128,7 +141,7 @@ $('#copy-link-after-prediction-create').click(function() {
  * Handles onclick for viewing the just created
  * prediction
  */
-$('#view-link-after-prediction-create').click(function() {
+$('#view-link-after-prediction-create').click(function () {
     window.location.href = window.location.origin + '/predictions?id=' + lastcreatedPreditionId;
 });
 
@@ -138,13 +151,13 @@ $('#view-link-after-prediction-create').click(function() {
  * It displays the date when each prediction
  * is made. 
  */
-dates.forEach(function(item, index) {
+dates.forEach(function (item, index) {
     date = new Date(item.date_created.replace(/-/g, '/') + ' UTC');
     $('#date-' + item.id.toString()).text(formatDateCreated(date));
 });
 
 var formatedPredictions = [];
-var scores
+var scores;
 /**
  * It displays prediction data
  */
@@ -168,13 +181,13 @@ function generatePredictionHtmlForMobileView(prediction, scores) {
 
     var homeScore;
     var awayScore;
-    var resultArr 
+    var resultArr
     for (league in prediction) {
-        $html+= '<div class="mobile-league">' + league + '</div>';
+        $html += '<div class="mobile-league">' + league + '</div>';
         datesFixturesObj = prediction[league];
-        
-        datesFixturesObj.dates.forEach(function(date, index) {
-            $html+= '<div class="mobile-fixture-wrapper">';
+
+        datesFixturesObj.dates.forEach(function (date, index) {
+            $html += '<div class="mobile-fixture-wrapper">';
             var dateStr = date + ' UTC';
             var date = new Date(dateStr.replace(/-/g, '/'));
             result = getScore(datesFixturesObj.fixtures[index], scores);
@@ -189,14 +202,14 @@ function generatePredictionHtmlForMobileView(prediction, scores) {
             }
             fixtureArr = datesFixturesObj.fixtures[index].split(' - ');
 
-            $html+='<div style="font-weight: unset; max-width: 30%;">' + formatDateForPrediction(date) + '</div>';
-            $html+='<div class="mobile-fixture">' + fixtureArr[0] + homeScore.toString() + ' - ' + awayScore.toString() + fixtureArr[1] + '</div>';
-            $html+='<div style="font-weight: 700;">' + datesFixturesObj.outcomes[index] + '</div>';
-            $html+= '</div>';
+            $html += '<div style="font-weight: unset; max-width: 30%;">' + formatDateForPrediction(date) + '</div>';
+            $html += '<div class="mobile-fixture">' + fixtureArr[0] + homeScore.toString() + ' - ' + awayScore.toString() + fixtureArr[1] + '</div>';
+            $html += '<div style="font-weight: 700;">' + datesFixturesObj.outcomes[index] + '</div>';
+            $html += '</div>';
         });
     }
 
-    $html+= '</div>';
+    $html += '</div>';
 
     return $html;
 }
@@ -209,8 +222,8 @@ function calculateOdds(odds) {
     console.log(odds);
     resultOdds = 1;
 
-    odds.forEach(function(odd) {
-        resultOdds*=Number.parseFloat(odd);
+    odds.forEach(function (odd) {
+        resultOdds *= Number.parseFloat(odd);
     });
 
     return resultOdds.toFixed(2);
@@ -220,25 +233,25 @@ function generatePredictionInfoHtml(prediction, predictionType) {
     console.log(predictionType);
     $html = '<div>No.Selection:<span><b>' + prediction.leagues.length.toString() + '</b></span></div>';
     if (prediction.bet_code) {
-        $html +='<div>Selection Type:<span><b>' + predictionType + '</b></span></div>';
-        $html +='<div>Booking Code:<span><b>' + prediction.bet_code + '</b></span></div>';
-        $html +='<div>Total Odds:<span><b>' + calculateOdds(prediction.odds) + '</b></span></div>';
+        $html += '<div>Selection Type:<span><b>' + predictionType + '</b></span></div>';
+        $html += '<div>Booking Code:<span><b>' + prediction.bet_code + '</b></span></div>';
+        $html += '<div>Total Odds:<span><b>' + calculateOdds(prediction.odds) + '</b></span></div>';
     }
     return $html;
 }
 
 function generatePredictionTable(data) {
     $table = '<table style="width:100%; margin-top: 10px; border:unset;">' +
-                 '<tr style="border:unset;"><th style="border:unset;">Date/Time</th><th style="border:unset;">League</th><th style="border:unset;">Fixture</th><th style="border:unset;">Oucome</th>' + 
-                 (data.hasOwnProperty('scores') && data.scores.length > 0 ? '<th style="border:unset;">Result</th>' : '' ) + '</tr>';
-    
-    data.leagues.forEach(function(item, index) {
+        '<tr style="border:unset;"><th style="border:unset;">Date/Time</th><th style="border:unset;">League</th><th style="border:unset;">Fixture</th><th style="border:unset;">Oucome</th>' +
+        (data.hasOwnProperty('scores') && data.scores.length > 0 ? '<th style="border:unset;">Result</th>' : '') + '</tr>';
+
+    data.leagues.forEach(function (item, index) {
         if (data.dates) {
             var dateStr = data.dates[index] + ' UTC';
             var date = new Date(dateStr.replace(/-/g, '/'));
         }
 
-        $table += '<tr style="border:unset;">' + '<td style="border:unset;">' + (data.dates ? formatDateCreated(date) : 'NS') + '</td>' + '<td style="border:unset;">' + item + '</td>' + '<td style="border:unset;">' + data.fixtures[index] + '</td>' + 
+        $table += '<tr style="border:unset;">' + '<td style="border:unset;">' + (data.dates ? formatDateCreated(date) : 'NS') + '</td>' + '<td style="border:unset;">' + item + '</td>' + '<td style="border:unset;">' + data.fixtures[index] + '</td>' +
             '<td style="border:unset;">' + data.outcomes[index] + '</td>' + (data.hasOwnProperty('scores') && data.scores.length > 0 ? '<td style="border:unset;">' + getScore(data.fixtures[index], data.scores) + '</td>' : '');
     });
 
@@ -248,13 +261,13 @@ function generatePredictionTable(data) {
 
 function formatPredictionDataForMobile(prediction) {
     formatedResult = {}
-    prediction.leagues.forEach(function(league, index) {
+    prediction.leagues.forEach(function (league, index) {
         if (league in formatedResult) {
             formatedResult[league].dates.push(prediction.dates[index]);
             formatedResult[league].fixtures.push(prediction.fixtures[index]);
             formatedResult[league].outcomes.push(prediction.outcomes[index]);
         } else {
-            formatedResult[league] = {dates: [prediction.dates[index]], fixtures: [prediction.fixtures[index]], outcomes: [prediction.outcomes[index]]}
+            formatedResult[league] = { dates: [prediction.dates[index]], fixtures: [prediction.fixtures[index]], outcomes: [prediction.outcomes[index]] }
         }
     });
 
@@ -283,10 +296,10 @@ function copyToClipboard(predictionId) {
     document.execCommand("copy");
     $temp.remove();
 }
-  
 
-function diff_minutes(dt2, dt1) { 
-    var diff =(dt2.getTime() - dt1.getTime()) / 1000;
+
+function diff_minutes(dt2, dt1) {
+    var diff = (dt2.getTime() - dt1.getTime()) / 1000;
     diff /= 60;
     return Math.abs(Math.round(diff));
 }
@@ -305,7 +318,7 @@ function resetCreatePredictionModal() {
 }
 
 
-$('#prediction-submit').click(function() {
+$('#prediction-submit').click(function () {
     if (currentTab == BOOKING_NUMBER_TAB && !shouldSubmitPrediction) {
         var bookingNumber = $('#booking-number').val();
         var platform = $('#betting-type').val();
@@ -313,7 +326,7 @@ $('#prediction-submit').click(function() {
         if (platform == PLATFORM_BET9JA)
             fetchBet9jaGames(bookingNumber, INITIAL_EVENT_TARGET);
 
-        if (platform == PLATFORM_BETKING) 
+        if (platform == PLATFORM_BETKING)
             fetchBetKingGames(bookingNumber);
 
         if (platform == PLATFORM_SPORTY_BET)
@@ -347,25 +360,25 @@ $('#prediction-submit').click(function() {
         var nowDateInUTC = new Date(Number.parseInt(dateArr[0]), Number.parseInt(dateArr[1]), Number.parseInt(dateArr[2]), Number.parseInt(timeArr[0]), Number.parseInt(timeArr[1]));
         var dateTimeInUTC = new Date(Number.parseInt(startDateArr[0]), Number.parseInt(startDateArr[1]), Number.parseInt(startDateArr[2]), Number.parseInt(startTimeArr[0]), Number.parseInt(startTimeArr[1]));
 
-         
+
         if (nowDateInUTC >= dateTimeInUTC) {
             alert('First match has started');
             return;
         }
         savePrediction({
             prediction: JSON.stringify(data),
-            start_date_time:  endStart.startDateTime,
+            start_date_time: endStart.startDateTime,
             end_date_time: endStart.endDateTime,
             type: 'fixtures',
         });
     }
 });
 
-$('#prediction-login').click(function() {
+$('#prediction-login').click(function () {
     window.location.href = '/login';
 });
 
-$('#report-bug').click(function() {
+$('#report-bug').click(function () {
     console.log('reporting...');
     if ($('#problem').val() == '--- Select a Problem ---') {
         return;
@@ -379,13 +392,15 @@ $('#report-bug').click(function() {
 
     console.log(data);
 
-    $.ajax('/api/web/report-prediction', { data: data,
-        type: 'POST',  success: function(result) {
-        console.log(result);
-        if (!result.success) {
-            console.log('sent')
+    $.ajax('/api/web/report-prediction', {
+        data: data,
+        type: 'POST', success: function (result) {
+            console.log(result);
+            if (!result.success) {
+                console.log('sent')
+            }
         }
-   }});
+    });
 });
 
 function getCurrentDateInStr() {
@@ -405,7 +420,7 @@ function getCurrentDateInStr() {
 
     date = now.getFullYear() + '-' + month.toString() + '-' + now.getDate() +
         ' ' + hours + ':' + minutes;
-    
+
     return date;
 }
 
@@ -413,17 +428,17 @@ function getCurrentDateInStr() {
 function formatDateCreated(date) {
     var now = new Date();
 
-    var  nowYear = now.getFullYear();
+    var nowYear = now.getFullYear();
     var nowMonth = now.getMonth();
     var nowDay = now.getDate();
 
-    var  year = date.getFullYear();
+    var year = date.getFullYear();
     var month = date.getMonth();
     var day = date.getDate();
     var hours = date.getHours();
     var minutes = date.getMinutes();
 
-    if (nowYear == year && nowMonth == month && nowDay  == day) {
+    if (nowYear == year && nowMonth == month && nowDay == day) {
         return 'Today at ' + format(date.getHours()) + ':' + format(date.getMinutes());
     }
 
@@ -435,35 +450,35 @@ function formatDateCreated(date) {
         return 'Tomorrow at ' + format(date.getHours()) + ':' + format(date.getMinutes());
     }
 
-   if (year == nowYear) {
-       return day.toString() + ' ' + monthsArr[month] + ' at '  + format(hours) + ':' + format(minutes);
-   }
-    
-    return day.toString() + ' ' + monthsArr[month] + ' ' + year.toString() + ' at '  + format(hours) + ':' + format(minutes);
+    if (year == nowYear) {
+        return day.toString() + ' ' + monthsArr[month] + ' at ' + format(hours) + ':' + format(minutes);
+    }
+
+    return day.toString() + ' ' + monthsArr[month] + ' ' + year.toString() + ' at ' + format(hours) + ':' + format(minutes);
 }
 
 function formatDateForPrediction(date) {
     var now = new Date();
 
-    var  nowYear = now.getFullYear();
+    var nowYear = now.getFullYear();
     var nowMonth = now.getMonth();
     var nowDay = now.getDate();
 
-    var  year = date.getFullYear();
+    var year = date.getFullYear();
     var month = date.getMonth();
     var day = date.getDate();
     var hours = date.getHours();
     var minutes = date.getMinutes();
 
-    if (nowYear == year && nowMonth == month && nowDay  == day) {
+    if (nowYear == year && nowMonth == month && nowDay == day) {
         return format(date.getHours()) + ':' + format(date.getMinutes());
     }
 
     if (nowYear == year) {
-        return  format(date.getHours()) + ':' + format(date.getMinutes()) + ' ' + monthsArr[month] + ' ' + day.toString() ;
+        return format(date.getHours()) + ':' + format(date.getMinutes()) + ' ' + monthsArr[month] + ' ' + day.toString();
     }
-    
-    return  format(hours) + ':' + format(minutes) + ' ' + monthsArr[month] + ' ' + day.toString() + ' ' + year.toString();
+
+    return format(hours) + ':' + format(minutes) + ' ' + monthsArr[month] + ' ' + day.toString() + ' ' + year.toString();
 }
 
 
@@ -483,7 +498,7 @@ function implementTextPrediction() {
      * Checks for empty input elements and saves the 
      * element in the errorArr if empty.
      */
-    inputsArr.forEach(function(item, index) {
+    inputsArr.forEach(function (item, index) {
         if (!item.val()) {
             errorArr.push(item.attr('id'));
         }
@@ -534,7 +549,7 @@ function implementTextPrediction() {
      */
     if (errorArr.includes('prediction'))
         error['predict'] = 'Prediction is required';
-    
+
     if (errorArr.includes('total-odds')) {
         error['odds'] = 'Total odds is required';
     } else if (!Number.parseFloat(totalOdds.val())) {
@@ -553,31 +568,31 @@ function implementTextPrediction() {
     /**
      * This block of code display the red border for empty input
      */
-    errorArr.forEach(function(item, index){
+    errorArr.forEach(function (item, index) {
         $('#' + item).addClass('invalid');
     });
 
     if (errorArr.length == 0 && Object.keys(error).length == 0) {
         var lines = prediction.val().split('\n');
         var predictionStr = '';
-        for(var i = 0;i < lines.length;i++){
+        for (var i = 0; i < lines.length; i++) {
             if (lines[i].trim())
-                predictionStr+= lines[i] + '<br>';
+                predictionStr += lines[i] + '<br>';
         }
 
         // Get start date string in UTC
         var utcStartDateStr = (startDateTime.getUTCFullYear()).toString() +
-             '-' + format(startDateTime.getUTCMonth() + 1) + 
-             '-' + format(startDateTime.getUTCDate()) + 
-             ' ' + format(startDateTime.getUTCHours()) + 
-             ':' + format(startDateTime.getUTCMinutes());
+            '-' + format(startDateTime.getUTCMonth() + 1) +
+            '-' + format(startDateTime.getUTCDate()) +
+            ' ' + format(startDateTime.getUTCHours()) +
+            ':' + format(startDateTime.getUTCMinutes());
 
         // Get end date string in UTC
         var utcEndDateStr = (endDateTime.getUTCFullYear()).toString() +
-             '-' + format(endDateTime.getUTCMonth() + 1) + 
-             '-' + format(endDateTime.getUTCDate()) + 
-             ' ' + format(endDateTime.getUTCHours()) + 
-             ':' + format(endDateTime.getUTCMinutes());
+            '-' + format(endDateTime.getUTCMonth() + 1) +
+            '-' + format(endDateTime.getUTCDate()) +
+            ' ' + format(endDateTime.getUTCHours()) +
+            ':' + format(endDateTime.getUTCMinutes());
 
 
         data = {
@@ -595,10 +610,10 @@ function implementTextPrediction() {
 
 function getDateTimeStrInUTC(date) {
     var utcDate = (date.getUTCFullYear()).toString() +
-    '-' + format(date.getUTCMonth() + 1) + 
-    '-' + format(date.getUTCDate()) + 
-    ' ' + format(date.getUTCHours()) + 
-    ':' + format(date.getUTCMinutes());
+        '-' + format(date.getUTCMonth() + 1) +
+        '-' + format(date.getUTCDate()) +
+        ' ' + format(date.getUTCHours()) +
+        ':' + format(date.getUTCMinutes());
 
     return utcDate;
 }
@@ -611,41 +626,43 @@ function savePrediction(data) {
 
     predictionButton.text('Submitting...');
     predictionButton.prop('disabled', true);
-    $.ajax('/api/web/create-prediction', { data: data,
-        type: 'POST',  success: function(result) {
-        predictionButton.text('Submit');
-        predictionButton.prop('disabled', false);
-        if (!result.success) {
-            if (typeof result.messages == 'string') {
-                $('#main-error').text(result.messages);
-            } else {
-                message = '';
-                count = Object.keys(result.messages) - 1;
-                counter = 0;
-                for(property in result.messages) {
-                    if (counter != count) {
-                        message+=result.messages[property] + ', ';
-                    } else {
-                        message+=result.messages[property];
+    $.ajax('/api/web/create-prediction', {
+        data: data,
+        type: 'POST', success: function (result) {
+            predictionButton.text('Submit');
+            predictionButton.prop('disabled', false);
+            if (!result.success) {
+                if (typeof result.messages == 'string') {
+                    $('#main-error').text(result.messages);
+                } else {
+                    message = '';
+                    count = Object.keys(result.messages) - 1;
+                    counter = 0;
+                    for (property in result.messages) {
+                        if (counter != count) {
+                            message += result.messages[property] + ', ';
+                        } else {
+                            message += result.messages[property];
+                        }
                     }
+
+                    $('#main-error').text(message);
                 }
 
-                $('#main-error').text(message);
+            } else {
+                lastcreatedPreditionId = result.prediction_id
+                $('#input-prediction-link').val(window.location.origin + '/predictions?id=' + lastcreatedPreditionId);
+                resetCreatePredictionModal();
+                $('#createPredictionModal').modal('hide');
+                $('#confirmModalCreate').modal('show');
             }
-            
-        } else {
-            lastcreatedPreditionId = result.prediction_id
-            $('#input-prediction-link').val(window.location.origin + '/predictions?id=' + lastcreatedPreditionId);
-            resetCreatePredictionModal();
-            $('#createPredictionModal').modal('hide');
-            $('#confirmModalCreate').modal('show');
         }
-   }});
+    });
 }
 
 
 
-$('.title').click(function() {
+$('.title').click(function () {
     var min = $('#min_odd');
     var max = $('#max_odd');
     error = {};
@@ -658,7 +675,7 @@ $('.title').click(function() {
         error['min'] = 'Minimum odd must be a number';
     }
 
-    
+
     if (!max.val())
         error['max'] = 'required';
     else if (!Number.parseFloat(max.val())) {
@@ -666,7 +683,7 @@ $('.title').click(function() {
     } else if (Number.parseFloat(max.val()) <= Number.parseFloat(min.val())) {
         error['max'] = 'Maximum odd must be greater than minimum odd';
     }
-    
+
     if (Object.keys(error).length == 0) {
         // console.log(window.location.host + '/?m=' + min.val() + '_' + max.val());
         window.location.href = window.location.origin + '/?filter_option=' + min.val() + '_' + max.val();
@@ -690,12 +707,12 @@ function format(d) {
 }
 
 function clearError() {
-    inputsArr.forEach(function(item, index) {
+    inputsArr.forEach(function (item, index) {
         item.removeClass('invalid');
     });
     errorMessagesIds = ['#start', '#end', '#predict', '#odds'];
 
-    errorMessagesIds.forEach(function(item, index) {
+    errorMessagesIds.forEach(function (item, index) {
         $(item).text('');
     });
     $('#main-error').text('');
@@ -717,8 +734,8 @@ function clearError() {
  * @return None
  */
 function followUser(userId, isFollowing, info, whoIsCalling, callingElem, index) {
-    if ($$id == -1 ) { // checks if user is not logged in
-        var name = $('#follow-' + userId.toString() +  '-' + index.toString()).attr('title')
+    if ($$id == -1) { // checks if user is not logged in
+        var name = $('#follow-' + userId.toString() + '-' + index.toString()).attr('title')
         $('#login-modal-txt').html('You need to <a href="/login" style="cursor: pointer;">login or signup</a> to follow ' + name);
         $('#follow-note').text('Note: following a user means you get notified when they drop predictions');
         $('#createPredictionModal').modal('show');
@@ -729,24 +746,25 @@ function followUser(userId, isFollowing, info, whoIsCalling, callingElem, index)
     data = {
         token: localStorage.getItem('$$token'),
         id: $$id,
-        action_type: 'follow', 
-        user_id: userId, 
+        action_type: 'follow',
+        user_id: userId,
         is_following: isFollowingId
     };
 
-    $.ajax('/api/web/users-action', { data: data,
-         type: 'POST',  success: function(result) {
-           if (result.success) {
+    $.ajax('/api/web/users-action', {
+        data: data,
+        type: 'POST', success: function (result) {
+            if (result.success) {
                 if (whoIsCalling == DOT_MENU) {
                     // Update all predictions by the user
-                    __predictionInfo.forEach(function(info, index) {
+                    __predictionInfo.forEach(function (info, index) {
                         if (info.user_id == userId) {
                             info.isFollowing_author = !info.isFollowing_author;
                             var text = info.isFollowing_author ? USER_CANCEL_ICON + ' Unfollow ' + info.first_name : USER_ICON + ' Follow ' + info.first_name;
-                            var dotElem = $('#' + DOT_MENU_ELEMENT_ID_PREFIX +  info.user_id.toString() + '-' + index.toString())
+                            var dotElem = $('#' + DOT_MENU_ELEMENT_ID_PREFIX + info.user_id.toString() + '-' + index.toString())
                             dotElem.text('');
                             dotElem.append(text);
-        
+
                             // update follow element
                             var text = info.isFollowing_author ? 'Following' : 'Follow';
                             $('#' + FOLLOW_ELEMENT_ID_PREFIX + info.user_id.toString() + '-' + index.toString()).text(text)
@@ -756,30 +774,27 @@ function followUser(userId, isFollowing, info, whoIsCalling, callingElem, index)
 
                 if (whoIsCalling == FOLLOW_ELEMENT) {
                     // Update all predictions by the user
-                    __predictionInfo.forEach(function(info, index) {
+                    __predictionInfo.forEach(function (info, index) {
                         if (info.user_id == userId) {
                             info.isFollowing_author = !info.isFollowing_author;
                             var followingJqueryObj = $('#' + FOLLOW_ELEMENT_ID_PREFIX + info.user_id.toString() + '-' + index.toString());
                             followingJqueryObj.text('Following');
                             followingJqueryObj.css('cursor', 'default');
-        
+
                             /**
                              * Update icon and text of dot menu
                              */
-                            var jqueryElemObj = $('#' + DOT_MENU_ELEMENT_ID_PREFIX +  info.user_id.toString() + '-' + index.toString());
+                            var jqueryElemObj = $('#' + DOT_MENU_ELEMENT_ID_PREFIX + info.user_id.toString() + '-' + index.toString());
                             jqueryElemObj.text('')
                             jqueryElemObj.append(USER_CANCEL_ICON + ' Unfollow ' + info.first_name);
                         }
                     });
                 }
-           }
+            }
 
-           return false;
-    }});
-}
-
-function updateUIAFterFollowOrUnfollow() {
-
+            return false;
+        }
+    });
 }
 
 /**
@@ -787,19 +802,20 @@ function updateUIAFterFollowOrUnfollow() {
  */
 let DELETE_PREDICTION_ID;
 
-$('.delete-close-icon').click(function() {
+$('.delete-close-icon').click(function () {
     $('#deleteModal').modal('hide');
 });
 
-$('#delete-cancel').click(function() {
+$('#delete-cancel').click(function () {
     $('#deleteModal').modal('hide');
 });
 
-$('#delete-prediction').click(function() {
+$('#delete-prediction').click(function () {
     deletePrediction();
 });
 
 function openDeleteConfirmationModal(predictionId) {
+    console.log('INININ');
     $('#deleteModal').modal('show');
     DELETE_PREDICTION_ID = predictionId;
 }
@@ -809,28 +825,55 @@ function deletePrediction() {
     data = {
         token: localStorage.getItem('$$token'),
         id: $$id,
-        prediction_id: DELETE_PREDICTION_ID, 
+        prediction_id: DELETE_PREDICTION_ID,
     };
 
     $('#delete-prediction').prop('disabled', true);
     $('#delete-prediction').text('Deleting...');
-    $.ajax('/api/web/delete-prediction', { data: data,
-        type: 'POST',  success: function(result) {
-        $('#delete-prediction').prop('disabled', false);
-        $('#delete-prediction').text('Delete');
-        if (result.success) {
-            $('#prediction-box-' + DELETE_PREDICTION_ID.toString()).remove();
-            $('#deleteModal').modal('hide');
-          }
+    $.ajax('/api/web/delete-prediction', {
+        data: data,
+        type: 'POST', success: function (result) {
+            $('#delete-prediction').prop('disabled', false);
+            $('#delete-prediction').text('Delete');
+            if (result.success) {
+                $('#prediction-box-' + DELETE_PREDICTION_ID.toString()).remove();
+                $('#deleteModal').modal('hide');
+            }
 
-          return false;
-   }});
+            return false;
+        }
+    });
 }
 /**
  * Deleting prediction section end
  */
 
- 
+function likePrediction(likeEvent, predictionInfo, predictionId) {
+    if ($$id == -1) { // checks if user is not logged in
+        $('#login-modal-txt').html('You need to <a href="/login" style="cursor: pointer;">login or signup</a> to like this prediction');
+        $('#createPredictionModal').modal('show');
+        return;
+    }
+    //  var data = { prediction_id: predictionId, token: token, id: $$id}
+    $.ajax('/api/web/predictions/like', {
+        data: { prediction_id: predictionId, token: token, id: $$id },
+        type: 'POST', success: function (result) {
+            console.log(result);
+            if (result.success) {
+                if (result.message == 'like') {
+                    predictionInfo.num_likes = predictionInfo.num_likes + 1;
+                } else {
+                    predictionInfo.num_likes = predictionInfo.num_likes - 1;
+                }
+                var text = LIKE_ICON + ' ' + (predictionInfo.num_likes == 0 ? '' : predictionInfo.num_likes.toString());
+                $(likeEvent).text('');
+                $(likeEvent).html(text);
+            }
+        }
+    });
+}
+
+
 
 /**
  * Add click events to menu follow user or unfollow, copy link and report bug
@@ -839,31 +882,53 @@ function deletePrediction() {
 */
 __predictionInfo.forEach(function (item, index) {
     // Copy prediction link 
-    $('#' + COPY_PREDICTION_LINK_PREFIX + item.prediction_id.toString()).click(function() {
+    $('#' + COPY_PREDICTION_LINK_PREFIX + item.prediction_id.toString()).click(function () {
         copyToClipboard(item.prediction_id);
     });
 
     // Add onclick for clicking report prediction link on prediction menu
-    $('#' + REPORT_PREDICTION_PREFIX + item.prediction_id.toString()).click(function() {
+    $('#' + REPORT_PREDICTION_PREFIX + item.prediction_id.toString()).click(function () {
         REPORT_PREDICTION_ID = item.prediction_id;
     });
 
     // Add onclick for deleting predictions you own
     $('#' + DOT_MENU_ELEMENT_ID_PREFIX + 'delete-' + item.prediction_id.toString() + '-' + index.toString())
-        .click(function() {
+        .click(function () {
+            console.log('Openeing modal for deleting')
             openDeleteConfirmationModal(item.prediction_id);
+    });
+
+    //  Add onclick to the like button
+    $('#' + LIKE_MENU_ELEMENT_ID_PREFIX + item.prediction_id.toString() + '-' + index.toString())
+        .click(function () {
+            likePrediction(this, item, item.prediction_id);
+    });
+
+    //  Add onclick to the like button
+
+
+    $('#' + ACTION_MENU_ELEMENT_ID_PREFIX + item.prediction_id.toString() + '-' + index.toString())
+        .click(function () {
+            selectedOutcomePrediction = item;
+            if (item.won == null) {
+                $('#predictionOutcomeModal').modal('show');
+            } else {
+                $('#concludedOutcomeModal').modal('show');
+            }
     });
 
     if (!item.isFollowing_athour) {
         $('#' + FOLLOW_ELEMENT_ID_PREFIX + item.user_id.toString() + '-' + index.toString())
-            .click(function() {
-                if (!item.isFollowing_author)
+            .click(function () {
+                if (!item.isFollowing_author) {
                     followUser(item.user_id, item.isFollowing_author, item, FOLLOW_ELEMENT, this, index);
+                }
         });
     }
 
     $('#' + DOT_MENU_ELEMENT_ID_PREFIX + item.user_id.toString() + '-' + index.toString())
-        .click(function() {
+        .click(function () {
+            console.log('Yeah!!!');
             followUser(item.user_id, item.isFollowing_author, item, DOT_MENU, this, index);
     });
 });
@@ -889,7 +954,7 @@ function fetchBet9jaGames(code, target) {
     }
 
     if (isResultDisplayed) {
-        var bookingTabLastElem = $bookingCodetab.children()[$bookingCodetab.children().length-1]; // get the last element
+        var bookingTabLastElem = $bookingCodetab.children()[$bookingCodetab.children().length - 1]; // get the last element
         $(bookingTabLastElem).remove();
         isResultDisplayed = false;
     }
@@ -902,21 +967,22 @@ function fetchBet9jaGames(code, target) {
 
     predictionButton.text('Loading games...');
     predictionButton.prop('disabled', true);
-    $.ajax('https://web.bet9ja.com/Sport/Default.aspx', { data: data,
-           type: 'POST',  success: function(result) {
+    $.ajax('https://web.bet9ja.com/Sport/Default.aspx', {
+        data: data,
+        type: 'POST', success: function (result) {
 
             var leagues = [];
             var fixtures = [];
             var outcome = [];
             var odds = [];
-  
+
             var lItem = $(result).find('.CEvento');
             var fItem = $(result).find('.CSubEv');
             var outcomeItem = $(result).find('.CSegno');
             var oddsR = $(result).find('.valQuota_1')
             var matchesStarted = $(result).find('#h_w_PC_cCoupon_mexPrenotazione')[0];
             var totalOdds = $(result).find('#h_w_PC_cCoupon_lblQuotaTotale').text();
-            
+
             if (target == INITIAL_EVENT_TARGET && matchesStarted.innerText.search('not found') != -1) {
                 $('#booking-code-tab').append('<div class="booking-not-found"> Booking code not found </div>');
                 isResultDisplayed = true;
@@ -938,19 +1004,19 @@ function fetchBet9jaGames(code, target) {
             resetButton();
 
             for (var i = 0; i < lItem.length; i++) {
-              leagues.push(lItem[i].textContent);
+                leagues.push(lItem[i].textContent);
             }
-  
+
             for (var i = 0; i < fItem.length; i++) {
-              fixtures.push(fItem[i].textContent);
+                fixtures.push(fItem[i].textContent);
             }
-  
+
             for (var i = 0; i < outcomeItem.length; i++) {
-              outcome.push($(outcomeItem[i]).attr('title'));
+                outcome.push($(outcomeItem[i]).attr('title'));
             }
-  
+
             for (var i = 0; i < oddsR.length; i++) {
-              odds.push(oddsR[i].textContent);
+                odds.push(oddsR[i].textContent);
             }
 
             if (leagues.length == 0) {
@@ -961,7 +1027,7 @@ function fetchBet9jaGames(code, target) {
                 isResultDisplayed = true;
                 return;
             }
-            
+
             /**
              * This section represent successful retrieval 
              * of booking games.
@@ -988,7 +1054,8 @@ function fetchBet9jaGames(code, target) {
                 end_date_time: DEFAULT_DATE_TIME,
                 type: PLATFORM_BET9JA,
             };
-      }});
+        }
+    });
 }
 
 /**
@@ -1001,7 +1068,7 @@ function fetchBet9jaGames(code, target) {
 function fetchBetKingGames(code) {
     if (isResultDisplayed) {
         // var bookingTabLastElem = $bookingCodetab.children()[$bookingCodetab.children().length-1]; 
-        var bookingLastElem = $bookingCodetab.children()[$bookingCodetab.children().length-1]; // get the last element
+        var bookingLastElem = $bookingCodetab.children()[$bookingCodetab.children().length - 1]; // get the last element
         $(bookingLastElem).remove();
         isResultDisplayed = false;
     };
@@ -1016,9 +1083,9 @@ function fetchBetKingGames(code) {
 
     predictionButton.text('Loading games...');
     predictionButton.prop('disabled', true);
-    $.ajax('/api/web/bet-games', { 
-        type: 'GET', data: {code: code, type: PLATFORM_BETKING, token: localStorage.getItem('$$token'),id: $$id },
-         success: function(result) {
+    $.ajax('/api/web/bet-games', {
+        type: 'GET', data: { code: code, type: PLATFORM_BETKING, token: localStorage.getItem('$$token'), id: $$id },
+        success: function (result) {
             var leagues = [];
             var fixtures = [];
             var outcomes = [];
@@ -1035,7 +1102,7 @@ function fetchBetKingGames(code) {
             }
 
             var betKingData = result.data.BookedCoupon.Odds;
-            var totalOdds = {maxOdd: result.data.BookedCoupon.MaxOdd, minOdd: result.data.BookedCoupon.MinOdd}
+            var totalOdds = { maxOdd: result.data.BookedCoupon.MaxOdd, minOdd: result.data.BookedCoupon.MinOdd }
 
             if (!betKingData) {
                 $bookingCodetab.append('<div class="booking-not-found">Invalid booking code</div>');
@@ -1049,7 +1116,7 @@ function fetchBetKingGames(code) {
                 return;
             }
 
-            betKingData.forEach(function(item, index) {
+            betKingData.forEach(function (item, index) {
                 leagues.push(item.TournamentName);
                 fixtures.push(item.MatchName);
                 outcomes.push(item.SelectionName + ' ' + item.SpecialValue);
@@ -1088,12 +1155,13 @@ function fetchBetKingGames(code) {
                 end_date_time: endStart.endDateTime,
                 type: PLATFORM_BETKING,
             };
-    }});
+        }
+    });
 }
 
 function fetchSportyBetGames(code) {
     if (isResultDisplayed) {
-        var bookingCodetabLastElem = $bookingCodetab.children()[$bookingCodetab.children().length-1]; // get the last element
+        var bookingCodetabLastElem = $bookingCodetab.children()[$bookingCodetab.children().length - 1]; // get the last element
         $(bookingCodetabLastElem).remove();
         isResultDisplayed = false;
     };
@@ -1108,8 +1176,8 @@ function fetchSportyBetGames(code) {
     predictionButton.prop('disabled', true);
 
     $.ajax('/api/web/bet-games', {
-        type: 'GET', data: {code: code, type: PLATFORM_SPORTY_BET, token: localStorage.getItem('$$token'),id: $$id },
-         success: function(result) {
+        type: 'GET', data: { code: code, type: PLATFORM_SPORTY_BET, token: localStorage.getItem('$$token'), id: $$id },
+        success: function (result) {
             var leagues = [];
             var fixtures = [];
             var outcomes = [];
@@ -1126,7 +1194,7 @@ function fetchSportyBetGames(code) {
 
             var sportyBetData = result.data.data.outcomes;
 
-            sportyBetData.forEach(function(item, index) {
+            sportyBetData.forEach(function (item, index) {
                 if (item.matchStatus == 'Not start') {
                     leagues.push(item.sport.category.tournament.name);
                     fixtures.push(item.homeTeamName + ' - ' + item.awayTeamName);
@@ -1172,16 +1240,17 @@ function fetchSportyBetGames(code) {
                 end_date_time: endStart.endDateTime,
                 type: PLATFORM_SPORTY_BET
             };
-    }});
+        }
+    });
 }
 
 function getStartEndDateTime(dates) {
     startDateTime = dates[0];
     endDateTime = dates[0];
 
-    dates.forEach(function(item, index) {
+    dates.forEach(function (item, index) {
         if (dates[index] > endDateTime) {
-            endDateTime = dates[index] 
+            endDateTime = dates[index]
         }
 
         if (dates[index] < startDateTime) {
@@ -1199,10 +1268,10 @@ function generateTable(data) {
     // bet 1 ZSSLMKR
     // bet 2 
     $table = '<div id="booking-code-table-section"><table style="width:100%; margin-top: 10px;">' +
-                 '<tr><th>League</th><th>Fixture</th><th>Oucome</th><th>Odd</th></tr>';
-    
-    data.leagues.forEach(function(item, index) {
-        $table += '<tr>' + '<td>' + item + '</td>' + '<td>' + data.fixtures[index] + '</td>' + 
+        '<tr><th>League</th><th>Fixture</th><th>Oucome</th><th>Odd</th></tr>';
+
+    data.leagues.forEach(function (item, index) {
+        $table += '<tr>' + '<td>' + item + '</td>' + '<td>' + data.fixtures[index] + '</td>' +
             '<td>' + data.outcomes[index] + '</td>' + '<td>' + data.odds[index] + '</td>';
     });
 
@@ -1233,64 +1302,65 @@ function removeBookingTable() {
  */
 
 
- /**
-  * Define global variables for this section
-  * like all fixtures, selected fixture etc...
-  */
- var filteredCompetitions = [];
- var filteredFixtures = [];
- var filteredOutcomes = [];
- var selectedCompetition = {}; // The selected competition
- var fixtures = [] // All fixtures gotten;
- var currentFixture = {}; // It holds all the fixtures of the selected competition
- var selectedMatch = {}; // This hold the selected match by the user AKA a fixture
- var selectedOutcome = '';
- 
-
- /**
-  * Declaration of table data.
-  * 
-  * Data that will be displayed and also sent 
-  * to the server.
-  */
-
-  var leagues = [];
-  var selectedFixtures = [];
-  var outcomes = [];
-  var teamIds = [];
-  var dates = [];
-  var competitionIds = [];
- 
+/**
+ * Define global variables for this section
+ * like all fixtures, selected fixture etc...
+ */
+var filteredCompetitions = [];
+var filteredFixtures = [];
+var filteredOutcomes = [];
+var selectedCompetition = {}; // The selected competition
+var fixtures = [] // All fixtures gotten;
+var currentFixture = {}; // It holds all the fixtures of the selected competition
+var selectedMatch = {}; // This hold the selected match by the user AKA a fixture
+var selectedOutcome = '';
+var isSearchingFixtures = false;
 
 
- /**
-  * Definitions of jquery objects for inputs,
-  * dropdowns etc..
-  */
- $competitionSearch = $('#competition-search'); // competition search input
- $competitionDropdown = $('#dropdown-competetion');
- $fetchingFixtures = $('#fetching-fixtures'); // div that displays while fetching competition fixtures
- $dropdonwFixture = $('#dropdown-fixture');
- $searchFixtureInput = $('#fixtures-search'); // fixture search input
- $addGame = $('#add-game'); 
- $competitionError = $('#competition-error');
- $fixturesError = $('#fixtures-error');
- $outcomeError = $('#outcome-error');
- $outcomeInput = $('#outcome');
- $tableSection = $('#table-section');
- $dropdownOutcomes = $('#dropdown-outcomes');
+/**
+ * Declaration of table data.
+ * 
+ * Data that will be displayed and also sent 
+ * to the server.
+ */
+
+var leagues = [];
+var selectedFixtures = [];
+var outcomes = [];
+var teamIds = [];
+var dates = [];
+var competitionIds = [];
 
 
- // Show dropdown on focus for competition search input 
- $competitionSearch.focus(function() {
+
+/**
+ * Definitions of jquery objects for inputs,
+ * dropdowns etc..
+ */
+$competitionSearch = $('#competition-search'); // competition search input
+$competitionDropdown = $('#dropdown-competetion');
+$fetchingFixtures = $('#fetching-fixtures'); // div that displays while fetching competition fixtures
+$dropdonwFixture = $('#dropdown-fixture');
+$searchFixtureInput = $('#fixtures-search'); // fixture search input
+$addGame = $('#add-game');
+$competitionError = $('#competition-error');
+$fixturesError = $('#fixtures-error');
+$outcomeError = $('#outcome-error');
+$outcomeInput = $('#outcome');
+$tableSection = $('#table-section');
+$dropdownOutcomes = $('#dropdown-outcomes');
+
+
+// Show dropdown on focus for competition search input 
+$competitionSearch.focus(function () {
     $competitionDropdown.show();
- });
+});
 
 
 // Hide dropdown on focus out for competition search input 
-$competitionSearch.focusout(function() {
+$competitionSearch.focusout(function () {
     // delay by 200 milliseconds so onclick can work
-    setTimeout(function() {
+    setTimeout(function () {
         $competitionDropdown.hide();
 
         // It makes the value of the competition input to the previous
@@ -1302,14 +1372,13 @@ $competitionSearch.focusout(function() {
     }, 200);
 });
 
-$competitionSearch.keyup(function() {
+$competitionSearch.keyup(function () {
     searchCompetition($competitionSearch.val());
     displayDropdownElements();
 })
 
 // Show dropdown on focus for fixture search input
-$searchFixtureInput.focus(function() {
-    console.log(currentFixture);
+$searchFixtureInput.focus(function () {
     if (Object.keys(currentFixture).length > 0) {
         $dropdonwFixture.show();
         searchFixtures($searchFixtureInput.val());
@@ -1318,46 +1387,49 @@ $searchFixtureInput.focus(function() {
 });
 
 // Hide dropdown on focus out for fixture search input 
-$searchFixtureInput.focusout(function() {
-    setTimeout(function() {
+$searchFixtureInput.focusout(function () {
+    setTimeout(function () {
         $dropdonwFixture.hide();
     }, 200);
 });
 
 // search for fixtures by team name
-$searchFixtureInput.keyup(function() {
+$searchFixtureInput.keyup(function () {
+    if (Object.keys(currentFixture).length > 0 && !isSearchingFixtures) {
+        $dropdonwFixture.show();
+    }
     searchFixtures($searchFixtureInput.val());
     displayFixtureDropDown();
 });
 
-$outcomeInput.focus(function() {
+$outcomeInput.focus(function () {
     $dropdownOutcomes.show();
     $outcomeError.hide();
     $outcomeInput.removeClass('invalid');
- });
+});
 
- $outcomeInput.focusout(function() {
-    setTimeout(function() {
+$outcomeInput.focusout(function () {
+    setTimeout(function () {
         $dropdownOutcomes.hide();
         if (!selectedOutcome) {
             $outcomeInput.val(selectedOutcome);
         }
     }, 200);
- });
+});
 
- $outcomeInput.keyup(function() {
+$outcomeInput.keyup(function () {
     searchOutcomes($outcomeInput.val());
     displayOutcomeDropdown();
- });
+});
 
-$addGame.click(function() {
+$addGame.click(function () {
     var isError = false;
 
     // check if competition has been selected
     if (Object.keys(selectedCompetition).length == 0) {
         $competitionError.show();
         $competitionSearch.addClass('invalid');
-        isError  = true;
+        isError = true;
     }
 
     // Checks if a match has been selected
@@ -1397,7 +1469,7 @@ $addGame.click(function() {
         dates.push(selectedMatch.date + " " + selectedMatch.time);
         competitionIds.push(selectedCompetition.id);
         $tableSection.append(generateTableForFixture());
-        $("#table-section").animate({ scrollTop: $("#table-section")[0].scrollHeight}, 1000);
+        $("#table-section").animate({ scrollTop: $("#table-section")[0].scrollHeight }, 1000);
 
         // Resets state 
         selectedOutcome = '';
@@ -1414,14 +1486,14 @@ $addGame.click(function() {
  * Start All functions declerations here
  */
 
- /**
-  * This filter an assign filters to filteredCompetitions
-  * 
-  * @param {String} param the parameter we want to search
-  */
+/**
+ * This filter an assign filters to filteredCompetitions
+ * 
+ * @param {String} param the parameter we want to search
+ */
 function searchCompetition(param) {
     filteredCompetitions = [];
-    __allCompetitions.forEach(function(competition, index) {
+    __allCompetitions.forEach(function (competition, index) {
         var countryOrFederationName = competition.countries.length > 0 ? competition.countries[0].name : competition.federations[0].name;
         if (countryOrFederationName.toLowerCase().includes(param.toLowerCase()) || competition.name.toLowerCase().includes(param.toLowerCase())) {
             filteredCompetitions.push(competition);
@@ -1431,18 +1503,20 @@ function searchCompetition(param) {
 
 
 function searchFixtures(param) {
-    filteredFixtures= [];
-    currentFixture.data.forEach(function(fixture, index) {
-       if (fixture.home_name.toLowerCase().includes(param.toLowerCase()) || fixture.away_name.toLowerCase().includes(param)) {
-           filteredFixtures.push(fixture);
-       }
-    });
+    filteredFixtures = [];
+    if (Object.keys(currentFixture).length > 0) {
+        currentFixture.data.forEach(function (fixture, index) {
+            if (fixture.home_name.toLowerCase().includes(param.toLowerCase()) || fixture.away_name.toLowerCase().includes(param)) {
+                filteredFixtures.push(fixture);
+            }
+        });
+    }
 }
 
 
 function searchOutcomes(param) {
     filteredOutcomes = [];
-    __outcomes.forEach(function(item, index) {
+    __outcomes.forEach(function (item, index) {
         if (item.toLowerCase().includes(param.toLowerCase())) {
             filteredOutcomes.push(item);
         }
@@ -1454,29 +1528,29 @@ function searchOutcomes(param) {
  */
 function displayDropdownElements() {
     $competitionDropdown.empty();
-    filteredCompetitions.forEach(function(competition, item) {
-        $competitionDropdown.append('<a onclick="selectCompetition(this)" id=' + '"' + competition.id + '"' + '>' + getCompetitionName(competition) +  '</a>');
+    filteredCompetitions.forEach(function (competition, item) {
+        $competitionDropdown.append('<a onclick="selectCompetition(this)" id=' + '"' + competition.id + '"' + '>' + getCompetitionName(competition) + '</a>');
     });
 }
 
 function displayFixtureDropDown() {
     $dropdonwFixture.empty();
-    filteredFixtures.forEach(function(fixture) {
+    filteredFixtures.forEach(function (fixture) {
         var dateStr = fixture.date + ' ' + fixture.time + ' UTC'
         var fixtureDate = new Date(dateStr.replace(/-/g, '/'));
 
-        $html = '<div onclick="selectFixture(this)" style="cursor: pointer;" id=' + '"' + fixture.id + '"' + '>' + '<a>' + fixture.home_name + ' - ' + fixture.away_name +  '</a>';
-        $html+= '<span class="fixture-date">' + formatDateCreated(fixtureDate) + '</span></div>';
+        $html = '<div onclick="selectFixture(this)" style="cursor: pointer;" id=' + '"' + fixture.id + '"' + '>' + '<a>' + fixture.home_name + ' - ' + fixture.away_name + '</a>';
+        $html += '<span class="fixture-date">' + formatDateCreated(fixtureDate) + '</span></div>';
         $dropdonwFixture.append($html);
     });
 }
 
-function displayOutcomeDropdown(){
+function displayOutcomeDropdown() {
     $dropdownOutcomes.empty();
-    filteredOutcomes.forEach(function(item, index) {
+    filteredOutcomes.forEach(function (item, index) {
         $dropdownOutcomes.append('<a onclick="selectOutcome(this)">' + item + '</a>');
     });
-    
+
 }
 
 /**
@@ -1512,106 +1586,107 @@ function selectOutcome(e) {
 
 
 
-  /**
-   * Given a competition object it returns 
-   * the name e.g England Premier league
-   */
-  function getCompetitionName(competition) {
+/**
+ * Given a competition object it returns 
+ * the name e.g England Premier league
+ */
+function getCompetitionName(competition) {
     if (competition.countries.length > 0) {
-    
-      return competition.countries[0].fifa_code ? competition.countries[0].fifa_code + ' - ' + competition.name :  competition.countries[0].name + ' - ' + competition.name;
+
+        return competition.countries[0].fifa_code ? competition.countries[0].fifa_code + ' - ' + competition.name : competition.countries[0].name + ' - ' + competition.name;
     }
 
     if (competition.federations.length > 0) {
-      return competition.federations[0].name  + ' - ' + competition.name;
+        return competition.federations[0].name + ' - ' + competition.name;
     }
 
     return competition.name;
-  }
+}
 
 
-  /**
-   * This function handles the action when a user 
-   * selects a competition.
-   * 
-   * What it does is to first
-   * go through the list of all the competitions fixtures we 
-   * have already if it found which means we have already 
-   * loaded it before it assign it and end the function. Else it fetches 
-   * or load the data from the server
-   * 
-   * @param {*} e The clicked element
-   */
-  function selectCompetition(e) {
-      $competitionError.hide(); // Hide any error;
-      $competitionSearch.removeClass('invalid');
+/**
+ * This function handles the action when a user 
+ * selects a competition.
+ * 
+ * What it does is to first
+ * go through the list of all the competitions fixtures we 
+ * have already if it found which means we have already 
+ * loaded it before it assign it and end the function. Else it fetches 
+ * or load the data from the server
+ * 
+ * @param {*} e The clicked element
+ */
+function selectCompetition(e) {
+    $competitionError.hide(); // Hide any error;
+    $competitionSearch.removeClass('invalid');
 
-      var competitionId = $(e).attr('id');
-      $competitionDropdown.hide();
-      var competition = getSelectedCompetition(competitionId);
-      selectedCompetition = competition;
-      $competitionSearch.val(getCompetitionName(competition));
+    var competitionId = $(e).attr('id');
+    $competitionDropdown.hide();
+    var competition = getSelectedCompetition(competitionId);
+    selectedCompetition = competition;
+    $competitionSearch.val(getCompetitionName(competition));
 
-      // Search for existing fixtures for the selected competition
-      for (var index = 0; index < fixtures.length; index++) {
-          if (fixtures[index].competitionId == competitionId) {
-              currentFixture = fixtures[index];
+    // Search for existing fixtures for the selected competition
+    for (var index = 0; index < fixtures.length; index++) {
+        if (fixtures[index].competitionId == competitionId) {
+            currentFixture = fixtures[index];
 
-              // reset selectedMatch because competition has changed
-              selectedMatch = {}; 
-              $searchFixtureInput.val('');
-              return;
-          }
-      }
-      currentFixture = {};
-      getFixtures(competitionId);
-  }
-
-
-  function getSelectedCompetition(competitionId) {
-      for (var index = 0; index < __allCompetitions.length; index++) {
-          if (__allCompetitions[index].id == competitionId) {
-              return __allCompetitions[index];
-          }
-      }
-  }
+            // reset selectedMatch because competition has changed
+            selectedMatch = {};
+            $searchFixtureInput.val('');
+            return;
+        }
+    }
+    currentFixture = {};
+    getFixtures(competitionId);
+}
 
 
-  function getFixtures(competitionId) {
+function getSelectedCompetition(competitionId) {
+    for (var index = 0; index < __allCompetitions.length; index++) {
+        if (__allCompetitions[index].id == competitionId) {
+            return __allCompetitions[index];
+        }
+    }
+}
+
+
+function getFixtures(competitionId) {
     $fetchingFixtures.show();
+    isSearchingFixtures = true;
     $.ajax('/api/web/fixtures', {
-        type: 'GET', data: {competition_id: competitionId, token: localStorage.getItem('$$token'),id: $$id },
-         success: function(result) {
+        type: 'GET', data: { competition_id: competitionId, token: localStorage.getItem('$$token'), id: $$id },
+        success: function (result) {
+            isSearchingFixtures = false;
             var tempFixtures = [];
-            console.log(result);
             if (result.success) {
-                console.log('Got inside')
                 $fetchingFixtures.hide();
-                result.data.forEach(function(item, index){
+                result.data.forEach(function (item, index) {
                     //tempFixtures.concat(item.fixtures)
-                    item.fixtures.forEach(function(item) {
+                    item.fixtures.forEach(function (item) {
                         tempFixtures.push(item);
                     });
                 });
-                currentFixture = {competitionId: competitionId, data: tempFixtures}
+                currentFixture = { competitionId: competitionId, data: tempFixtures }
                 fixtures.push(currentFixture);
                 // reset selectedMatch because competition has changed
                 selectedMatch = {};
                 $searchFixtureInput.val('');
             }
 
-    }});
-  }
+        }
+    });
+}
 
-  function generateTableForFixture() {
+function generateTableForFixture() {
     $tableSection.empty();
     $table = '<table style="width:100%; margin-top: 10px;">' +
-                 '<tr><th>Date/Time</th><th>League</th><th>Fixture</th><th>Oucome</th><th>Cancel</th></tr>';
-    
-    leagues.forEach(function(item, index) {
+        '<tr><th>Date/Time</th><th>League</th><th>Fixture</th><th>Oucome</th><th>Cancel</th></tr>';
+
+    leagues.forEach(function (item, index) {
         var dateStr = dates[index] + ' UTC';
         var date = new Date(dateStr.replace(/-/g, '/'));
-        $table += '<tr>' + '<td>' + formatDateCreated(date) + '</td>' + '<td>' + item + '</td>' + '<td>' + selectedFixtures[index] + '</td>' + 
+        $table += '<tr>' + '<td>' + formatDateCreated(date) + '</td>' + '<td>' + item + '</td>' + '<td>' + selectedFixtures[index] + '</td>' +
             '<td>' + outcomes[index] + '</td>' + '<td style="text-align:center; color:red;"><i onclick="removePrediction(this)" id="selected-fixture-' + index + '" style="cursor:pointer; font-size:1.9rem;" class="fa fa-times" aria-hidden="true"></i></td>';
     });
 
@@ -1621,7 +1696,7 @@ function selectOutcome(e) {
 
 function removePrediction(e) {
     var index = $(e).attr('id').split('-')[2];
-    
+
     leagues.splice(index, 1);
     dates.splice(index, 1);
     selectedFixtures.splice(index, 1);
@@ -1634,13 +1709,13 @@ function removePrediction(e) {
     }
 
     $tableSection.append(generateTableForFixture());
-    $("#table-section").animate({ scrollTop: $("#table-section")[0].scrollHeight}, 1000);
+    $("#table-section").animate({ scrollTop: $("#table-section")[0].scrollHeight }, 1000);
 }
 
 
 
 
- /**
-  * End All functions declaration 
-  * =================================================
-  */
+/**
+ * End All functions declaration
+ * =================================================
+ */

@@ -4,11 +4,11 @@
 
     var numFollowers = Number.parseInt($('#num-followers').attr('data'));
     $('#profile-follow').click(function() {
-        followUser(CALLING_FROM_PROFILE_PAGE);
+        followUserWithoutUpdate(CALLING_FROM_PROFILE_PAGE);
     });
 
     $('#profile-follow-mobile').click(function() {
-        followUser(CALLING_FROM_PROFILE_PAGE);
+        followUserWithoutUpdate(CALLING_FROM_PROFILE_PAGE);
     });
 
     /**
@@ -18,12 +18,12 @@
      * @param {*} callingFrom Which page we calling this function as it is a shared function
      * @param {*} userId The userid 
      */
-    function followUser(callingFrom, userId=null) {
+    function followUserWithoutUpdate(callingFrom, userId=null) {
         // Checks if user is logged in;
         if ($$id == -1) {
             $('#login-modal-txt').html('You need to <a href="/login" style="cursor: pointer;">login or signup</a> to follow ' + __name);
             $('#follow-note').text('Note: following a user means you get notified when they drop predictions');
-            $('#exampleModal').modal('show');
+            $('#createPredictionModal').modal('show');
             return;
         }
 

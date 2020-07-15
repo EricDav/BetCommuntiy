@@ -81,6 +81,6 @@
         <?php include 'Pages/common/Footer.php';?>
         <?php include 'Pages/common/Script.php'?>
         <script src = '/bet_community/Public/js/contact.js'></script>
-       
+        <script src="/bet_community/Public/js/script.js"></script>
     </body>
 </html>

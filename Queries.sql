@@ -18,11 +18,19 @@ CREATE TABLE users (
     code_token VARCHAR(9),
     password_count TINYINT DEFAULT 0,
     token_count TINYINT DEFAULT 0,
+    send_email_notification boolean,
+    send_sms_notification boolean,
     settings VARCHAR(3000),
     PRIMARY KEY(id)
 );
 
-SELECT predictions.prediction, predictions.id, predictions.created_at, predictions.start_date, predictions.end_date, users.id AS user_id, users.name, users.sex FROM predictions INNER JOIN users ON predictions.user_id = users.id
+"SELECT (SELECT COUNT(*) FROM comments WHERE predictions.id=comments.id) AS total_comments,
+                    predictions.prediction, predictions.id, predictions.created_at, predictions.start_date, 
+                    predictions.end_date, predictions.won, predictions.type, users.id AS user_id, users.name, users.sex, users.image_path
+                    FROM predictions 
+                    INNER JOIN users ON predictions.user_id = users.id 
+                    WHERE users.id=" . $userId . ($approved === null ? '' : " AND predictions.approved = " . $approved) . 
+                    " ORDER BY predictions.start_date desc";
 
 /**
     Query to create Predictions table
@@ -40,6 +48,10 @@ CREATE TABLE predictions (
     approved boolean NOT NULL,
     scores_finished boolean,
     approved_by int,
+    updated_by int,
+    date_updated DATETIME,
+    booking_code VARCHAR(50),
+    
     type VARCHAR(30),
     PRIMARY KEY(id)
 );
@@ -58,10 +70,13 @@ CREATE TABLE reviews (
 
 CREATE TABLE notifications (
     notification VARCHAR(500),
-    user_id int references users(id),
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    is_read boolean
-);
+    user_id int NOT NULL references users(`id`),
+    ref_id  int NOT NULL,
+    link VARCHAR(100),
+    created_at DATETIME NOT NULL,
+    is_read boolean DEFAULT 0,
+    is_seen boolean DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE payslip(
     amount VARCHAR(125),
