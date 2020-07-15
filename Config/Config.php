@@ -3,10 +3,10 @@
         const  dbConfig = array(
             'development' => array(
                 'user' => 'root',
-                'password' => 'root',
+                'password' => '',
                 'host' => 'localhost',
                 'database' => 'bet_community',
-                'port' => 8889
+                'port' => 3306
             ),
     
             'production' => array(
