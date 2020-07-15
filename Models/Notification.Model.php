@@ -23,7 +23,7 @@
 
             } catch(Exception $e) {
                 $pdoConnection->pdo->rollBack();
-                echo $e->getMessage();
+                ErrorMail::LogError($e);
                 return false;
             }
         }
@@ -34,7 +34,7 @@
                         notifications.is_read, users.name, users.image_path FROM notifications INNER JOIN users ON notifications.ref_id=users.id WHERE user_id=' . $userId;
                 return $pdoConnection->pdo->query($sql)->fetchAll();
             } catch(Exception $e) {
-                echo $e->getMessage();
+                ErrorMail::LogError($e);
                 return false;
             }
         }
@@ -44,7 +44,7 @@
                 $sql = 'UPDATE notifications SET is_seen=1 WHERE user_id=' . $userId;
                 return $pdoConnection->pdo->query($sql);
             } catch(Exception $e) {
-                echo $e->getMessage();
+                ErrorMail::LogError($e);
                 return false;
             }
         }
@@ -54,7 +54,7 @@
                 $sql = 'UPDATE users SET ' . $settingsType . '=' . $settings .  ' WHERE id=' . $userId;
                 return $pdoConnection->pdo->query($sql);
             } catch(Exception $e) {
-                echo $e->getMessage();
+                ErrorMail::LogError($e);
                 return false;
             }
         }
@@ -64,7 +64,7 @@
                 $sql = 'UPDATE users SET ' . $settingsType . '=' . $settings .  ' WHERE email=' . $email;
                 return $pdoConnection->pdo->query($sql);
             } catch(Exception $e) {
-                echo $e->getMessage();
+                ErrorMail::LogError($e);
                 return false;
             }
         }

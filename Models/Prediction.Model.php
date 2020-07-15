@@ -153,7 +153,7 @@
                 $sql = 'UPDATE predictions SET won=' . $predictionStatus . ', updated_by=' . $updatedBy . ', date_updated=' . '"' . gmdate("Y-m-d\ H:i:s") . '"' . ' WHERE predictions.id=' . $predictionId;
                 return $pdoConnection->pdo->query($sql);
             } catch(Exception $e) {
-                var_dump($e->getMessage()); exit;
+                ErrorMail::LogError($e);
                 return false;
             }
         }
