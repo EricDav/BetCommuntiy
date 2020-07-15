@@ -233,8 +233,7 @@
             try {
                 $sql = 'DELETE FROM likes WHERE prediction_id=' . $predictionId . ' AND user_id=' . $userId;
                 // echo $sql; exit;
-                $pdoConnection->pdo->query($sql)->fetch();
-                return true;
+                return $pdoConnection->pdo->query($sql);
             } catch(Exception $e) {
                 ErrorMail::LogError($e);
                 return false;

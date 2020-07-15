@@ -74,8 +74,9 @@ CREATE TABLE notifications (
     ref_id  int NOT NULL,
     link VARCHAR(100),
     created_at DATETIME NOT NULL,
-    is_read boolean DEFAULT 0
-);
+    is_read boolean DEFAULT 0,
+    is_seen boolean DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE payslip(
     amount VARCHAR(125),
