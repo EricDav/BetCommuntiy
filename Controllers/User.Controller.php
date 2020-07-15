@@ -126,12 +126,14 @@
             if ($this->request->method == 'GET') {
                 $followers = array();
                 $this->pdoConnection->open();
+                $featuredUsers = UserModel::getFeaturedUsers($this->pdoConnection);
                 $forcasters = UserModel::getAllUsers($this->pdoConnection);
                 if ($this->isLogin()) {
                     $followers = UserModel::getFollowers($this->pdoConnection, $this->request->session['userInfo']['id']);
                 }
 
                 $this->data['followers'] = $followers;
+                $this->data['featuredUsers'] = $featuredUsers;
                 $this->data['template'] = 'Forcasters.php';
                 $this->data['title'] = 'Forcasters';
                 $this->data['forcasters'] = $forcasters;
