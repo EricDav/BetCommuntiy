@@ -5,7 +5,6 @@
     background-size: cover;
 }
 
-
 .about-txt {
     color: white;
     font-size: 45px;
@@ -23,4 +22,13 @@
     font-size: 18px;
     font-weight: 700;
     margin-top: 20px;
+}
+
+@media only screen and (max-width: 900px) {
+    .about-img {
+        padding-left: 10px !important;
+    }
+    .cover-abt {
+        margin-left: 10px !important;
+    }
 }

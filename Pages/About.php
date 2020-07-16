@@ -23,7 +23,8 @@
     	    </div>
         </div>
         </div>
-        <div id="page-contents">
+        
+        <div class="cover-abt" id="page-contents">
     	    <div class="container">
                 <div class="row">
                     <div class="how-to-play">What We Do?</div>

@@ -14,28 +14,17 @@
             include 'Pages/common/Header.php';
         ?>
         <div class = 'benefit-container'>
-            <div class="google-maps">
-                <div id="map" class="map contact-map" style="position: relative; overflow: hidden;">
-                    <div style="height: 100%; width: 100%; position: absolute; top: 0px; left: 0px; background-color: rgb(229, 227, 223);">
-                        <div class="gm-err-container">
-                            <div class="gm-err-content">
-                                <div class="gm-err-icon">
-                                    <img src="https://maps.gstatic.com/mapfiles/api-3/images/icon_error.png" draggable="false" style="user-select: none;">
-                                </div>
-                                <div  class="h2 benefit-head-text gm-err-title">
-                                    Benefits
-                                </div>
-                            </div>
+            <div class="about-img">
+                <div id="page-contents">
+                    <div class="container">
+                        <div class="row">
+                           <h2 class="about-txt">Benefits</h2>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class = 'success-fade centered benefit-main-content'>
+            <div class = 'centered benefit-main-content'>
                 <div style = 'width: fit-content; padding:10px'>
-
-
-
-
 
                     <div class = 'w-100 col-sm-6'>
 
@@ -49,7 +38,7 @@
                             <div class = 'col-sm-9 col-xs-12'>
                                 <b>Free Airtime</b>
                                 <p class = 'justify'>
-                                    Forcasters in our platform stand a chance
+                                    Forecasters in our platform stand a chance
                                     to win a minimum airtime of &#8358 200 (Naira) off
                                     any network weekly. Every week we select top 5 (five)
                                     forcasters for the week. This are the things we put
@@ -78,8 +67,6 @@
                         </div>
 
 
-
-
                         <div class = 'row item bottom-top-space'>
                             <div class = 'text-align-center  col-sm-3 col-xs-12'>
                                 <span class = 'icon-size fa fa-dollar'></span>
@@ -88,16 +75,28 @@
                                 <b>Earn with us</b>
                                 <p class = 'justify'>
                                     You can also make cool cash from us by becoming a verified
-                                    forcaster. To become a verified you need to have 5 correct
+                                    forecaster. To become a verified you need to have 5 correct
                                     predictions within a week with odds greater than 5.
                                 </p>
                             </div>
                         </div>
+
+                        <div class = 'row item bottom-top-space'>
+                            <div class = 'text-align-center  col-sm-3 col-xs-12'>
+                                <span class = 'icon-size fa fa-bell'></span>
+                            </div>
+                            <div class = 'col-sm-9 col-xs-12'>
+                                <b>Get Free Scores Update</b>
+                                <p class = 'justify'>
+                                    As a forecaster you can recieve scores updates or notification of every game in a
+                                     prediction you subscribe to. The result of each match will be sent to your email and the result 
+                                    of all the games will be sent too, when all the games in the prediction as finished.
+                                    
+                                </p>
+                            </div>
+                        </div>
+
                     </div>
-
-
-
-
 
                     <div class = 'w-100 col-sm-6'>
 

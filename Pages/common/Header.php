@@ -23,7 +23,7 @@
                 <a href="/about">About Us</a>
               </li>
               <li class="dropdown">
-                <a href="/Benefits">Benefits</a>
+                <a href="/benefits">Benefits</a>
               </li>
               <li class="dropdown"><a href="/contact">Contact</a></li>
               <?php if (!isLogin()): ?>
