@@ -13,41 +13,30 @@
               </ul>
             </div>
             <div class="col-md-2 col-sm-2">
-              <h5>For individuals</h5>
+              <h5>Useful Links</h5>
               <ul class="footer-links">
-                <li><a href="">Signup</a></li>
-                <li><a href="">login</a></li>
-                <li><a href="">Explore</a></li>
-                <li><a href="">Finder Fordasters</a></li>
-              </ul>
-            </div>
-            <div class="col-md-2 col-sm-2">
-              <h5>For businesses</h5>
-              <ul class="footer-links">
-                <li><a href="">Business signup</a></li>
-                <li><a href="">Business login</a></li>
+                <li><a href="/login">Signup</a></li>
+                <li><a href="/login">Login</a></li>
+                <li><a href="/forecasters">Foreasters</a></li>
                 <li><a href="">Benefits</a></li>
-                <li><a href="">Resources</a></li>
-                <li><a href="">Advertise</a></li>
-                <li><a href="">Setup</a></li>
               </ul>
             </div>
+
             <div class="col-md-2 col-sm-2">
               <h5>About</h5>
               <ul class="footer-links">
-                <li><a href="">About us</a></li>
-                <li><a href="">Contact us</a></li>
-                <li><a href="">Privacy Policy</a></li>
-                <li><a href="">Terms</a></li>
-                <li><a href="">Help</a></li>
+                <li><a href="/about">About us</a></li>
+                <li><a href="/contact">Contact us</a></li>
+                <li><a href="/terms">Terms</a></li>
+                <li><a href="/">Home</a></li>
               </ul>
             </div>
             <div class="col-md-3 col-sm-3">
               <h5>Contact Us</h5>
               <ul class="contact">
-                <li><i class="icon ion-ios-telephone-outline"></i>+1 (234) 222 0754</li>
-                <li><i class="icon ion-ios-email-outline"></i>info@thunder-team.com</li>
-                <li><i class="icon ion-ios-location-outline"></i>228 Park Ave S NY, USA</li>
+                <li><i class="icon ion-ios-telephone-outline"></i>+234 7069229546</li>
+                <li><i class="icon ion-ios-email-outline"></i>info@betcommunity.net</li>
+                <li><i class="icon ion-ios-location-outline"></i>8 Rabiatu street Mushin Lagos</li>
               </ul>
             </div>
           </div>

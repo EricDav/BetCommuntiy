@@ -10,6 +10,8 @@
         const INPROGRESS_FILTER = 7;
         const FORCASTERS_FILTER = 8;
         const NUM_SECONDS_PERDAY = 86400;
+        const PENDING_OUTCOMES_ROUTE = '/predictions/pending-outcomes';
+        const MY_APPROVED_OUTCOMES_ROUTE = '/predictions/my/approved-outcomes';
 
         public $offset;
         public function  __construct($request) {
@@ -23,6 +25,9 @@
             $this->predictionStatus = isset($this->request->query['filter_status']) ? $this->request->query['filter_status'] : null;
             $this->currentSideBarFilter = 'All Predictions';
             $this->isOddsFilter = null;
+            $this->isPendingOutcomes = false;
+            $this->myApprovedUserId = null;
+            $this->pendingUserId = null;
         }
 
         public function validate() {
@@ -33,8 +38,10 @@
              */
             if ($this->isOddsFilter) {
                 $minMax = explode('_', $this->query);
-                if (sizeof($minMax) > 2 || !is_numeric($minMax[0]) || !is_numeric($minMax[1]))
+                if (sizeof($minMax) > 2 || !is_numeric($minMax[0]) || !is_numeric($minMax[1])) {
+                    $this->set404Page();
                     return false;
+                }
             }
 
             if ($this->predictionStatus) {
@@ -107,8 +114,32 @@
             /**
              * Validates that page number is numeric
              */
-            if (!is_numeric($this->pageNum))
-                return false;
+            if (!is_numeric($this->pageNum)) {
+                $this->pageNum = Controller::DEFAULT_OFFSET;
+            }
+
+            if ($this->request->route == self::PENDING_OUTCOMES_ROUTE) {
+                if (isset($this->request->session['userInfo']) && $this->request->session['userInfo']['role'] > 1) {
+                    $this->isPendingOutcomes = true;
+                    $this->currentSideBarFilter = 'Pending Predictions Outcomes';
+
+                } else {
+                    $this->set404Page();
+                    return false;
+                }
+
+            } else if ($this->request->route == self::MY_APPROVED_OUTCOMES_ROUTE) {
+                if (isset($this->request->session['userInfo']) && $this->request->session['userInfo']['role'] > 1) {
+                    $this->pendingUserId = $this->request->session['userInfo']['id'];
+                    $this->currentSideBarFilter = 'My Approved Outcomes';
+
+                } else {
+                    $this->set404Page();
+                    return false;
+                }
+            } 
+            
+            
 
             $this->offset = ($this->pageNum - 1) * Controller::DEFAULT_LIMIT;
             return true;
@@ -123,7 +154,7 @@
                 $followers = array();
 
                 $predictions = PredictionModel::getPredictions($this->pdoConnection, Controller::DEFAULT_LIMIT,
-                    $this->offset, $this->startDateInUTC, $this->endDateInUTC, $this->predictionStatus);
+                    $this->offset, $this->startDateInUTC, $this->endDateInUTC, $this->predictionStatus, $this->isPendingOutcomes, $this->pendingUserId);
 
                 
                 $featuredUsers = UserModel::getFeaturedUsers($this->pdoConnection);
@@ -138,6 +169,7 @@
                 
                 if ($this->isLogin()) {
                     $followers = UserModel::getFollowers($this->pdoConnection, $this->request->session['userInfo']['id']);
+                    // var_dump($followers); exit;
                 }
 
                 if (!$isProblemWhileFecthingData) {

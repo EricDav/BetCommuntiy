@@ -1,20 +1,4 @@
 <?php 
-  /**
-   * Given a competition object it returns 
-   * the name e.g England Premier league
-   */
-  function getCompetitionName($competition) {
-    if (sizeof($competition->countries) > 0) {
-      return $competition->countries[0]->fifa_code ? $competition->countries[0]->fifa_code . ' - ' . $competition->name :  $competition->countries[0]->name . ' - ' . $competition->name;
-    }
-
-    if (sizeof($competition->federations) > 0) {
-      return $competition->federations[0]->name . ' - ' . $competition->name;
-    }
-
-    return $competition->name;
-  }
-
   function isSelf($userId) {
     return isLogin() && $_SESSION['userInfo']['id'] == $userId;
   }
@@ -46,13 +30,18 @@
 
 <?php endif; ?>
 
+<?php if( isAdmin()): ?>
+  <?php  include 'Pages/modals/PredictionOutcomeModal.php';?>
+  <?php  include 'Pages/modals/ConcludedOutcomeModal.php';?>
+  <?php  include 'Pages/modals/UpdatePredictionModal.php';?>
+<?php endif ?>
+
   <?php if (!isLogin()): ?>
       <!-- Obstruction modal -->
       <?php  include 'Pages/modals/ObstructionModal.php';?>
   <?php endif; ?>
     	<div class="container">
     		<div class="row">
-
           <!-- Newsfeed Common Side Bar Left
           ================================================= -->
     			<div class="col-md-3 static">
@@ -88,23 +77,28 @@
             <div class="dropdown dot-menu">
               <i class="fa fa-ellipsis-h dropdown-toggle" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
               <div id="menu-action" class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                <?php if($data['isLogin'] && (int)$_SESSION['userInfo']['role'] > 1): ?>
-                  <a class="dropdown-item"> <i class="fa fa-user"></i>  Action</a>
+                <?php if(isLogin() && (int)$_SESSION['userInfo']['role'] > 1): ?>
+                  <a id="<?= 'update-prediction-menu-' . $prediction['id'] . '-' . (string)$index?>" class="dropdown-item"> <i class="fa fa-user"></i>Update Prediction</a>
+                  <div class="line-divider"></div>
+
+                  <a id="<?= 'action-menu-' . $prediction['id'] . '-' . (string)$index?>" class="dropdown-item"> <i class="fa fa-user"></i>Prediction  Actions</a>
+                  <div class="line-divider"></div>
                 <?php endif ?>
                 
-                <?php if (isSelf($prediction['user_id'])): ?>
+                <?php if (isSelf($prediction['user_id']) && gmdate("Y-m-d\ H:i:s") < $prediction['start_date']): ?>
                    <a style="color: red;" id="<?= 'dot-menu-delete-' . $prediction['id'] . '-' . (string)$index?>" class="dropdown-item"> <i class="fa fa-trash"></i>
                     Delete Prediction
                   </a>
+                  <div class="line-divider"></div>
                 <?php endif; ?>
 
                 <?php if (!isSelf($prediction['user_id'])): ?>
                   <a  id="<?= 'dot-menu-' . $prediction['user_id'] . '-' . (string)$index?>" class="dropdown-item"> <i class="<?= $isFollowing ? 'fa fa-user-times' : 'fa fa-user'; ?>"></i>
                     <?= !$isFollowing ? '  Follow     ' . explode(' ', $prediction['name'])[0] : '  Unfollow     ' . explode(' ', $prediction['name'])[0]?>
                   </a>
+                  <div class="line-divider"></div>
                 <?php endif; ?>
 
-                <div class="line-divider"></div>
                 <a id="<?='report-prediction-' . $prediction['id']?>"  data-toggle="modal" data-target="#reportBugModal" class="dropdown-item"><i class="fa fa-bug"></i> Report Prediction</a>
                 <div class="line-divider"></div>
                 <a id="<?='copy-prediction-' . $prediction['id']?>" class="dropdown-item"><i class="fa fa-share-alt"></i> Copy Prediction Link</a>
@@ -123,7 +117,7 @@
                     <p id="<?='date-'.$prediction['id']?>" class="text-muted"></p>
                   </div>
                   <div class="reaction">
-                    <a class="btn text-green"><i class="icon ion-thumbsup"></i> 2</a>
+                    <a id="<?='like-' . $prediction['id'] . '-' . (string)$index?>" class="btn text-green"><i class="icon ion-thumbsup"></i><?=$prediction['total_likes'] > 0 ? $prediction['total_likes'] : '';  ?></a>
                   </div>
                   <div class="line-divider"></div>
                     <div id ="<?='prediction-' . $prediction['id']?>" class="post-text">
@@ -134,9 +128,9 @@
                   <div style="margin-bottom: 20px;" class="post-meta">
                       <div class="post-meta-like">
                         <div>
-                            <i class="fa fa-commenting-o ic"><strong><?=((int)$prediction['total_comments'] == 0 ? '' : $prediction['total_comments'])?></strong></i>
+                            <!-- <i class="fa fa-commenting-o ic"><strong><?php /**((int)$prediction['total_comments'] == 0 ? '' : $prediction['total_comments'])*/?></strong></i> -->
                             <!-- <strong>206</strong> -->
-                            <span class="status"><b>Status:</b><strong><i><?=$controllerObject->getPredictionStatus($prediction)?></i></strong></span>
+                            <span class="status"><b>Status:</b><strong id="<?='outcome-status-' . $prediction['id']?>"><?=$controllerObject->getPredictionStatus($prediction)?></strong></span>
                         </div>
                       </div>
                   </div>
@@ -156,28 +150,18 @@
       </div>
           <!-- Newsfeed Common Side Bar Right
           ================================================= -->
-    			<div class="col-md-2 static static-featured">
-            <div class="suggestions is_stuck" id="sticky-sidebar" style="position: fixed; top: -3px; width: 155px;">
-              <h4 class="grey"><b>Featured Users</b></h4>
-              <?php foreach($data['featuredUsers'] as $featuredUser): ?>
-                <div class="follow-user">
-                  <img src="images/users/user-15.jpg" alt="" class="profile-photo-sm pull-left">
-                  <div>
-                    <h5><a href="timeline.html"><?=$featuredUser['name']?></a></h5>
-                    <a id="<?=$featuredUser['id']?>" class="text-green"><?=$controllerObject->isFollowing($prediction['user_id']) ? 'Following': 'Follow' ?></a>
-                  </div>
-                </div>
-              <?php endforeach ?>
-            </div><div style="position: static; width: 155px; height: 374px; display: block; vertical-align: baseline; float: none;"></div>
-          </div>
+          <?php  include 'Pages/common/RightSideBar.php';?>
 
-
-    		</div>
     	</div>
     </div>
 
   <?php  include 'Pages/common/Footer.php';?>
   <?php include 'Pages/common/Script.php'?>
+  <script>
+    function openNav() {
+      document.getElementById("mySidenav").style.display = 'block';
+    }
+  </script>
   <!-- The core Firebase JS SDK is always required and must be listed first -->
     <script type="text/javascript">var dates=<?=json_encode($data['dates'])?>;</script>
     <script type="text/javascript">var __allCompetitions=<?=json_encode($data['competitions'])?>;</script>
@@ -185,5 +169,14 @@
     <script type="text/javascript">var __outcomes=<?=json_encode($data['outcomes'])?>;</script>
     <script src="/bet_community/Public/js/prediction.js"></script>
     <script src="/bet_community/Public/js/common-sidebar.js"></script>
+    <?php if(isAdmin()): ?>
+      <script src="/bet_community/Public/js/outcome.js"></script>
+    <?php endif; ?>
+    <script>
+      setTimeout(() => {
+        $($('#f-users-wrapper').children()[1]).css('pointer-events', 'none');
+      }, 500);
+    </script>
+    <script src="/bet_community/Public/js/script.js"></script>
   </body>
 </html>

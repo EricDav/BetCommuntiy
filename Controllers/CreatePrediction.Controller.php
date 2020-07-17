@@ -163,24 +163,16 @@
             $result = PredictionModel::createPrediction($this->pdoConnection, $this->startDateTime, $this->endDateTime, $userId, $this->totalOdds, 
                 $this->prediction, $approved, $this->type, $this->getEachGameUpdate, $this->getAllGameUpdate);
 
-            if ($result)
+            if ($result) {
+                $notifications = NotificationModel::creatNotifictionsForPrediction($this->pdoConnection, $this->request->session['userInfo']['id'], $result);
+
+                if (!$notifications) {
+                    // TODO LOG ERRORS HERE
+                }
                 $this->jsonResponse(array('success' => true, 'code' => Controller::HTTP_OKAY_CODE, 'messages' => 'Prediction created successfully', 'prediction_id' => $result));
+            }
 
             $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_SERVER_ERROR_CODE, 'message' => 'Server error'));
-        }
-
-
-        /**
-         * It checks weather a data is a valid json
-         * 
-         * @param $data the json to validate
-         */
-        function jsonValidator($data) {
-            if (!empty($data)) {
-                @json_decode($data);
-                return (json_last_error() === JSON_ERROR_NONE);
-            }
-            return false;
         }
 
         /**

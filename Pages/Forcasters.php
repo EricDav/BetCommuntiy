@@ -24,9 +24,6 @@
             		<div class="col-md-7 col-sm-7">
                     <?=$data['paginationHtml']?>
                 </div>
-            		<div  class="col-md-5 col-sm-9">
-                    <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#exampleModal" id="open-prediction-modal">Create Prediction</button>
-                </div>
             	</div>
             </div>
             <!-- Post Create Box End-->
@@ -38,22 +35,7 @@
         </div>
           <!-- Newsfeed Common Side Bar Right
           ================================================= -->
-    	<div class="col-md-2 static">
-            <div class="suggestions is_stuck" id="sticky-sidebar" style="position: fixed; top: -3px; width: 155px;">
-              <h4 class="grey"><b>Featured Users</b></h4>
-              <?php foreach($data['featuredUsers'] as $featuredUser): ?>
-                <div class="follow-user">
-                  <img src="images/users/user-15.jpg" alt="" class="profile-photo-sm pull-left">
-                  <div>
-                    <h5><a href="timeline.html"><?=$featuredUser['name']?></a></h5>
-                    <a id="<?=$featuredUser['id']?>" class="text-green"><?=isLogin() && $controllerObject->isFollowing($prediction['user_id']) ? 'Following': 'Follow' ?></a>
-                  </div>
-                </div>
-              <?php endforeach ?>
-            </div><div style="position: static; width: 155px; height: 374px; display: block; vertical-align: baseline; float: none;"></div>
-          </div>
-
-
+          <?php  include 'Pages/common/RightSideBar.php';?>
     		</div>
     	</div>
     </div>
@@ -61,5 +43,11 @@
     <?php include 'Pages/common/Script.php'?>
     <script src="/bet_community/Public/js/common-sidebar.js"></script>
     <script src="/bet_community/Public/js/follow.js"></script>
+    <script>
+      setTimeout(() => {
+        $($('#f-users-wrapper').children()[1]).css('pointer-events', 'none');
+      }, 500);
+    </script>
+    <script src="/bet_community/Public/js/script.js"></script>
   </body>
 </html>

@@ -134,5 +134,6 @@
     </div>
     <?php include 'Pages/common/Script.php'?>
     <script src="/bet_community/Public/js/login.js"></script>
+    <script src="/bet_community/Public/js/script.js"></script>
 </body>
 </html>

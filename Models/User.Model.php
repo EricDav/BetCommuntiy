@@ -81,11 +81,11 @@
             }
 
             try {
-                $sql = 'INSERT INTO users (name, email, password, sex, country, city, role, special_id, image_path) VALUES(?,?,?,?,?,?,?,?,?)';
+                $sql = 'INSERT INTO users (name, email, password, sex, country, city, role, special_id, image_path, date_created) VALUES(?,?,?,?,?,?,?,?,?,?)';
                 $stmt = $pdoConnection->pdo->prepare($sql);
                 $specialId = uniqid();
                 $imagePath = $sex == 'M' ? self::DEFAULT_IMAGE_PATH_MALE : DEFAULT_IMAGE_PATH_FEMALE;
-                $stmt->execute([$name, $email, $password, $sex, $country, $city, UserModel::DEFAULT_ROLE, $specialId, $imagePath]);
+                $stmt->execute([$name, $email, $password, $sex, $country, $city, UserModel::DEFAULT_ROLE, $specialId, $imagePath, gmdate("Y-m-d\ H:i:s")]);
                 return ['specialId' => $specialId, 'id' => $pdoConnection->pdo->lastInsertId()];
             } catch(Exception $e) {
                 ErrorMail::LogError($e);
@@ -175,7 +175,7 @@
 
         public static function getFeaturedUsers($pdoConnection) {
             try {
-                $sql = 'SELECT users.id, users.name FROM featured_users INNER JOIN users ON
+                $sql = 'SELECT users.id, users.name, users.image_path FROM featured_users INNER JOIN users ON
                  featured_users.user_id=users.id WHERE featured_users.featured_date > ' . "'" . gmdate("Y-m-d\ H:i:s", strtotime('-7 days')) .  "'";
                 // echo $sql; exit;
                 return $pdoConnection->pdo->query($sql)->fetchAll();
@@ -220,6 +220,7 @@
         public static function like($pdoConnection, $predictionId, $userId) {
             try {
                 $sql = 'INSERT INTO likes (prediction_id, user_id) VALUES(' . $predictionId . ',' . $userId . ')';
+                // echo $sql; exit;
                 $pdoConnection->pdo->query($sql);
                 return true;
             } catch(Exception $e) {
@@ -231,11 +232,21 @@
         public static function unlike($pdoConnection, $predictionId, $userId) {
             try {
                 $sql = 'DELETE FROM likes WHERE prediction_id=' . $predictionId . ' AND user_id=' . $userId;
-                $pdoConnection->pdo->query($sql);
-                return true;
+                // echo $sql; exit;
+                return $pdoConnection->pdo->query($sql);
             } catch(Exception $e) {
                 ErrorMail::LogError($e);
                 return false;
+            }
+        }
+
+        public static function getLike($pdoConnection, $predictionId, $userId) {
+            try {
+                $sql = 'SELECT * FROM likes WHERE prediction_id=' . $predictionId . ' AND user_id=' . $userId;
+                return $pdoConnection->pdo->query($sql)->fetch();
+            } catch(Exception $e) {
+                var_dump($e->getMessage());
+                return 'Server error';
             }
         }
 

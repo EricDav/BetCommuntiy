@@ -23,6 +23,16 @@ class BetCommunity {
         '/forgot-password' => "ForgotPasswordController",
         '/forgot-password/reset' => "ForgotPasswordController@resetPassword",
         '/benefits' => "BenefitsController",
+        '/api/web/notifications' => "NotificationController",
+        '/api/web/notifications/clear-seen' => "NotificationController@clearSeen",
+        '/api/web/predictions/like' => "PredictionController@like",
+        '/api/web/predictions/determine-outcome' => "PredictionController@updateWonStatus",
+        '/predictions/pending-outcomes' => "HomeController",
+        '/predictions/my/approved-outcomes' => "HomeController",
+        '/api/web/notifications/email-settings' => "NotificationController@updateSettings",
+        '/notifications/email-settings' => "NotificationController@updateEmailSettings",
+        '/api/web/predictions/update' => 'PredictionController@update',
+        '/about' => "AboutController",
         '/' => "HomeController"
     ];
 
@@ -60,11 +70,15 @@ class BetCommunity {
         'ForgotPasswordController' => 'Controllers/ForgotPassword.Controller.php',
         'ForgotPasswordModel' => 'Models/ForgotPassword.Model.php',
         'SendMail' => 'SendMail.php',
+        'BenefitsController' => 'Controllers/Benefits.Controller.php',
+        'NotificationModel' => 'Models/Notification.Model.php',
+        'FollowerModel' => 'Models/Follower.Model.php',
+        'NotificationController' => 'Controllers/Notification.Controller.php',
+        'AboutController' => 'Controllers/About.Controller.php',
         'ErrorMail' => 'ErrorMail.php',
-        'BenefitsController' => 'Controllers/Benefits.Controller.php'
     ];
 
-    const OUTCOMES = array('1', '2', 'X', '1X', '2X', '12', 'GG', 'NG', 'Over 0.5', 'Over 1.5',
+    const OUTCOMES = array('1', '2', 'X', '1X', 'X2', '12', 'GG', 'NG', 'Over 0.5', 'Over 1.5',
         'Over 2.5', 'Over 3.5', 'Over 4.5', 'Over 5.5', 'Under 0.5', 'Under 1.5', 'Under 2.5',
         'Under 3.5', 'Under 4.5', 'Under 5.5', '1-0) 1 Handicap', '(2:0) 1 Handicap',
         '1 Handicap', '(0:2) 1 Handicap', '(1:0) 2 Handicap', '(2:0) 2 Handicap', '(0:1) 2 Handicap',

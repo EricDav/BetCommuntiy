@@ -19,7 +19,7 @@ class Request {
         $this->serverName = $_SERVER['SERVER_NAME'];
         $path = explode('?', $_SERVER['REQUEST_URI'])[0];
 
-        $this->route = $path;
+        $this->route = strtolower($path);
     } 
 }
 

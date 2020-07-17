@@ -7,7 +7,7 @@ if(!!window.IntersectionObserver){
         entries.forEach((entry)=>{
             if(entry.isIntersecting){
                 $(entry.target).addClass('animate'); 
-                entry.unobserve();
+                // entry.unobserve();
             }
         });
     }, options);

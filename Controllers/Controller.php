@@ -69,11 +69,10 @@ abstract class Controller {
     }
 
     public function getPredictionStatus($prediction) {
-        if ($prediction['won']) {
-            return ((int)$prediction['won'] == 0 ? 'Lost <i style="color: red;" class="fa fa-close"></i>' : 'Won <i style="color: green;" class="fa fa-check"></i>');
-        }
-
-        return ($prediction['start_date'] > gmdate("Y-m-d\ H:i:s") ? '  Not started' : '  Running');
+        if (is_null($prediction['won']))
+            return ($prediction['start_date'] > gmdate("Y-m-d\ H:i:s") ? '  Not started' : '  Running');
+        
+        return ((int)$prediction['won'] == 0 ? 'Lost <i style="color: red; font-size: 20;" class="fa fa-close"></i>' : 'Won <i style="color: green; font-size: 20;" class="fa fa-check"></i>');
     }
 
     public function setResponseType($responseType) {
@@ -182,7 +181,9 @@ abstract class Controller {
                     'isFollowing_author' => $this->isFollowing($prediction['user_id']),
                     'first_name' => $firstName,
                     'prediction' => $prediction['prediction'],
-                    'prediction_type' => $prediction['type']
+                    'prediction_type' => $prediction['type'],
+                    'num_likes' => $prediction['total_likes'],
+                    'won' => $prediction['won']
                 ));
             endforeach;
 
@@ -215,6 +216,34 @@ abstract class Controller {
         $this->data['template'] = '404.php';
         $this->data['title'] = '404 | Not found';
         $this->responseType = 'html';
+    }
+
+    public function authenticateAdmin($returnJson=true) {
+        $this->authenticate();
+
+        if ($this->request->session['userInfo']['role'] == 1) {
+            if ($returnJson) {
+                $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_UNAUTHORIZED_CODE, 'message' => 'You are not authorize to perform this action'));
+            }
+
+            return false;
+        }
+
+        if (!$returnJson)
+            return true;
+    }
+
+    /**
+    * It checks weather a data is a valid json
+    * 
+    * @param $data the json to validate
+    */
+    function jsonValidator($data) {
+        if (!empty($data)) {
+            @json_decode($data);
+            return (json_last_error() === JSON_ERROR_NONE);
+        }
+        return false;
     }
 
     abstract function validate();
