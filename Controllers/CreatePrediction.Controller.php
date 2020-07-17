@@ -134,20 +134,6 @@
             $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_SERVER_ERROR_CODE, 'message' => 'Server error'));
         }
 
-
-        /**
-         * It checks weather a data is a valid json
-         * 
-         * @param $data the json to validate
-         */
-        function jsonValidator($data) {
-            if (!empty($data)) {
-                @json_decode($data);
-                return (json_last_error() === JSON_ERROR_NONE);
-            }
-            return false;
-        }
-
         /**
          * It valdates prediction json. Checks if the clients 
          * sends a json that correlate to the booking number. 

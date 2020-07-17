@@ -233,6 +233,19 @@ abstract class Controller {
             return true;
     }
 
+    /**
+    * It checks weather a data is a valid json
+    * 
+    * @param $data the json to validate
+    */
+    function jsonValidator($data) {
+        if (!empty($data)) {
+            @json_decode($data);
+            return (json_last_error() === JSON_ERROR_NONE);
+        }
+        return false;
+    }
+
     abstract function validate();
 
     abstract function perform();

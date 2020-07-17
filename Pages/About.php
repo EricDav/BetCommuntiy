@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>Contact | Bet Community</title>
+        <title>About | Bet Community</title>
         <?php
             /**
              * include head styles

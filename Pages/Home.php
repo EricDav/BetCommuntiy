@@ -33,6 +33,7 @@
 <?php if( isAdmin()): ?>
   <?php  include 'Pages/modals/PredictionOutcomeModal.php';?>
   <?php  include 'Pages/modals/ConcludedOutcomeModal.php';?>
+  <?php  include 'Pages/modals/UpdatePredictionModal.php';?>
 <?php endif ?>
 
   <?php if (!isLogin()): ?>
@@ -77,6 +78,9 @@
               <i class="fa fa-ellipsis-h dropdown-toggle" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
               <div id="menu-action" class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                 <?php if(isLogin() && (int)$_SESSION['userInfo']['role'] > 1): ?>
+                  <a id="<?= 'update-prediction-menu-' . $prediction['id'] . '-' . (string)$index?>" class="dropdown-item"> <i class="fa fa-user"></i>Update Prediction</a>
+                  <div class="line-divider"></div>
+
                   <a id="<?= 'action-menu-' . $prediction['id'] . '-' . (string)$index?>" class="dropdown-item"> <i class="fa fa-user"></i>Prediction  Actions</a>
                   <div class="line-divider"></div>
                 <?php endif ?>

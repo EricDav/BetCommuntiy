@@ -81,11 +81,11 @@
             }
 
             try {
-                $sql = 'INSERT INTO users (name, email, password, sex, country, city, role, special_id, image_path) VALUES(?,?,?,?,?,?,?,?,?)';
+                $sql = 'INSERT INTO users (name, email, password, sex, country, city, role, special_id, image_path, date_created) VALUES(?,?,?,?,?,?,?,?,?,?)';
                 $stmt = $pdoConnection->pdo->prepare($sql);
                 $specialId = uniqid();
                 $imagePath = $sex == 'M' ? self::DEFAULT_IMAGE_PATH_MALE : DEFAULT_IMAGE_PATH_FEMALE;
-                $stmt->execute([$name, $email, $password, $sex, $country, $city, UserModel::DEFAULT_ROLE, $specialId, $imagePath]);
+                $stmt->execute([$name, $email, $password, $sex, $country, $city, UserModel::DEFAULT_ROLE, $specialId, $imagePath, gmdate("Y-m-d\ H:i:s")]);
                 return ['specialId' => $specialId, 'id' => $pdoConnection->pdo->lastInsertId()];
             } catch(Exception $e) {
                 ErrorMail::LogError($e);

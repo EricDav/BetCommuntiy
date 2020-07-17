@@ -18,6 +18,7 @@ const FOLLOW_ELEMENT = 0 // It show that an action is coming from the `follow` s
 const FOLLOW_ELEMENT_ID_PREFIX = 'follow-';
 const DOT_MENU_ELEMENT_ID_PREFIX = 'dot-menu-';
 const ACTION_MENU_ELEMENT_ID_PREFIX = 'action-menu-';
+const ACTION_MENU_UPDATE_PREDICTION = 'update-prediction-menu-';
 const USER_ICON = '<i class="fa fa-user"></i>';
 const LIKE_ICON = '<i class="icon ion-thumbsup"></i>';
 const USER_CANCEL_ICON = '<i class="fa fa-user-times"></i>';
@@ -36,6 +37,7 @@ const DEFAULT_DATE_TIME = '1900-01-01 00:00:00';
 let REPORT_PREDICTION_ID = null;
 let lastcreatedPreditionId = null;
 let selectedOutcomePrediction = null
+let predictionIdToUpdate = null;
 var isMobile = false;
 
 var currentTab = BOOKING_NUMBER_TAB // Set the default tab to the booking number tab
@@ -44,6 +46,7 @@ var tabs = [BOOKING_NUMBER_TAB, TEXT_TAB, FIXTURES_TAB];
 var tabIds = ['#tab-one-id', '#tab-two-id', 'tab-three-id'];
 
 $bookingCodetab = $('#booking-code-tab');
+$tablePredictionUpdateSection =  $('#table-prediction-update');
 $('#open-prediction-modal').click(function () {
     if ($$id == -1) {
         $('#login-modal-txt').html('You need to <a href="/login" style="cursor: pointer;">login or signup</a> to create a prediction');
@@ -158,6 +161,7 @@ dates.forEach(function (item, index) {
 
 var formatedPredictions = [];
 var scores;
+
 /**
  * It displays prediction data
  */
@@ -165,18 +169,19 @@ __predictionInfo.forEach(function (item, index) {
     var prediction = JSON.parse(item.prediction);
     item.prediction = prediction;
     scores = prediction.hasOwnProperty('scores') ? prediction.scores : [];
+    outcomeResults = prediction.hasOwnProperty('outcome_results') ? prediction.outcome_results : [];
     formatedPredictions.push(formatPredictionDataForMobile(prediction));
     $('#prediction-info-' + item.prediction_id).append(generatePredictionInfoHtml(prediction, item.prediction_type));
 
     if (isMobile) {
-        $('#prediction-' + item.prediction_id).append(generatePredictionHtmlForMobileView(formatPredictionDataForMobile(prediction), scores));
+        $('#prediction-' + item.prediction_id).append(generatePredictionHtmlForMobileView(formatPredictionDataForMobile(prediction), scores, outcomeResults));
     } else {
         $('#prediction-' + item.prediction_id).append(generatePredictionTable(prediction));
     }
 });
 
-function generatePredictionHtmlForMobileView(prediction, scores) {
-    console.log(scores);
+function generatePredictionHtmlForMobileView(prediction, scores, outcomeResults) {
+    console.log(prediction, '========>>>>>>>');
     $html = '<div class="mobile-prediction-wrapper">';
 
     var homeScore;
@@ -191,6 +196,7 @@ function generatePredictionHtmlForMobileView(prediction, scores) {
             var dateStr = date + ' UTC';
             var date = new Date(dateStr.replace(/-/g, '/'));
             result = getScore(datesFixturesObj.fixtures[index], scores);
+            outcomeResult = getOutcomeResult(datesFixturesObj.fixtures[index], outcomeResults);
 
             if (result) {
                 resultArr = result.split(' - ');
@@ -204,7 +210,7 @@ function generatePredictionHtmlForMobileView(prediction, scores) {
 
             $html += '<div style="font-weight: unset; max-width: 30%;">' + formatDateForPrediction(date) + '</div>';
             $html += '<div class="mobile-fixture">' + fixtureArr[0] + homeScore.toString() + ' - ' + awayScore.toString() + fixtureArr[1] + '</div>';
-            $html += '<div style="font-weight: 700;">' + datesFixturesObj.outcomes[index] + '</div>';
+            $html += '<div style="font-weight: 700;">' + datesFixturesObj.outcomes[index] + outcomeResult +'</div>';
             $html += '</div>';
         });
     }
@@ -242,7 +248,7 @@ function generatePredictionInfoHtml(prediction, predictionType) {
 
 function generatePredictionTable(data) {
     $table = '<table style="width:100%; margin-top: 10px; border:unset;">' +
-        '<tr style="border:unset;"><th style="border:unset;">Date/Time</th><th style="border:unset;">League</th><th style="border:unset;">Fixture</th><th style="border:unset;">Oucome</th>' +
+        '<tr style="border:unset;"><th style="border:unset;">Date/Time</th><th style="border:unset;">League</th><th style="border:unset;">Fixture</th><th style="border:unset;">Tip</th>' +
         (data.hasOwnProperty('scores') && data.scores.length > 0 ? '<th style="border:unset;">Result</th>' : '') + '</tr>';
 
     data.leagues.forEach(function (item, index) {
@@ -250,9 +256,10 @@ function generatePredictionTable(data) {
             var dateStr = data.dates[index] + ' UTC';
             var date = new Date(dateStr.replace(/-/g, '/'));
         }
+        let outcomeResults = data.hasOwnProperty('outcome_results') ? data.outcome_results : [];
 
         $table += '<tr style="border:unset;">' + '<td style="border:unset;">' + (data.dates ? formatDateCreated(date) : 'NS') + '</td>' + '<td style="border:unset;">' + item + '</td>' + '<td style="border:unset;">' + data.fixtures[index] + '</td>' +
-            '<td style="border:unset;">' + data.outcomes[index] + '</td>' + (data.hasOwnProperty('scores') && data.scores.length > 0 ? '<td style="border:unset;">' + getScore(data.fixtures[index], data.scores) + '</td>' : '');
+            '<td style="border:unset;">' + data.outcomes[index] + '</td>' + (data.hasOwnProperty('scores') && data.scores.length > 0 ? '<td style="border:unset; padding-right: 0px;">' + getScore(data.fixtures[index], data.scores) + getOutcomeResult(data.fixtures[index], outcomeResults) + '</td>' : '');
     });
 
     $table += '</table>';
@@ -272,6 +279,20 @@ function formatPredictionDataForMobile(prediction) {
     });
 
     return formatedResult;
+}
+
+function getOutcomeResult(fixture, outcomeResults) {
+    for (let i = 0; i < outcomeResults.length; i++) {
+        if (outcomeResults[i].hasOwnProperty(fixture)) {
+            if (outcomeResults[i][fixture] == 1) {
+                return '<i class="fa fa-apple" aria-hidden="true" style="margin-left: 3px;color: green;font-size: 15px;"></i>'
+            } else {
+                return '<i class="fa fa-apple" aria-hidden="true" style="margin-left: 3px;color: red;font-size: 15px;"></i>'
+            }
+        }
+    }
+
+    return '';
 }
 
 function getScore(fixture, scores) {
@@ -624,6 +645,7 @@ function savePrediction(data) {
     data.token = localStorage.getItem('$$token');
     data.id = $$id;
 
+
     predictionButton.text('Submitting...');
     predictionButton.prop('disabled', true);
     $.ajax('/api/web/create-prediction', {
@@ -904,9 +926,9 @@ __predictionInfo.forEach(function (item, index) {
             likePrediction(this, item, item.prediction_id);
     });
 
-    //  Add onclick to the like button
 
 
+    // add onclick for prediction out come
     $('#' + ACTION_MENU_ELEMENT_ID_PREFIX + item.prediction_id.toString() + '-' + index.toString())
         .click(function () {
             selectedOutcomePrediction = item;
@@ -916,6 +938,18 @@ __predictionInfo.forEach(function (item, index) {
                 $('#concludedOutcomeModal').modal('show');
             }
     });
+
+
+    // add onclick for prediction update
+    $('#' + ACTION_MENU_UPDATE_PREDICTION + item.prediction_id.toString() + '-' + index.toString())
+        .click(function () {
+            predictionIdToUpdate = item.prediction_id;
+            $('#updatePredictionModal').modal('show');
+            updatedScores = [];
+            updatedOutcomeResults = [];
+            $tablePredictionUpdateSection.append(generateTableForUpdate(item.prediction, item.prediction_id));
+    });
+
 
     if (!item.isFollowing_athour) {
         $('#' + FOLLOW_ELEMENT_ID_PREFIX + item.user_id.toString() + '-' + index.toString())
@@ -1233,7 +1267,6 @@ function fetchSportyBetGames(code) {
             shouldSubmitPrediction = true;
 
             endStart = getStartEndDateTime(data.dates);
-            console.log()
             predictionRes = {
                 prediction: JSON.stringify(data),
                 start_date_time: endStart.startDateTime,
@@ -1268,7 +1301,7 @@ function generateTable(data) {
     // bet 1 ZSSLMKR
     // bet 2 
     $table = '<div id="booking-code-table-section"><table style="width:100%; margin-top: 10px;">' +
-        '<tr><th>League</th><th>Fixture</th><th>Oucome</th><th>Odd</th></tr>';
+        '<tr><th>League</th><th>Fixture</th><th>Tip</th><th>Odd</th></tr>';
 
     data.leagues.forEach(function (item, index) {
         $table += '<tr>' + '<td>' + item + '</td>' + '<td>' + data.fixtures[index] + '</td>' +
@@ -1719,3 +1752,185 @@ function removePrediction(e) {
  * End All functions declaration
  * =================================================
  */
+
+
+
+
+ /**
+ * =================================================
+ * 
+ * This section contains all the javascript for 
+ * updating prediction with fixtures.
+ * 
+ * ==================================================
+ */
+
+ var updatedScores = [];
+ var updatedOutcomeResults = [];
+
+ function getPredictionToEdit(predictionId) {
+    __predictionInfo.forEach(function(item, index) {
+        if (predictionId == item.prediction_id) {
+            return item.prediction;
+        }
+    });
+ }
+
+ function generateTableForUpdate(prediction, predictionId) {
+    $tablePredictionUpdateSection.empty();
+    $table = '<table style="width:100%; margin-top: 10px;">' +
+        '<tr><th>Date/Time</th><th>Fixture</th><th>Scores</th><th>Oucome</th><th>Out.Result</th></tr>';
+    
+    let scores = prediction.hasOwnProperty('scores') ? prediction.scores : [];
+    let score;
+    let outcomeResult;
+    let outcomeResults = prediction.hasOwnProperty('outcome_results') ? prediction.outcome_results : [];
+    prediction.fixtures.forEach(function (item, index) {
+        var dateStr = prediction.dates[index] + ' UTC';
+        var date = new Date(dateStr.replace(/-/g, '/'));
+
+        score = getScore(item, scores);
+        outcomeResult = getOutcomeResult(item, outcomeResults);
+        outcomeResult = outcomeResult ? outcomeResult : '<select onchange="selectOutcomeResult(this.value,' + "'" + item + "'" + ',' + predictionId + ')" style="width: 100%; height: 100%;"><option value="-1">Select</option><option value="1">Won</option><option value="0">Lost</option></select>';
+
+        $table += '<tr>' + '<td>' + formatDateCreated(date) + '</td>' + '<td>' + item + '</td>' + '<td>' + (score ? score : '<input onchange="onChangeScoresResult(this.value,' + "'" + item + "'" + ')" type="text" style="width: 100%; height: 100%;">') + '</td>' +
+            '<td>' + prediction.outcomes[index] + '</td>' + '<td>' + outcomeResult + '</td>';
+    });
+
+    $table += '</table>';
+    return $table;
+}
+
+function getFixtureIndexForOutcomes(fixture) {
+    for (let index = 0; index < updatedOutcomeResults.length; index++) {
+        if (updatedOutcomeResults[index].hasOwnProperty(fixture)) {
+            return index;
+        }
+    }
+
+    return -1;
+}
+
+function getFixtureIndexForScores(fixture) {
+    for (let index = 0; index < updatedScores.length; index++) {
+        if (updatedScores[index].hasOwnProperty(fixture)) {
+            return index;
+        }
+    }
+
+    return -1;
+}
+
+function selectOutcomeResult(value, fixture, predictionId) {
+    if (value != 1 && value != 0) {
+        for (let i = 0; i < updatedOutcomeResults.length; i++) {
+            if (Object.keys(updatedOutcomeResults[i])[0] == fixture) {
+                updatedOutcomeResults.splice(i, 1);
+                console.log(updatedOutcomeResults);
+                return;
+            }
+        }
+    }
+
+    const index = getFixtureIndexForOutcomes(fixture);
+    if (index != -1) {
+        updatedOutcomeResults[index][fixture] = value
+    } else {
+        obj = {};
+        obj[fixture] = value;
+        updatedOutcomeResults.push(obj);
+    }
+    console.log(updatedOutcomeResults);
+}
+
+function onChangeScoresResult(value, fixture) {
+    if (!value.trim()) {
+        for (let i = 0; i < updatedScores.length; i++) {
+            if (Object.keys(updatedScores[i])[0] == fixture) {
+                updatedScores.splice(i, 1);
+                console.log(updatedScores);
+                return;
+            }
+        }
+    }
+
+    // check if isValid 
+    let valueArr = value.split('-');
+    console.log(valueArr, '====>>>>');
+
+    if (valueArr.length != 2) {
+        return;
+    }
+
+    if (!valueArr[0] || !valueArr[1]) {
+        return;
+    }
+
+    if (isNaN(valueArr[0].trim()) || isNaN(valueArr[1].trim())) {
+        return;
+    }
+
+    value = valueArr[0] + ' - ' + valueArr[1];
+
+    const index = getFixtureIndexForScores(fixture);
+
+    if (index  != -1) {
+        updatedScores[index][fixture] = value
+    } else {
+        obj = {};
+        obj[fixture] = value;
+        updatedScores.push(obj);
+    }
+
+    console.log(updatedScores);
+}
+
+$('#update-prediction').click(function() {
+    if (updatedOutcomeResults.length == 0 && updatedScores.length == 0) {
+        return;
+    }
+
+    var data = {
+        prediction_id: predictionIdToUpdate,
+        scores: JSON.stringify(updatedScores),
+        outcome_results: JSON.stringify(updatedOutcomeResults),
+        id: $$id,
+        token: token
+    };
+    // $('#update-prediction').prop('disabled', true);
+    $.ajax('/api/web/predictions/update', {
+        data: data,
+        type: 'POST', 
+        success: function (result) {
+           // $('#update-prediction').prop('disabled', false);
+            console.log(result);
+            if (result.success) {
+                $('#main-error-update').text('');
+                $('#outcome-response-message-update').text(result.message);
+                $('#outcome-success-update').show();
+                setTimeout(function() {
+                    $('outcome-success-update').hide();
+                    $('#updatePredictionModal').modal('hide');
+                }, 3000);
+            } else {
+                $('#main-error-update').text(result.messages);
+            }
+        },
+        failure: function() {
+            $('#update-prediction').prop('disabled', false);
+            console.log('Yes.........');
+        }
+    });
+});
+
+
+ /**
+ * 
+ * 
+ * This ends the section that contains all the javascript for 
+ * updating prediction with fixtures.
+ * 
+ * ==================================================
+ */
+
+

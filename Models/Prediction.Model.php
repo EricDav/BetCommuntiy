@@ -75,7 +75,7 @@
 
         public static function getPredictionById($pdoConnection, $id) {
             try {
-                $sql = "SELECT user_id, start_date, won FROM predictions WHERE id=" . $id;
+                $sql = "SELECT user_id, start_date, won, prediction FROM predictions WHERE id=" . $id;
                 return $pdoConnection->pdo->query($sql)->fetch();
             } catch(Exception $e) {
                 ErrorMail::LogError($e);
@@ -151,6 +151,16 @@
         public static function updatePredictionStatus($pdoConnection, $predictionId, $predictionStatus, $updatedBy) {
             try {
                 $sql = 'UPDATE predictions SET won=' . $predictionStatus . ', updated_by=' . $updatedBy . ', date_updated=' . '"' . gmdate("Y-m-d\ H:i:s") . '"' . ' WHERE predictions.id=' . $predictionId;
+                return $pdoConnection->pdo->query($sql);
+            } catch(Exception $e) {
+                ErrorMail::LogError($e);
+                return false;
+            }
+        }
+
+        public static function updatePrediction($pdoConnection, $predictionId, $prediction) {
+            try {
+                $sql = 'UPDATE predictions SET prediction=' . "'" . $prediction . "'" . ' WHERE predictions.id=' . $predictionId;
                 return $pdoConnection->pdo->query($sql);
             } catch(Exception $e) {
                 ErrorMail::LogError($e);
