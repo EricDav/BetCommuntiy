@@ -457,4 +457,60 @@ table {
     overflow: hidden;
 }
 
+/*check box style*/
+.check-container{
+    display: inline;
+    position: relative;
+    padding-left: 25px;
+    cursor: pointer;
+    font-size: 15px;
+    -webkit-user-select: none;
+}
+
+.checkbox{
+    position: absolute;
+    top: 0;
+    left: 0px;
+    cursor: pointer;
+    width: 0px;
+    height: 0px;
+}
+
+.check-indicator{
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 18px;
+    width: 18px;
+    border-radius: 5px;
+    background-color: #eee;
+    padding-left: 2px;
+    padding-top: 1px;
+}
+
+.check-container:hover input ~ .check-indicator{
+    background: #ccc;
+}
+
+.check-container input:checked ~ .check-indicator{
+    background: #2196F3;
+}
+
+.check-container input:checked ~ .check-indicator .fa-check{
+    color: white !important;
+    opacity: 1;
+}
+
+.check-container input:checked ~ .check-container .update-option-text{
+    color: black;
+}
+
+.check-indicator .fa-check{
+    opacity: 0;
+}
+
+
+
+
+
 

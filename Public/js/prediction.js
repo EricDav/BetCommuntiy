@@ -1,3 +1,4 @@
+
 var startDate = $('#start-date');
 var startTime = $('#start-time');
 var endDate = $('#end-date');
@@ -9,6 +10,8 @@ var monthsArr = ['Jan', 'Feb', 'March', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'
 var inputsArr = [startDate, startTime, endDate, endTime, prediction, totalOdds];
 var shouldSubmitPrediction = false; // A variable that determines if the prediction button should submit prediction to server
 var predictionRes = {};
+var getEachGameUpdate = $('#each-game-update');
+var getAllGameUpdate = $('#all-game-update');
 
 /**
  * Start of declarations of constants uses
@@ -39,7 +42,7 @@ var currentTab = BOOKING_NUMBER_TAB // Set the default tab to the booking number
 var tabs = [BOOKING_NUMBER_TAB, TEXT_TAB, FIXTURES_TAB];
 var tabIds = ['#tab-one-id', '#tab-two-id', 'tab-three-id'];
 
-$bookingCodetab = $('#booking-code-tab');
+var $bookingCodetab = $('#booking-code-tab');
 $('#open-prediction-modal').click(function() {
     if ($$id == -1) {
         $('#login-modal-txt').html('You need to <a href="/login" style="cursor: pointer;">login or signup</a> to create a prediction');
@@ -301,6 +304,8 @@ function resetCreatePredictionModal() {
         $('#outcome').val('');
         $('#table-section').empty();
         $('#main-error').val('');
+        getEachGameUpdate.attr("checked", false);
+        getAllGameUpdate.attr("checked", false);
     }
 }
 
@@ -604,10 +609,14 @@ function getDateTimeStrInUTC(date) {
 }
 
 
+
 function savePrediction(data) {
     data.current_date = getCurrentDateInStr();
     data.token = localStorage.getItem('$$token');
     data.id = $$id;
+    data.get_each_game_update = (getEachGameUpdate.val() == 'on')? 1:0;
+    data.get_all_game_update = (getAllGameUpdate.val() == 'on')? 1:0;
+    
 
     predictionButton.text('Submitting...');
     predictionButton.prop('disabled', true);

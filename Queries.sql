@@ -108,3 +108,10 @@ CREATE TABLE bugs(
     prediction_id int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+
+
+ALTER TABLE `predictions`  
+    ADD `get_each_game_update` BOOLEAN NOT NULL DEFAULT FALSE
+    AFTER `type`,  
+    ADD `get_all_game_update` BOOLEAN NOT NULL DEFAULT FALSE  
+    AFTER `get_each_game_update`;
