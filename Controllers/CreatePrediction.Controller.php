@@ -8,10 +8,30 @@
             $this->totalOdds =  '0';
             $this->type = isset($request->postData['type']) ? $request->postData['type'] : '';
             $this->currentDate = isset($request->postData['current_date']) ? $request->postData['current_date'] : null;
+            $this->getEachGameUpdate = isset($request->postData['get_each_game_update'])? $request->postData['get_each_game_update']:0;
+            $this->getAllGameUpdate = isset($request->postData['get_all_game_update'])? $request->postData['get_all_game_update']:0;
         }
 
         public function validate() {
             $this->authenticate();
+
+            /**
+             * Validate get game update request
+             */
+            $getUpdateValues = [
+                'get_each_game_update' => $this->getEachGameUpdate,
+                'get_all_game_update' => $this->getAllGameUpdate
+            ];
+            
+            foreach($getUpdateValues as $index => $getUpdateValue){
+                $result = $this->isGetGameUpdateValid($getUpdateValue);
+                if(!$result['is_numeric'])
+                    $this->error[$index] = 'Invalid get game update request';
+
+                else if(!$result['is_with_in_range'])
+                    $this->error[$index] = 'Invalid get game update request';
+            }
+            
 
             if (!$this->startDateTime) {
                 $this->error['start_date_time'] = 'Start date time is required';
@@ -97,6 +117,28 @@
 
         }
 
+
+        public function isGetGameUpdateValid($value){
+            $__isNumeric = false;
+            $__isWithinRange = false;
+
+            if(is_numeric($value))
+                $__isNumeric = true;
+            
+            if(strlen($value) == 1){
+                if(preg_match("/[0, 1]{1}/", $value))
+                    $__isWithinRange = true;
+            }
+
+            $result = [
+                'is_numeric' => $__isNumeric,
+                'is_with_in_range' => $__isWithinRange
+            ];
+
+            return $result;
+        }
+
+
         public function getStatus($prediction) {
             if (!$prediction['won']) {
                 $now = gmdate("Y-m-d\ H:i:s");
@@ -120,7 +162,7 @@
             $approved = $this->type == BetGamesController::PLATFORM_BET9JA ? 0 : 1;
             $userId = $this->request->session['userInfo']['id'];
             $result = PredictionModel::createPrediction($this->pdoConnection, $this->startDateTime, $this->endDateTime, $userId, $this->totalOdds, 
-                $this->prediction, $approved, $this->type);
+                $this->prediction, $approved, $this->type, $this->getEachGameUpdate, $this->getAllGameUpdate);
 
             if ($result) {
                 $notifications = NotificationModel::creatNotifictionsForPrediction($this->pdoConnection, $this->request->session['userInfo']['id'], $result);

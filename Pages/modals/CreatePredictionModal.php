@@ -76,6 +76,27 @@
      </div>
     </div>
       <div class="modal-footer">
+        <div style = 'text-align:left'>
+          <strong>Receive Game Update:</strong>
+          <div>
+            <label for = 'each-game-update' class = 'check-container'>
+              <input id = 'each-game-update' type = 'checkbox' class = 'checkbox'/>
+              <span class = 'check-indicator'>
+                <span class = 'fa fa-check'></span>
+              </span>
+            </label>
+            <span class = '#'> Update me at the end of each game.</span>
+          </div>
+          <div>
+            <label for = 'all-game-update' class = 'check-container'>
+              <input id = 'all-game-update' type = 'checkbox' class = 'checkbox'/>
+              <span class = 'check-indicator'>
+                <span class = 'fa fa-check'></span>
+              </span>
+            </label>
+            <span class = '#'>Update me at the end of all games.</span>
+          </div>
+        </div>
         <button id="prediction-submit" type="button" class="btn btn-primary">Submit</button>
       </div>
     </div>

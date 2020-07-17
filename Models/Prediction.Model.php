@@ -7,12 +7,12 @@
         const UN_APPROVED = 0;
         const DEFAULT_SCROES_FINISHED = 0;
         
-        public static function createPrediction($pdoConnection, $startDate, $endDate, $userId, $odds, $prediction, $approved, $type) {
+        public static function createPrediction($pdoConnection, $startDate, $endDate, $userId, $odds, $prediction, $approved, $type, $getEachUpdate, $getAllUpdate) {
             // var_dump($approved); exit;
             try {
-                $sql = 'INSERT INTO predictions (start_date, end_date, prediction, total_odds, user_id, approved, created_at, type, scores_finished) VALUES(?,?,?,?,?,?,?,?,?)';
+                $sql = 'INSERT INTO predictions (start_date, end_date, prediction, total_odds, user_id, approved, created_at, type, scores_finished, get_each_game_update, get_all_game_update) VALUES(?,?,?,?,?,?,?,?,?,?,?)';
                 $stmt= $pdoConnection->pdo->prepare($sql);
-                $stmt->execute([$startDate, $endDate, $prediction, $odds, $userId, $approved, gmdate("Y-m-d\ H:i:s"), $type, self::DEFAULT_SCROES_FINISHED]);
+                $stmt->execute([$startDate, $endDate, $prediction, $odds, $userId, $approved, gmdate("Y-m-d\ H:i:s"), $type, self::DEFAULT_SCROES_FINISHED, $getEachUpdate, $getAllUpdate]);
                 return $pdoConnection->pdo->lastInsertId();
             } catch(Exception $e) {
                 ErrorMail::LogError($e);
