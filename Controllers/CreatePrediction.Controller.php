@@ -9,6 +9,7 @@
             $this->type = isset($request->postData['type']) ? $request->postData['type'] : '';
             $this->currentDate = isset($request->postData['current_date']) ? $request->postData['current_date'] : null;
             $this->getEachGameUpdate = isset($request->postData['get_each_game_update'])? $request->postData['get_each_game_update']:0;
+            $this->getAllGameUpdate = isset($request->postData['get_all_game_update'])? $request->postData['get_all_game_update']:0;
         }
 
         public function validate() {
