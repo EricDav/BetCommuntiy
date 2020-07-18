@@ -10,11 +10,12 @@
         public static function createPrediction($pdoConnection, $startDate, $endDate, $userId, $odds, $prediction, $approved, $type, $getEachUpdate, $getAllUpdate) {
             // var_dump($approved); exit;
             try {
-                $sql = 'INSERT INTO predictions (start_date, end_date, prediction, total_odds, user_id, approved, created_at, type, scores_finished, get_each_game_update, get_all_game_update) VALUES(?,?,?,?,?,?,?,?,?,?,?)';
+                $sql = 'INSERT INTO predictions (start_date, end_date, prediction, total_odds, user_id, approved, created_at, type, scores_finished, is_each_game_update, is_all_game_update) VALUES(?,?,?,?,?,?,?,?,?,?,?)';
                 $stmt= $pdoConnection->pdo->prepare($sql);
-                $stmt->execute([$startDate, $endDate, $prediction, $odds, $userId, $approved, gmdate("Y-m-d\ H:i:s"), $type, self::DEFAULT_SCROES_FINISHED, $getEachUpdate, $getAllUpdate]);
+                $stmt->execute([$startDate, $endDate, $prediction, $odds, $userId, $approved, gmdate("Y-m-d\ H:i:s"), $type, self::DEFAULT_SCROES_FINISHED, 0, 0]); // Replace the 0, 0 with the actual value
                 return $pdoConnection->pdo->lastInsertId();
             } catch(Exception $e) {
+                var_dump($e);
                 ErrorMail::LogError($e);
                 return false;
             }

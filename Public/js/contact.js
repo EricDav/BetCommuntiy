@@ -103,7 +103,6 @@ $(document).ready(function(){
                     'data' : fields
                 },
                 success: function(result){
-                    // console.log(result);
                     button.prop('disabled', false);
                     if(result !== ""){
                         if(result['success'] === false){

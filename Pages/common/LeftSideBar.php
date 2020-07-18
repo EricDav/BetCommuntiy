@@ -1,6 +1,6 @@
 <ul id="chat-block" class="nav-news-feed" style="position: fixed; top: 70px; width: 242.5px;">
     <li><i class="fa fa-futbol-o"></i><div><a href="/"><?=$controllerObject->formatFilterText('All Predictions')?></a></div></li>
-    <li><i class="fa fa-user"></i><div><a href="newsfeed-people-nearby.html">Admin Predictions</a></div></li>
+    <!-- <li><i class="fa fa-user"></i><div><a href="newsfeed-people-nearby.html">Admin Predictions</a></div></li> -->
     <li><i class="icon ion-ios-people-outline"></i><div><a id="forecasters" href="/forcasters">Forecasters</a></div></li>
     <li><i style="color: green;" class="fa fa-check"></i><div style="color: black"><a id="correct-prediction"><?=$controllerObject->formatFilterText('Correct Predictions')?></a></div></li>
     <li><i class="fa fa-calendar-o"></i><div><a id="today-prediction"><?=$controllerObject->formatFilterText('Today Predictions')?></a></div></li>

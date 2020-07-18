@@ -3,10 +3,11 @@ session_start();
 include 'BetCommunity.Class.php';
 $envObj = json_decode(file_get_contents(__DIR__ .'/.envJson'));
 
-  /**
-   * Given a competition object it returns 
-   * the name e.g England Premier league
-   */
+
+/**
+* Given a competition object it returns 
+* the name e.g England Premier league
+*/
   function getCompetitionName($competition) {
     if (sizeof($competition->countries) > 0) {
       return $competition->countries[0]->fifa_code ? $competition->countries[0]->fifa_code . ' - ' . $competition->name :  $competition->countries[0]->name . ' - ' . $competition->name;
@@ -35,6 +36,7 @@ function isAdmin() {
 
 
 
+
 spl_autoload_register(function ($name) {
     $classPaths =  BetCommunity::loads;
     if (file_exists($classPaths[$name])) {
@@ -43,6 +45,42 @@ spl_autoload_register(function ($name) {
         die($name . " class not found");
     }
 });
+
+
+/**
+ * Re-logs a user 
+ */
+if (!isset($_SESSION['userInfo'])) {
+    // check for token
+    if (isset($_COOKIE['__uii']) &&  isset($_COOKIE['__uiispecial'])) {
+        $userId = is_numeric($_COOKIE['__uii']) ? (int)$_COOKIE['__uii'] - BetCommunity::DEFAULT_ADD_PROFILE : null;
+
+        if ($userId) {
+            $pdoConnection = new PDOConnection();
+            $pdoConnection->open();
+            $user = UserModel::getUserById($pdoConnection, $userId);
+
+            if ($user) {
+                $user = $user[0];
+
+                if ($user && $_COOKIE['__uiispecial'] == $user['special_id']) {
+                    $userInfo = array(
+                        'id' => $user['id'],
+                        'name' => $user['name'],
+                        'email' => $user['email'],
+                        'specialId' => $user['special_id'],
+                        'role' => $user['role'],
+                        'imagePath' => $user['image_path'],
+                        'phoneNumber' => $user['phone_number']
+                    );
+
+                    $_SESSION['userInfo'] = $userInfo;
+                }
+            }
+        }
+    }
+}
+
 
 $enviroment = Enviroment::getEnv();
 $request = new Request(); // Create a request object

@@ -7,7 +7,6 @@ $(document).ready(function(){
         $.ajax('/api/web/predictions/determine-outcome', {
             data: data,
             type: 'POST', success: function (result) {
-                console.log(result);
                 $('#outcome-response-message').text(result.message);
                 if (result.success) {
                     $('#outcome-success').show();

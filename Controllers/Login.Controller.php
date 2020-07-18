@@ -100,7 +100,7 @@ class LoginController extends Controller {
                 if (!$user || !password_verify($this->request->postData['password'], $user['password']))
                     $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_UNAUTHORIZED_CODE,  'message' => 'Invalid username or password'));
                 
-                $this->setUserSession($user['name'], $user['email'], $user['special_id'], $user['id'], $user['role'], $user['image_path'], $user['phoneNumber']);
+                $this->setUserSession($user['name'], $user['email'], $user['special_id'], $user['id'], $user['role'], $user['image_path'], $user['phone_number']);
                 $this->jsonResponse(array('success' => true, 'code' => Controller::HTTP_OKAY_CODE, 'message' => 'User successfuly logs in'));
             }
 

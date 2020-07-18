@@ -36,7 +36,7 @@ const FINAL_EVENT_TARGET = 'h$w$PC$cCoupon$lnkOkPrenotatore';
 const PLATFORM_BET9JA = 'Bet9ja';
 const PLATFORM_BETKING = 'BetKing';
 const PLATFORM_SPORTY_BET = 'SportyBet';
-const DEFAULT_DATE_TIME = '1900-01-01 00:00:00';
+const DEFAULT_DATE_TIME = '2021-01-01 00:00:00';
 let REPORT_PREDICTION_ID = null;
 let lastcreatedPreditionId = null;
 let selectedOutcomePrediction = null
@@ -138,7 +138,6 @@ $('#tab-three-id').click(function () {
  * just created prediction
  */
 $('#copy-link-after-prediction-create').click(function () {
-    console.log(lastcreatedPreditionId, '====>>>>');
     copyToClipboard(lastcreatedPreditionId);
     $('.copied-txt').text('Link copied to clipboard!');
 });
@@ -184,20 +183,22 @@ __predictionInfo.forEach(function (item, index) {
 });
 
 function generatePredictionHtmlForMobileView(prediction, scores, outcomeResults) {
-    console.log(prediction, '========>>>>>>>');
     $html = '<div class="mobile-prediction-wrapper">';
 
     var homeScore;
     var awayScore;
-    var resultArr
+    var resultArr;
     for (league in prediction) {
         $html += '<div class="mobile-league">' + league + '</div>';
         datesFixturesObj = prediction[league];
 
         datesFixturesObj.dates.forEach(function (date, index) {
             $html += '<div class="mobile-fixture-wrapper">';
-            var dateStr = date + ' UTC';
-            var date = new Date(dateStr.replace(/-/g, '/'));
+            if (date != 'NS') {
+                var dateStr = date + ' UTC';
+                date = new Date(dateStr.replace(/-/g, '/'));
+            }
+
             result = getScore(datesFixturesObj.fixtures[index], scores);
             outcomeResult = getOutcomeResult(datesFixturesObj.fixtures[index], outcomeResults);
 
@@ -210,8 +211,7 @@ function generatePredictionHtmlForMobileView(prediction, scores, outcomeResults)
                 awayScore = '';
             }
             fixtureArr = datesFixturesObj.fixtures[index].split(' - ');
-
-            $html += '<div style="font-weight: unset; max-width: 30%;">' + formatDateForPrediction(date) + '</div>';
+            $html += '<div style="font-weight: unset; max-width: 30%;">' + (date === 'NS' ? 'NS' : formatDateForPrediction(date)) + '</div>';
             $html += '<div class="mobile-fixture">' + fixtureArr[0] + homeScore.toString() + ' - ' + awayScore.toString() + fixtureArr[1] + '</div>';
             $html += '<div style="font-weight: 700;">' + datesFixturesObj.outcomes[index] + outcomeResult +'</div>';
             $html += '</div>';
@@ -223,12 +223,7 @@ function generatePredictionHtmlForMobileView(prediction, scores, outcomeResults)
     return $html;
 }
 
-console.log(formatedPredictions);
-
-console.log(__predictionInfo);
-
 function calculateOdds(odds) {
-    console.log(odds);
     resultOdds = 1;
 
     odds.forEach(function (odd) {
@@ -239,7 +234,6 @@ function calculateOdds(odds) {
 }
 
 function generatePredictionInfoHtml(prediction, predictionType) {
-    console.log(predictionType);
     $html = '<div>No.Selection:<span><b>' + prediction.leagues.length.toString() + '</b></span></div>';
     if (prediction.bet_code) {
         $html += '<div>Selection Type:<span><b>' + predictionType + '</b></span></div>';
@@ -271,13 +265,16 @@ function generatePredictionTable(data) {
 
 function formatPredictionDataForMobile(prediction) {
     formatedResult = {}
+    let d;
     prediction.leagues.forEach(function (league, index) {
         if (league in formatedResult) {
-            formatedResult[league].dates.push(prediction.dates[index]);
+            d = prediction.hasOwnProperty('dates') ? prediction.dates[index] : 'NS';
+            formatedResult[league].dates.push(d);
             formatedResult[league].fixtures.push(prediction.fixtures[index]);
             formatedResult[league].outcomes.push(prediction.outcomes[index]);
         } else {
-            formatedResult[league] = { dates: [prediction.dates[index]], fixtures: [prediction.fixtures[index]], outcomes: [prediction.outcomes[index]] }
+            d = prediction.hasOwnProperty('dates') ? prediction.dates[index] : 'NS';
+            formatedResult[league] = { dates: [d], fixtures: [prediction.fixtures[index]], outcomes: [prediction.outcomes[index]] }
         }
     });
 
@@ -299,10 +296,7 @@ function getOutcomeResult(fixture, outcomeResults) {
 }
 
 function getScore(fixture, scores) {
-    // console.log(scores, fixture);
     for (let i = 0; i < scores.length; i++) {
-        // console.log(scores[i]);
-        // console.log(scores[i].hasOwnProperty(fixture))
         if (scores[i].hasOwnProperty(fixture)) {
             return scores[i][fixture];
         }
@@ -388,7 +382,7 @@ $('#prediction-submit').click(function () {
 
 
         if (nowDateInUTC >= dateTimeInUTC) {
-            alert('First match has started');
+            $('#main-error').text('First match has started');
             return;
         }
         savePrediction({
@@ -405,7 +399,6 @@ $('#prediction-login').click(function () {
 });
 
 $('#report-bug').click(function () {
-    console.log('reporting...');
     if ($('#problem').val() == '--- Select a Problem ---') {
         return;
     }
@@ -416,14 +409,11 @@ $('#report-bug').click(function () {
         note: $('#extra-note').val()
     }
 
-    console.log(data);
-
     $.ajax('/api/web/report-prediction', {
         data: data,
         type: 'POST', success: function (result) {
-            console.log(result);
             if (!result.success) {
-                console.log('sent')
+
             }
         }
     });
@@ -657,6 +647,7 @@ function savePrediction(data) {
 
     predictionButton.text('Submitting...');
     predictionButton.prop('disabled', true);
+
     $.ajax('/api/web/create-prediction', {
         data: data,
         type: 'POST', success: function (result) {
@@ -687,6 +678,10 @@ function savePrediction(data) {
                 $('#createPredictionModal').modal('hide');
                 $('#confirmModalCreate').modal('show');
             }
+        }, error: function() {
+            predictionButton.text('Submit');
+            predictionButton.prop('disabled', false);
+            $('#main-error').text("An unknown error occurred. Refresh the page or try another method");
         }
     });
 }
@@ -716,7 +711,6 @@ $('.title').click(function () {
     }
 
     if (Object.keys(error).length == 0) {
-        // console.log(window.location.host + '/?m=' + min.val() + '_' + max.val());
         window.location.href = window.location.origin + '/?filter_option=' + min.val() + '_' + max.val();
         // window.location.reload();
     }
@@ -772,7 +766,6 @@ function followUser(userId, isFollowing, info, whoIsCalling, callingElem, index)
         $('#createPredictionModal').modal('show');
         return;
     }
-    // console.log(whoIsCalling, '========>>>>'); return; 
     var isFollowingId = isFollowing ? 1 : 0;
     data = {
         token: localStorage.getItem('$$token'),
@@ -846,7 +839,6 @@ $('#delete-prediction').click(function () {
 });
 
 function openDeleteConfirmationModal(predictionId) {
-    console.log('INININ');
     $('#deleteModal').modal('show');
     DELETE_PREDICTION_ID = predictionId;
 }
@@ -889,7 +881,6 @@ function likePrediction(likeEvent, predictionInfo, predictionId) {
     $.ajax('/api/web/predictions/like', {
         data: { prediction_id: predictionId, token: token, id: $$id },
         type: 'POST', success: function (result) {
-            console.log(result);
             if (result.success) {
                 if (result.message == 'like') {
                     predictionInfo.num_likes = predictionInfo.num_likes + 1;
@@ -925,7 +916,6 @@ __predictionInfo.forEach(function (item, index) {
     // Add onclick for deleting predictions you own
     $('#' + DOT_MENU_ELEMENT_ID_PREFIX + 'delete-' + item.prediction_id.toString() + '-' + index.toString())
         .click(function () {
-            console.log('Openeing modal for deleting')
             openDeleteConfirmationModal(item.prediction_id);
     });
 
@@ -971,7 +961,6 @@ __predictionInfo.forEach(function (item, index) {
 
     $('#' + DOT_MENU_ELEMENT_ID_PREFIX + item.user_id.toString() + '-' + index.toString())
         .click(function () {
-            console.log('Yeah!!!');
             followUser(item.user_id, item.isFollowing_author, item, DOT_MENU, this, index);
     });
 });
@@ -1115,8 +1104,6 @@ function fetchBetKingGames(code) {
         $(bookingLastElem).remove();
         isResultDisplayed = false;
     };
-
-    console.log($('#booking-number').val(), '=====>>>>>>>>>');
 
     if (!$('#booking-number').val()) {
         $bookingCodetab.append('<div class="booking-not-found">Booking code is required, it can not be empty</div>');
@@ -1382,6 +1369,7 @@ var competitionIds = [];
 $competitionSearch = $('#competition-search'); // competition search input
 $competitionDropdown = $('#dropdown-competetion');
 $fetchingFixtures = $('#fetching-fixtures'); // div that displays while fetching competition fixtures
+$fetchingFixturesError = $('#fetching-fixtures-error'); //div that displays while fetching competition fixtures error
 $dropdonwFixture = $('#dropdown-fixture');
 $searchFixtureInput = $('#fixtures-search'); // fixture search input
 $addGame = $('#add-game');
@@ -1499,7 +1487,7 @@ $addGame.click(function () {
 
         if (isSameFixtureWithLastPrediction && isSameLeagueWithLastPrediction && isSameOutcomeWithLastPrediction) {
             isError = true;
-            alert('Duplicate prediction');
+            $('#main-error').text('Duplicate prediction');
         }
     }
 
@@ -1695,14 +1683,22 @@ function getSelectedCompetition(competitionId) {
 
 function getFixtures(competitionId) {
     $fetchingFixtures.show();
+    $fetchingFixturesError.hide();
     isSearchingFixtures = true;
     $.ajax('/api/web/fixtures', {
         type: 'GET', data: { competition_id: competitionId, token: localStorage.getItem('$$token'), id: $$id },
         success: function (result) {
             isSearchingFixtures = false;
+            $fetchingFixtures.hide();
             var tempFixtures = [];
             if (result.success) {
-                $fetchingFixtures.hide();
+                if (!result.data[0].hasOwnProperty('fixtures')) {
+                    $fetchingFixtures.hide();
+                    $fetchingFixturesError.show();
+                    $fetchingFixturesError.text('No fixtures return try another competition');
+                    return;
+                }
+
                 result.data.forEach(function (item, index) {
                     //tempFixtures.concat(item.fixtures)
                     item.fixtures.forEach(function (item) {
@@ -1714,11 +1710,28 @@ function getFixtures(competitionId) {
                 // reset selectedMatch because competition has changed
                 selectedMatch = {};
                 $searchFixtureInput.val('');
+            } else {
+                $fetchingFixtures.hide();
+                $fetchingFixturesError.show();
+                $fetchingFixturesError.text(result.messages + ' click to refresh.Or try another competition.');
             }
 
+        }, error: function(err) {
+            isSearchingFixtures = false;
+            $fetchingFixtures.hide();
+            $fetchingFixturesError.show();
+            $fetchingFixturesError.text('An error occurred click to refresh. Or try another competition.');
         }
     });
 }
+
+/**
+ * Refreshing getFixtures of the current competition
+ */
+$fetchingFixturesError.click(function() {
+    $fetchingFixturesError.hide();
+    getFixtures(selectedCompetition.id);
+});
 
 function generateTableForFixture() {
     $tableSection.empty();
@@ -1835,7 +1848,6 @@ function selectOutcomeResult(value, fixture, predictionId) {
         for (let i = 0; i < updatedOutcomeResults.length; i++) {
             if (Object.keys(updatedOutcomeResults[i])[0] == fixture) {
                 updatedOutcomeResults.splice(i, 1);
-                console.log(updatedOutcomeResults);
                 return;
             }
         }
@@ -1849,7 +1861,6 @@ function selectOutcomeResult(value, fixture, predictionId) {
         obj[fixture] = value;
         updatedOutcomeResults.push(obj);
     }
-    console.log(updatedOutcomeResults);
 }
 
 function onChangeScoresResult(value, fixture) {
@@ -1857,7 +1868,6 @@ function onChangeScoresResult(value, fixture) {
         for (let i = 0; i < updatedScores.length; i++) {
             if (Object.keys(updatedScores[i])[0] == fixture) {
                 updatedScores.splice(i, 1);
-                console.log(updatedScores);
                 return;
             }
         }
@@ -1865,7 +1875,6 @@ function onChangeScoresResult(value, fixture) {
 
     // check if isValid 
     let valueArr = value.split('-');
-    console.log(valueArr, '====>>>>');
 
     if (valueArr.length != 2) {
         return;
@@ -1890,8 +1899,6 @@ function onChangeScoresResult(value, fixture) {
         obj[fixture] = value;
         updatedScores.push(obj);
     }
-
-    console.log(updatedScores);
 }
 
 $('#update-prediction').click(function() {
@@ -1912,7 +1919,6 @@ $('#update-prediction').click(function() {
         type: 'POST', 
         success: function (result) {
            // $('#update-prediction').prop('disabled', false);
-            console.log(result);
             if (result.success) {
                 $('#main-error-update').text('');
                 $('#outcome-response-message-update').text(result.message);
@@ -1927,7 +1933,6 @@ $('#update-prediction').click(function() {
         },
         failure: function() {
             $('#update-prediction').prop('disabled', false);
-            console.log('Yes.........');
         }
     });
 });

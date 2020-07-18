@@ -17,8 +17,6 @@
 
     function checkFixture($fixture, $scores) {
         foreach($scores as $score) {
-            // var_dump($score);
-            // var_dump($fixture);
             var_dump(property_exists($score, $fixture));
             // exit;
             if (property_exists($score, $fixture)) {
@@ -99,15 +97,17 @@
     $page = 0;
     $liveScroes = array();
     $data = json_decode(file_get_contents('http://livescore-api.com/api-client/scores/live.json?key='. $envObj->LIVESCORE_API_KEY . '&secret=' . $envObj->LIVESCORE_API_SECRET));
-    // var_dump($data);
-    // $data = json_decode(file_get_contents(__DIR__ . '/../data2.json'));
     
-    file_put_contents('data4.json', json_encode($data));
+
     $endedMatches = array();
 
     foreach($data->data->match as $match) {
         if ($match->status == 'FINISHED')
             array_push($endedMatches, $match);
+    }
+
+    if (!$data->data->match) {
+        ErrorMail::Log('updateScores.php', '110', 'It seems livescores API failed or returns empty result');
     }
 
 
@@ -144,6 +144,9 @@
                 
                 foreach($endedMatches as $match) {
                     if ($match->home_id == $homeId && $match->away_id == $awayId) {
+                        if ($prediction->is_each_game_update == 1) {
+                            // send email notification
+                        }
                         array_push($scores, array($predictionObj->fixtures[$index] => $match->ft_score));
                         break;
                     }

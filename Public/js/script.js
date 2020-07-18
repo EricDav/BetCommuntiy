@@ -49,9 +49,6 @@ jQuery(document).ready(function($) {
         var vLoaded = 0;
 
         vElem.each(function(index, elem) {
-
-            //console.log(elem, elem.readyState);
-
             if (elem.readyState) {
                 vLoaded++;
 
@@ -64,7 +61,6 @@ jQuery(document).ready(function($) {
 
             $(elem).on('loadedmetadata', function() {
                 vLoaded++;
-                //console.log('vLoaded',vLoaded, this);
                 if (videoCount == vLoaded) {
                     $('.js-masonry').masonry('layout');
                 }

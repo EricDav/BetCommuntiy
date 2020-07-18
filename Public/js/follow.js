@@ -28,7 +28,6 @@
         }
 
         var userId = userId ? userId : __userId; // if I am calling this function from forecaster page user id will be passed
-        // console.log(userId, )
         var isFollowingId;
         if (callingFrom == CALLING_FROM_PROFILE_PAGE) {
             isFollowingId = isFollowing ? 1 : 0;

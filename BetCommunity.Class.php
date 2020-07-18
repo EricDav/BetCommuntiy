@@ -5,6 +5,7 @@ class BetCommunity {
     const DEFAULT_ADD_PROFILE = 180191;
     const DEFAULT_METHOD = -1;
     const NUM_PREDICTIONS_PER_DAY = 3;
+    const DEFAULT_TODO_LOG_EMAIL = 'betdavid123@gmail.com';
     const routes = [
         '/login' => "LoginController",
         '/api/web/create-prediction' => "CreatePredictionController",

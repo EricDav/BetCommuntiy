@@ -73,7 +73,13 @@
                 $this->mail->Port       = 25;      
                 $this->mail->SMTPSecure = 'tsl';
                 $this->mail->setFrom('info@betcommunity.net', 'BetCommunity');
-                $this->mail->addAddress($this->to);                        // Set email format to HTML
+                if (is_array($this->to)) {
+                    foreach($this->to as $email) {
+                        $this->mail->addAddress($email); 
+                    }
+                } else {
+                    $this->mail->addAddress($this->to); 
+                }                    
                 $this->mail->Subject = $this->subject;
                 $this->mail->Body    = $this->message;
                 $this->mail->send();

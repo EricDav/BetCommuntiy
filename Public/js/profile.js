@@ -25,7 +25,6 @@ var $profileFollowersWrapper = $('#followers-wrapper');
  var $changePasswordWrapper = $('#change-password');
 
  var $emailSettingsCheckboxInput = $('#email-notification-settings');
- console.log($emailSettingsCheckboxInput);
 
 
  /**
@@ -482,13 +481,12 @@ function readURL(input, id, showModal=true) {
         }
         reader.readAsDataURL(input.files[0]);
     } else {
-        console.log('I got here baby girl!!!');
+
     }
 }
 
 function updateSettings(settings) {
     var currentState = $('#email-notification-settings').prop('checked');
-    console.log(currentState);
     $.ajax('/notifications/email-settings', {
         data: {settings: settings, id: $$id, token: token},
         type: 'GET', success: function (result) {

@@ -14,7 +14,7 @@ abstract class Controller {
     const HTTP_OKAY_CODE = 200;
     const DEFAULT_LIMIT = 20;
     const DEFAULT_OFFSET = 1;
-
+    const SESSION_LASTING_DAY = 7;
 
     public function __construct($request, $envObj=null) {
         $this->data = array();
@@ -129,6 +129,9 @@ abstract class Controller {
             'imagePath' => $imagePath,
             'phoneNumber' => $phoneNumber,
         );
+
+        setcookie('__uii', BetCommunity::DEFAULT_ADD_PROFILE + (int)$id, time() + (86400 * self::SESSION_LASTING_DAY), "/");
+        setcookie('__uiispecial', $specialId, time() + (86400 * self::SESSION_LASTING_DAY), "/");
 
         $_SESSION['userInfo'] = $userInfo;
     }

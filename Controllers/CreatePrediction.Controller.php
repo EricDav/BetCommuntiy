@@ -168,12 +168,13 @@
                 $notifications = NotificationModel::creatNotifictionsForPrediction($this->pdoConnection, $this->request->session['userInfo']['id'], $result);
 
                 if (!$notifications) {
+
                     // TODO LOG ERRORS HERE
                 }
                 $this->jsonResponse(array('success' => true, 'code' => Controller::HTTP_OKAY_CODE, 'messages' => 'Prediction created successfully', 'prediction_id' => $result));
             }
 
-            $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_SERVER_ERROR_CODE, 'message' => 'Server error'));
+            $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_SERVER_ERROR_CODE, 'messages' => 'Server error'));
         }
 
         /**
@@ -342,6 +343,8 @@
     
                 if (explode('-', $firstDate)[2] == explode('-', $sixthDate)[2]) {
                     // TODO log error here should not get to this
+                    $msg = "Something unexpected happened at line 346 file: CreatePrediction.Controller.php";
+                    mail(BetCommunity::DEFAULT_TODO_LOG_EMAIL,"Error Log",$msg);
                     return false;
                 }
             }

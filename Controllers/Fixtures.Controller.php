@@ -27,14 +27,13 @@
                 while (true) {
 
                     if (!$data) {
-                        // TODO
+                        ErrorMail::Log('Fixture.Controller.php', '30', 'Error retrieving fixtures with competition id of' . $this->competitionId . ' from api. Mostly likely API failed');
                         break;
                         // log error like time
                     }
 
                     if ($page >= 100) {
-                        // TODO
-                        // log error here something unusaul happen
+                        ErrorMail::Log('Fixture.Controller.php', '36', 'Fixtures exceed expected page for for fixture id ' . $this->competitionId);
                         break;
                     }
 

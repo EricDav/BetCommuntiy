@@ -9,8 +9,6 @@ $(document).ready(function() {
 
     $notificationWrapper = $('#mySidenav');
     function goToNotification() {
-        alert('Here');
-        console.log($(this).attr('data'));
         window.location.href = window.location.origin + $(this).attr('data');
     }
 
@@ -45,7 +43,6 @@ $(document).ready(function() {
     function getNotifications() {
         $.ajax('/api/web/notifications?id=' + $$id + '&token=' + token, {
             type: 'GET',  success: function(result) {
-                console.log(result);
                 if (result.success) {
                     notifications = result.data;
                     var $notificationWrapper = $('#mySidenav');

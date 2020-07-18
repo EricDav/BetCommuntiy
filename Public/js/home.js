@@ -8,20 +8,16 @@ dates.forEach(function(item, index) {
 });
 
 function calculateOdds(odds) {
-    console.log(odds);
     resultOdds = 1;
 
     odds.forEach(function(odd) {
         resultOdds*=Number.parseFloat(odd);
     });
 
-    console.log(resultOdds);
-
     return resultOdds.toFixed(2);
 }
 
 function generatePredictionInfoHtml(prediction, predictionType) {
-    console.log(predictionType);
     $html = '<div>No.Selection:<span><b>' + prediction.leagues.length.toString() + '</b></span></div>';
     if (prediction.bet_code) {
         $html +='<div>Selection Type:<span><b>' + predictionType + '</b></span></div>';
@@ -54,7 +50,6 @@ function generatePredictionTable(data) {
  */
 __predictionInfo.forEach(function (item, index) {
     var prediction = JSON.parse(item.prediction);
-    // console.log(prediction);
     item.prediction = prediction;
     $('#prediction-info-' + item.prediction_id).append(generatePredictionInfoHtml(prediction, item.prediction_type));
     $('#prediction-' + item.prediction_id).append(generatePredictionTable(prediction));

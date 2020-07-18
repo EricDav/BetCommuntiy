@@ -22,7 +22,6 @@ $('#today-prediction').click(function() {
 
     date = now.getFullYear() + '-' + month.toString() + '-' + now.getDate() +
         ' ' + hours + ':' + minutes;
-    // console.log(date); return;
 
     window.location.href = window.location.origin + '/?filter_day=today&current_date=' + date;
 });

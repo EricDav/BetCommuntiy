@@ -56,6 +56,7 @@
             <div style="margin-top: 5px;"><b>Fixture: </b></div>
             <input autocomplete="off" id="fixtures-search" type="search" class="form-control my-input" placeholder="Search by team name...">
             <div id="fetching-fixtures">Fetching fixtures...</div>
+            <div style="color: red; font-weight: 700; display:none; font-size: 10px; line-height: 1.5; cursor: pointer;" id="fetching-fixtures-error"></div>
             <div id="dropdown-fixture" class="dropdown-content">
             </div>
             <div id="fixtures-error" class="fixtures-booking-error">Required. You need to select a fixture.</div>
@@ -76,7 +77,7 @@
      </div>
     </div>
       <div class="modal-footer">
-        <div style = 'text-align:left'>
+        <!-- <div style = 'text-align:left'>
           <strong>Receive Game Update:</strong>
           <div>
             <label for = 'each-game-update' class = 'check-container'>
@@ -96,7 +97,7 @@
             </label>
             <span class = '#'>Update me at the end of all games.</span>
           </div>
-        </div>
+        </div> -->
         <button id="prediction-submit" type="button" class="btn btn-primary">Submit</button>
       </div>
     </div>

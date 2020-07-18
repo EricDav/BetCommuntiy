@@ -59,6 +59,7 @@ class ForgotPasswordController extends Controller{
             }
 
             if ($user['token_count'] >= 3) {
+                ErrorMail::Log('Fixture.Controller.php', '36', 'Fixtures exceed expected page for for fixture id ' . $this->competitionId);
                 // Todo block the user
             }
             
