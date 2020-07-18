@@ -8,7 +8,7 @@ class BenefitsController extends Controller{
     public function perform(){
         if ($this->request->method == 'GET') {
             $this->data['template'] = 'Benefit.php';
-            $this->data['title'] = 'Benefit | Bet Community';
+            $this->data['title'] = '4CastBet | Benefit';
             $this->responseType = 'html';
         }
     }

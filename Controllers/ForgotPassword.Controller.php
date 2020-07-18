@@ -37,7 +37,7 @@ class ForgotPasswordController extends Controller{
     public function perform() {
         if ($this->requestMethod == 'GET') {
             $this->data['template'] = 'ForgotPassword.php';
-            $this->data['title'] = 'BetCommunity | Forgot password';
+            $this->data['title'] = '4CastBet | Forgot password';
             $this->data['message'] = '';
             return;
         }
@@ -95,7 +95,7 @@ class ForgotPasswordController extends Controller{
     }
 
     public function getMessage($name, $code) {
-        $htmlMessage = '<div style="margin-left: 10px; margin-top: 20px; line-height: 1.5; text-align: left"><b>Hi ' . $name . '</b>, ' .  '<span font-weight: 500;> Your betcommunity password reset code is <b>' . $code . '</span>' . '</div>';
+        $htmlMessage = '<div style="margin-left: 10px; margin-top: 20px; line-height: 1.5; text-align: left"><b>Hi ' . $name . '</b>, ' .  '<span font-weight: 500;> Your 4castbet password reset code is <b>' . $code . '</span>' . '</div>';
         $htmlMessage .='<div style="margin-left: 10px;line-height: 1.5; text-align: left">If you did not ask to reset your password, please ignore this email and nothing will change.</div>';
 
         return $htmlMessage;
@@ -111,7 +111,7 @@ class ForgotPasswordController extends Controller{
             if (isset($_SESSION['temp_user'])) {
                 $this->data['code'] = $_SESSION['temp_user']['code'];
                 $this->data['template'] = 'ForgotPassword.php';
-                $this->data['title'] = 'BetCommunity | Reset Password';
+                $this->data['title'] = '4CastBet.com | Reset Password';
             } else {
                 header('Location: /forgot-password');
                 exit;

@@ -14,7 +14,9 @@
 <link rel="stylesheet" href="/bet_community/Public/css/ionicons.min.css">
 <link rel="stylesheet" href="/bet_community/Public/css/font-awesome.min.css">
 <link href="/bet_community/Public/css/emoji.css" rel="stylesheet">
-<link rel="stylesheet" href="/bet_community/Public/css/notification.css">
+<?php if (isLogin()): ?>
+    <link rel="stylesheet" href="<?='/bet_community/Public/css/notification.css?v=' . BetCommunity::CSS['notification.css']?>">
+<?php endif; ?>
 
 <!--Google Font-->
 <link href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700,700i" rel="stylesheet">

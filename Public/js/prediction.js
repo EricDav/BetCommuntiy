@@ -12,6 +12,7 @@ var shouldSubmitPrediction = false; // A variable that determines if the predict
 var predictionRes = {};
 var getEachGameUpdate = $('#each-game-update');
 var getAllGameUpdate = $('#all-game-update');
+console.log('Yes...');
 
 /**
  * Start of declarations of constants uses

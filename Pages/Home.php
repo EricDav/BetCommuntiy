@@ -8,7 +8,7 @@
 <html class="js sizes customelements history pointerevents postmessage webgl websockets cssanimations csscolumns csscolumns-width csscolumns-span csscolumns-fill csscolumns-gap csscolumns-rule csscolumns-rulecolor csscolumns-rulestyle csscolumns-rulewidth csscolumns-breakbefore csscolumns-breakafter csscolumns-breakinside flexbox picture srcset webworkers" lang="en">
 <head>
   <?php include 'Pages/common/Head.php'; ?>
-  <link rel="stylesheet" href="/bet_community/Public/css/home.css">
+  <link rel="stylesheet" href="<?='/bet_community/Public/css/home.css?v=' . BetCommunity::CSS['home.css']?>">
 </head>
 <body>
 <?php include 'Pages/common/Header.php';?>
@@ -164,13 +164,11 @@
   </script>
   <!-- The core Firebase JS SDK is always required and must be listed first -->
     <script type="text/javascript">var dates=<?=json_encode($data['dates'])?>;</script>
-    <script type="text/javascript">var __allCompetitions=<?=json_encode($data['competitions'])?>;</script>
     <script type="text/javascript">var __predictionInfo=<?=json_encode($data['predictionInfo'])?>;</script>
-    <script type="text/javascript">var __outcomes=<?=json_encode($data['outcomes'])?>;</script>
-    <script src="/bet_community/Public/js/prediction.js"></script>
-    <script src="/bet_community/Public/js/common-sidebar.js"></script>
+    <script src="<?='/bet_community/Public/js/prediction.js?v=' . BetCommunity::JS['prediction.js']?>"></script>
+    <script src="<?='/bet_community/Public/js/common-sidebar.js?v=' . BetCommunity::JS['common-sidebar.js']?>"></script>
     <?php if(isAdmin()): ?>
-      <script src="/bet_community/Public/js/outcome.js"></script>
+      <script src="<?='/bet_community/Public/js/outcome.js?v=' . BetCommunity::JS['outcome.js']?>"></script>
     <?php endif; ?>
     <script>
       setTimeout(() => {
@@ -178,5 +176,7 @@
       }, 500);
     </script>
     <script src="/bet_community/Public/js/script.js"></script>
+    <script type="text/javascript">var __allCompetitions=<?=json_encode($data['competitions'])?>;</script>
+    <script type="text/javascript">var __outcomes=<?=json_encode($data['outcomes'])?>;</script>
   </body>
 </html>

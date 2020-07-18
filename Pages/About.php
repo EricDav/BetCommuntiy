@@ -7,7 +7,7 @@
              */
             include 'Pages/common/Head.php';
         ?>
-        <link rel="stylesheet" href="/bet_community/Public/css/about.css">
+        <link rel="stylesheet" href="<?='/bet_community/Public/css/about.css?v=' . BetCommunity::CSS['about.css']?>">
     </head>
     <body>
 
@@ -28,7 +28,7 @@
     	    <div class="container">
                 <div class="row">
                     <div class="how-to-play">What We Do?</div>
-                    <div style="margin-top: 15px;">BetCommunity is a platform that connects betters and forecasters.<br>
+                    <div style="margin-top: 15px;">4CastBet is a platform that connects betters and forecasters.<br>
                     It is a community of bet  lovers, is platform that helps betters come together and make their predictions. </div>
                    <div style="margin-top: 10px;" class="how-to-play">How to Predict?</div>
                    <div class="header">Booking Code:</div>

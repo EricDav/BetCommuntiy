@@ -290,7 +290,7 @@
             $this->setPredictionInfo($prediction);
             $this->data['featuredUsers'] = $featuredUsers;
             $this->data['template'] = 'Predictions.php';
-            $this->data['title'] = 'BetCommunity | Prediction';
+            $this->data['title'] = '4CastBet | Prediction';
             $this->data['outcomes'] = BetCommunity::OUTCOMES;
             $this->responseType = 'html';
 

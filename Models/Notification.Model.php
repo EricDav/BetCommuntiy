@@ -32,13 +32,13 @@
 
         public static function sendEmailNotification($emails, $name, $receiver, $id) {
             if (sizeof($emails) > 0) {
-                $sendEmail = new SendMail($emails, 'Betcommunity | Prediction Notification', self::getMessage($name, $receiver, $id));
+                $sendEmail = new SendMail($emails, '4CastBet | Prediction Notification', self::getMessage($name, $receiver, $id));
             }
         }
 
         public function getMessage($name, $receiver, $id) {
             $htmlMessage = '<div style="margin-left: 10px; margin-top: 20px; line-height: 1.5; text-align: left"><b>Hi ' . $name . ',</b>, ' .  '<br><span font-weight: 500;>' . $receiver . ' just drop a prediction</span>' . '</div>';
-            $htmlMessage .='<div style="margin-left: 10px;line-height: 1.5; text-align: left">Click the <a href="http://betcommunity.net/predictions?id="' + $id + '>link to view the prediction</div>';
+            $htmlMessage .='<div style="margin-left: 10px;line-height: 1.5; text-align: left">Click the <a href="http://4castbet.com/predictions?id="' + $id + '>link to view the prediction</div>';
     
             return $htmlMessage;
         }

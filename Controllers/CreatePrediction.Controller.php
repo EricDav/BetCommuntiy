@@ -159,7 +159,7 @@
                 $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_BAD_REQUEST_CODE, 'messages' => 'Maximum prediction reached for the day. You only make three predictions per day'));
             }
 
-            $approved = $this->type == BetGamesController::PLATFORM_BET9JA ? 0 : 1;
+            $approved =  1;
             $userId = $this->request->session['userInfo']['id'];
             $result = PredictionModel::createPrediction($this->pdoConnection, $this->startDateTime, $this->endDateTime, $userId, $this->totalOdds, 
                 $this->prediction, $approved, $this->type, $this->getEachGameUpdate, $this->getAllGameUpdate);

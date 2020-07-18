@@ -1,8 +1,8 @@
 <html class="js sizes customelements history pointerevents postmessage webgl websockets cssanimations csscolumns csscolumns-width csscolumns-span csscolumns-fill csscolumns-gap csscolumns-rule csscolumns-rulecolor csscolumns-rulestyle csscolumns-rulewidth csscolumns-breakbefore csscolumns-breakafter csscolumns-breakinside flexbox picture srcset webworkers" lang="en">
 <head>
   <?php include 'Pages/common/Head.php'?>
-  <link rel="stylesheet" href="/bet_community/Public/css/home.css">
-  <link rel="stylesheet" href="/bet_community/Public/css/profile.css">
+  <link rel="stylesheet" href="<?='/bet_community/Public/css/home.css?v=' . BetCommunity::CSS['home.css']?>">
+  <link rel="stylesheet" href="<?='/bet_community/Public/css/profile.css?v=' . BetCommunity::CSS['profile.css']?>">
 </head>
 <body>
 <?php include 'Pages/common/Header.php';?>
@@ -262,16 +262,16 @@
     <script type="text/javascript">var dates=<?=json_encode($data['dates'])?>;</script>
     <script type="text/javascript">var __userId=<?=json_encode($data['user'][0]['id'])?>;</script>
     <script type="text/javascript">var __name=<?=json_encode($data['user'][0]['name'])?>;</script>
-    <script type="text/javascript">var __allCompetitions=<?=json_encode($data['competitions'])?>;</script>
     <script type="text/javascript">var __predictionInfo=<?=json_encode($data['predictionInfo'])?>;</script>
-    <script type="text/javascript">var __outcomes=<?=json_encode($data['outcomes'])?>;</script>
     <script type="text/javascript">var isFollowing=<?=json_encode($data['isFollowing'])?>;</script>
-    <script src="/bet_community/Public/js/profile.js"></script>
-    <script src="/bet_community/Public/js/follow.js"></script>
-    <script src="/bet_community/Public/js/prediction.js"></script>
+    <script src="<?='/bet_community/Public/js/profile.js?v=' . BetCommunity::JS['profile.js']?>"></script>
+    <script src="<?='/bet_community/Public/js/prediction.js?v=' . BetCommunity::JS['prediction.js']?>"></script>
+    <script src="<?='/bet_community/Public/js/follow.js?v=' . BetCommunity::JS['follow.js']?>"></script>
     <?php if(isAdmin()): ?>
       <script src="/bet_community/Public/js/outcome.js"></script>
     <?php endif; ?>
     <script src="/bet_community/Public/js/script.js"></script>
+    <script type="text/javascript">var __allCompetitions=<?=json_encode($data['competitions'])?>;</script>
+    <script type="text/javascript">var __outcomes=<?=json_encode($data['outcomes'])?>;</script>
 </body>
 <body>

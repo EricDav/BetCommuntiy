@@ -7,7 +7,7 @@
              */
             include 'Pages/common/Head.php';
         ?>
-        <link rel="stylesheet" href="/bet_community/Public/css/benefits.css">
+        <link rel="stylesheet" href="<?='/bet_community/Public/css/benefits.css?v=' . BetCommunity::CSS['benefit.css']?>?>">
     </head>
     <body>
         <?php
@@ -165,5 +165,5 @@
     </body>
     <?php include 'Pages/common/Footer.php';?>
     <?php include 'Pages/common/Script.php'?>
-    <script src = '/bet_community/Public/js/benefit.js'></script>
+    <script src = "<?='/bet_community/Public/js/benefit.js?v=' . BetCommunity::JS['benefit.js']?>?>"></script>
 </html>

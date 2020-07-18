@@ -46,6 +46,37 @@ class BetCommunity {
         'Other'
     ];
 
+    // Stores all javascript files and the versions
+    // This is used to break cache whenever we chane our js files
+    const JS = [
+        'benefit.js' => 1,
+        'common-sidebar.js' => 1,
+        'contact.js' => 1,
+        'follow.js' => 1,
+        'forgotPassword.js' => 1,
+        'home.js' => 1,
+        'like.js' => 1,
+        'login.js' => 1,
+        'notification.js' => 1,
+        'outcome.js' => 1,
+        'prediction.js' => 1,
+        'profile.js' => 1,
+    ];
+
+    // Stores all CSS files and the versions
+    // This is used to break cache whenever we chanGE our css files
+    const CSS = [
+        'benefit.css' => 1,
+        'about.css' => 1,
+        'contact.css' => 1,
+        'forcasters.css' => 1,
+        'forgotPassword.css' => 1,
+        'home.css' => 1,
+        'login.css' => 1,
+        'notification.css' => 1,
+        'profile.css' => 1
+    ];
+
     // saves class name as key and path as value
     const loads = [
         'Enviroment' => 'Enviroment/Enviroment.php',

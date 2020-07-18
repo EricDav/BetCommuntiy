@@ -1,7 +1,7 @@
 <html class="js sizes customelements history pointerevents postmessage webgl websockets cssanimations csscolumns csscolumns-width csscolumns-span csscolumns-fill csscolumns-gap csscolumns-rule csscolumns-rulecolor csscolumns-rulestyle csscolumns-rulewidth csscolumns-breakbefore csscolumns-breakafter csscolumns-breakinside flexbox picture srcset webworkers" lang="en">
 <head>
   <?php include 'Pages/common/Head.php'; ?>
-  <link rel="stylesheet" href="/bet_community/Public/css/forcasters.css">
+  <link rel="stylesheet" href="<?='/bet_community/Public/css/forcasters.css?v=' . BetCommunity::CSS['forcasters.css']?>">
 </head>
 <body>
 <?php include 'Pages/common/Header.php';?>
@@ -41,8 +41,8 @@
     </div>
     <?php  include 'Pages/common/Footer.php';?>
     <?php include 'Pages/common/Script.php'?>
-    <script src="/bet_community/Public/js/common-sidebar.js"></script>
-    <script src="/bet_community/Public/js/follow.js"></script>
+    <script src="<?='/bet_community/Public/js/common-sidebar.js?v=' . BetCommunity::JS['common-sidebar.js']?>"></script>
+    <script src="<?='/bet_community/Public/js/follow.js?v=' .  BetCommunity::JS['follow.js']?>"></script>
     <script>
       setTimeout(() => {
         $($('#f-users-wrapper').children()[1]).css('pointer-events', 'none');

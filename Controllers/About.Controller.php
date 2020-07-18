@@ -10,7 +10,7 @@
 
         public function perform() {
             $this->data['template'] = 'About.php';
-            $this->data['title'] = 'BetCommunity | About Us';
+            $this->data['title'] = '4CastBet | About Us';
             $this->responseType = 'html';
         }
     }

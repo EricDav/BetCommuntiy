@@ -50,7 +50,7 @@
             $this->data['followers'] = $followers;
             $this->data['isFollowing'] = $this->isFollowing(); // checks if the current user is following the user we are checking the profile
             $this->data['template'] = 'Profile.php';
-            $this->data['title'] = 'Profile';
+            $this->data['title'] = '4CastBet | Profile';
             $this->data['supportedBettingPlatforms'] = BetGamesController::SUPPORTED_BETTING_PLATFORMS;
             $this->data['isSelf'] = $this->isSelf();
             $this->data['followingText'] = $this->getNumberFollowingText($user[0]['num_followers'], $user[0]['sex']);

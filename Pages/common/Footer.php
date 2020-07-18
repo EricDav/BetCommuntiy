@@ -35,7 +35,7 @@
               <h5>Contact Us</h5>
               <ul class="contact">
                 <li><i class="icon ion-ios-telephone-outline"></i>+234 7069229546</li>
-                <li><i class="icon ion-ios-email-outline"></i>info@betcommunity.net</li>
+                <li><i class="icon ion-ios-email-outline"></i>info@4castbet.com</li>
                 <li><i class="icon ion-ios-location-outline"></i>8 Rabiatu street Mushin Lagos</li>
               </ul>
             </div>
@@ -43,6 +43,6 @@
       	</div>
       </div>
       <div class="copyright">
-        <p>BetCommunity © 2020. All rights reserved</p>
+        <p>4castbet.com © 2020. All rights reserved</p>
       </div>
 </footer>

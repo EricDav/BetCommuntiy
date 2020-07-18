@@ -7,7 +7,7 @@
              */
             include 'Pages/common/Head.php';
         ?>
-        <link rel="stylesheet" href="/bet_community/Public/css/contact.css">
+        <link rel="stylesheet" href="<?='/bet_community/Public/css/contact.css?v=' . BetCommunity::CSS['contact.css']?>">
     </head>
     <body>
         <?php
@@ -80,7 +80,7 @@
         </div>
         <?php include 'Pages/common/Footer.php';?>
         <?php include 'Pages/common/Script.php'?>
-        <script src = '/bet_community/Public/js/contact.js'></script>
+        <script src = "<?='/bet_community/Public/js/contact.js?v=' . BetCommunity::JS['contact.js']?>"></script>
         <script src="/bet_community/Public/js/script.js"></script>
     </body>
 </html>

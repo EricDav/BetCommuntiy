@@ -1,7 +1,7 @@
 <html class="js sizes customelements history pointerevents postmessage webgl websockets cssanimations csscolumns csscolumns-width csscolumns-span csscolumns-fill csscolumns-gap csscolumns-rule csscolumns-rulecolor csscolumns-rulestyle csscolumns-rulewidth csscolumns-breakbefore csscolumns-breakafter csscolumns-breakinside flexbox picture srcset webworkers" lang="en">
 <head>
   <?php include 'Pages/common/Head.php'?>
-  <link rel="stylesheet" href="/bet_community/Public/css/forgotPassword.css">
+  <link rel="stylesheet" href="<?='/bet_community/Public/css/forgotPassword.css?v=' . BetCommunity::CSS['forgotPassword.css']?>">
 </head>
 <body>
     <?php include 'Pages/common/Header.php'?>
@@ -117,7 +117,7 @@
     <?php if (isset($_SESSION['temp_user'])): ?>
       <script type="text/javascript">var __code=<?=json_encode($data['code'])?>;</script>
     <?php endif ?>
-    <script src="/bet_community/Public/js/forgotPassword.js"></script>
+    <script src="<?='/bet_community/Public/js/forgotPassword.js?v=' . BetCommunity::JS['forgotPassword.js']?>"></script>
     <script src="/bet_community/Public/js/script.js"></script>
 </body>
 </html>

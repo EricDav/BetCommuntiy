@@ -181,7 +181,7 @@
                     $this->setDateCreatedUTC($predictions);
                     $this->setPredictionInfo($predictions);
                     $this->data['template'] = 'Home.php';
-                    $this->data['title'] = 'BetCommunity';
+                    $this->data['title'] = '4CastBet';
                     $this->data['supportedBettingPlatforms'] = BetGamesController::SUPPORTED_BETTING_PLATFORMS;
                     $this->data['competitions'] = $competitions->data->competition;
                     $this->data['outcomes'] = BetCommunity::OUTCOMES;

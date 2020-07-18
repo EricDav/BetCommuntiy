@@ -91,7 +91,7 @@ class ContactController extends Controller{
     public function perform(){
         if ($this->request->method == 'GET') {
             $this->data['template'] = 'Contact.php';
-            $this->data['title'] = 'BetCommunity | Contact Us';
+            $this->data['title'] = '4CastBet | Contact Us';
             $this->responseType = 'html';
         }else if($this->request->method == 'POST'){
             $time = new DateTime('now');

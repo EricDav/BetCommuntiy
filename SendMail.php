@@ -26,7 +26,7 @@
 
             $emailHeader .= '<div style="width: 100%;border-top: 0px;border-left: 0px;border-bottom: 1px;border-right: 0px;border-style: solid;height: 50px; background-color: rgb(35, 31, 32)">
 
-                                <center><img width =60%; height=40;" src="http://betcommunity.net/bet_community/Public/images/logo1.png" alt="logo"></center>
+                                <center><img width =60%; height=40;" src="http://4castbet.com/bet_community/Public/images/logo1.png" alt="logo"></center>
                             </div>';
 
             return $emailHeader;
@@ -38,15 +38,15 @@
                                 <center>
                                     <div style="color: #27aae1;font-weight: 700;">Contact Us</div>
                                     <span style="color: black; font-weight: 700;">+1 (234) 222 0754</span> 
-                                    <span style="color: black;font-weight: 700;margin-left: 10px;">info@betcommunity.com</span>
-                                    <div style="color: black; font-weight: 600; font-style: oblique;">Visit our <a href="http://www.betcommunity.net">website</a> to view our latest predictions</div>
+                                    <span style="color: black;font-weight: 700;margin-left: 10px;">info@4castbet.com</span>
+                                    <div style="color: black; font-weight: 600; font-style: oblique;">Visit our <a href="http://www.4castbet.com">website</a> to view our latest predictions</div>
                                 </center>
                             </div>';
 
 
             $emailFooter .='<div style="background: #231F20;text-align: center;color: #fff;top: 457;width: 100%; height: 45px; border-bottom: 0px;">
                                 <center>
-                                    <p style="padding-top: 10px;">BetCommunity © 2020. All rights reserved</p>
+                                    <p style="padding-top: 10px;">4CastBet.com © 2020. All rights reserved</p>
                                 </center>
                             </div>';
             $emailFooter .='</div>';
@@ -65,14 +65,14 @@
             try {
                 $this->mail->isHTML(true); 
                 $this->mail->isSMTP();
-                $this->mail->Host  = "mail.betcommunity.net";
+                $this->mail->Host  = "mail.4castbet.com";
                 $this->mail->SMTPAuth   = true;                                 // Enable SMTP authentication
                 $this->mail->Username   = $this->envObj->email;            // SMTP username
                 $this->mail->Password   = $this->envObj->password;                      // SMTP password
                 // $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;          // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
                 $this->mail->Port       = 25;      
                 $this->mail->SMTPSecure = 'tsl';
-                $this->mail->setFrom('info@betcommunity.net', 'BetCommunity');
+                $this->mail->setFrom('info@4castbet.com');
                 if (is_array($this->to)) {
                     foreach($this->to as $email) {
                         $this->mail->addAddress($email); 
