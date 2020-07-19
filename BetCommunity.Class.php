@@ -59,7 +59,7 @@ class BetCommunity {
         'login.js' => 1,
         'notification.js' => 1,
         'outcome.js' => 1,
-        'prediction.js' => 1,
+        'prediction.js' => 2,
         'profile.js' => 1,
     ];
 
@@ -108,6 +108,7 @@ class BetCommunity {
         'NotificationController' => 'Controllers/Notification.Controller.php',
         'AboutController' => 'Controllers/About.Controller.php',
         'ErrorMail' => 'ErrorMail.php',
+        'ResizeImage' => 'Helper/ResizeImage.php'
     ];
 
     const OUTCOMES = array('1', '2', 'X', '1X', 'X2', '12', 'GG', 'NG', 'Over 0.5', 'Over 1.5',

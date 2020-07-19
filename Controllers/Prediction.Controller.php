@@ -59,9 +59,10 @@
             if (!$prediction) {
                 $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_NOT_FOUND, 'messages' => 'Prediction not found'));
             }
+            // var_dump($prediction); exit;
 
             // Checks if the first game has began
-            if (gmdate("Y-m-d\ H:i:s") < $prediction['start_date']) {
+            if (gmdate("Y-m-d\ H:i:s") < $prediction['start_date'] && $prediction['type'] != 'Bet9ja') {
                 $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_BAD_REQUEST_CODE, 'messages' => 'Can not update first game already began' ));
             }
 

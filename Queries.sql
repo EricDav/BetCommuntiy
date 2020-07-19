@@ -123,6 +123,15 @@ CREATE TABLE bugs(
     prediction_id int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE `contacts` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `message` varchar(255) NOT NULL,
+  `registered` tinyint(1) NOT NULL,
+  `user_id` varchar(100),
+  `send_date` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 ALTER TABLE `predictions`  

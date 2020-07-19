@@ -1809,14 +1809,19 @@ function removePrediction(e) {
     let outcomeResult;
     let outcomeResults = prediction.hasOwnProperty('outcome_results') ? prediction.outcome_results : [];
     prediction.fixtures.forEach(function (item, index) {
-        var dateStr = prediction.dates[index] + ' UTC';
-        var date = new Date(dateStr.replace(/-/g, '/'));
+        var date;
+        if (!prediction.hasOwnProperty('dates')) {
+            date = 'NS';
+        } else {
+            var dateStr = prediction.dates[index] + ' UTC';
+            date = new Date(dateStr.replace(/-/g, '/'));
+        }
 
         score = getScore(item, scores);
         outcomeResult = getOutcomeResult(item, outcomeResults);
         outcomeResult = outcomeResult ? outcomeResult : '<select onchange="selectOutcomeResult(this.value,' + "'" + item + "'" + ',' + predictionId + ')" style="width: 100%; height: 100%;"><option value="-1">Select</option><option value="1">Won</option><option value="0">Lost</option></select>';
 
-        $table += '<tr>' + '<td>' + formatDateCreated(date) + '</td>' + '<td>' + item + '</td>' + '<td>' + (score ? score : '<input onchange="onChangeScoresResult(this.value,' + "'" + item + "'" + ')" type="text" style="width: 100%; height: 100%;">') + '</td>' +
+        $table += '<tr>' + '<td>' + (date == 'NS' ? date : formatDateCreated(date)) + '</td>' + '<td>' + item + '</td>' + '<td>' + (score ? score : '<input onchange="onChangeScoresResult(this.value,' + "'" + item + "'" + ')" type="text" style="width: 100%; height: 100%;">') + '</td>' +
             '<td>' + prediction.outcomes[index] + '</td>' + '<td>' + outcomeResult + '</td>';
     });
 

@@ -17,7 +17,7 @@
 
     function checkFixture($fixture, $scores) {
         foreach($scores as $score) {
-            var_dump(property_exists($score, $fixture));
+            // (property_exists($score, $fixture));
             // exit;
             if (property_exists($score, $fixture)) {
                 return true;

@@ -36,6 +36,7 @@
                     return false;
                 }
             } catch(Exception $e) {
+                // var_dump($e); exit;
                 ErrorMail::LogError($e);
                 return 'Server error';
             }

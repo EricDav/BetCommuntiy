@@ -66,7 +66,7 @@
 
         public static function getPredictionsByIds($pdoConnection, $ids) {
             try {
-                $sql = "SELECT id, prediction FROM predictions WHERE id IN (" . $ids . ")";
+                $sql = "SELECT id, prediction, type FROM predictions WHERE id IN (" . $ids . ")";
                 return $pdoConnection->pdo->query($sql)->fetchAll();
             } catch(Exception $e) {
                 ErrorMail::LogError($e);
@@ -76,7 +76,7 @@
 
         public static function getPredictionById($pdoConnection, $id) {
             try {
-                $sql = "SELECT user_id, start_date, won, prediction FROM predictions WHERE id=" . $id;
+                $sql = "SELECT user_id, start_date, won, prediction, type FROM predictions WHERE id=" . $id;
                 return $pdoConnection->pdo->query($sql)->fetch();
             } catch(Exception $e) {
                 ErrorMail::LogError($e);

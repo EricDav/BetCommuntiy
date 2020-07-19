@@ -63,9 +63,7 @@
 
             if ($this->type == 'update_password') {
                 return $this->handleUpdatePasswordValidation();
-            }
-
-            
+            }  
         }
 
         public function perform() {
@@ -79,6 +77,10 @@
                     }
 
                     if (move_uploaded_file($_FILES['file']['tmp_name'],  __DIR__ . '/..' . '/Public/images/users/' . $newFilename)); {
+                        $resize = new ResizeImage(__DIR__ . '/..' . '/Public/images/users/' . $newFilename);
+                        $resize->resizeTo(280, 280, 'exact');
+                        $resize->saveImage(__DIR__ . '/..' . '/Public/images/users/' . $newFilename);
+
                         $_SESSION['userInfo']['imagePath'] = $newFilename;
                         $this->jsonResponse(array('success' => true, 'url' => '/bet_community/Public/images/users/' . $newFilename,  'code' => Controller::HTTP_OKAY_CODE, 'message' => 'User profile picture updated successfully'));
                     }

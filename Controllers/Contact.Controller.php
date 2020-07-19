@@ -82,6 +82,7 @@ class ContactController extends Controller{
                 }  
                 $field_indicator++;
             }
+            //echo "Valid here ===>>>"; exit;
             return true;
         }else{
             return false;
@@ -131,6 +132,7 @@ class ContactController extends Controller{
                 exit;
             }else{
                 $register_contact_message = $contact->storeContactMessage($name, $email, $message, $isAUser, $userId, $request_time, $this->pdoConnection);
+                // var_dump($register_contact_message); exit;
                 if($register_contact_message !== false && $register_contact_message !== true){
                     
                     $this->jsonResponse(
