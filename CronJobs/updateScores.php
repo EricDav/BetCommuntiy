@@ -4,6 +4,7 @@
     include __DIR__  . '/../DB/DBConnection.php';
     $envObj = json_decode(file_get_contents(__DIR__ .'/../.envJson'));
     
+    mail("alienyidavid4christ@gmail.com","My subject",'Test');
     function getMinutesDiffFromNow($dateStr){
         $startDate = new DateTime($dateStr);
         $sinceStart = $startDate->diff(new DateTime(gmdate("Y-m-d\ H:i:s")));
