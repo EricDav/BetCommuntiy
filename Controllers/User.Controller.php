@@ -117,6 +117,8 @@
             if (!$this->isLogin()) {
                 header('Location: /');
             } else {
+                setcookie('__uii', '', time() - 3600, "/");
+                setcookie('__uiispecial', '', time() - 3600, "/");
                 session_destroy();
                 header('Location: /');
             }
