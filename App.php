@@ -47,10 +47,15 @@ spl_autoload_register(function ($name) {
 });
 
 
+
+$enviroment = Enviroment::getEnv();
+$request = new Request(); // Create a request object
+$data = null;
+
 /**
  * Re-logs a user 
  */
-if (!isset($_SESSION['userInfo'])) {
+if (!isset($_SESSION['userInfo']) && $request->route != '/logout') {
     // check for token
     if (isset($_COOKIE['__uii']) &&  isset($_COOKIE['__uiispecial'])) {
         $userId = is_numeric($_COOKIE['__uii']) ? (int)$_COOKIE['__uii'] - BetCommunity::DEFAULT_ADD_PROFILE : null;
@@ -80,11 +85,6 @@ if (!isset($_SESSION['userInfo'])) {
         }
     }
 }
-
-
-$enviroment = Enviroment::getEnv();
-$request = new Request(); // Create a request object
-$data = null;
 
 if (in_array($request->route, array_keys(BetCommunity::routes))) {
 

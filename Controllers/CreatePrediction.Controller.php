@@ -1,7 +1,8 @@
 <?php 
     class CreatePredictionController extends Controller {
-        public function __construct($request) {
+        public function __construct($request, $envObj) {
             parent::__construct($request);
+            $this->envObj = $envObj;
             $this->startDateTime = isset($request->postData['start_date_time']) ? $request->postData['start_date_time'] : '';
             $this->endDateTime = isset($request->postData['end_date_time']) ? $request->postData['end_date_time'] : '';
             $this->prediction = $this->request->postData['prediction'];
@@ -97,11 +98,16 @@
                     }
                 }
 
-                // if ($this->type == BetGamesController::PLATFORM_BET9JA) {
-                //     if (!$this->getDatesForBet9jaBooking($this->prediction)) {
-                //         $this->error['prediction'] = 'Something is wrong with prediction json';
-                //     }
-                // }
+                if ($this->type == BetGamesController::PLATFORM_BET9JA) {
+                    $bet9jaIsValid = $this->validateBet9jaPredictionJson($this->prediction);
+                    if (!$bet9jaIsValid['success']) {
+                        $this->error['prediction'] = $bet9jaIsValid['message'];
+                    } else {
+                        $predictionData = json_decode($this->prediction);
+                        $predictionData->dates = $bet9jaIsValid['date'];
+                        $this->prediction = json_encode($predictionData);
+                    }
+                }
 
                 if (sizeof($this->error) == 0 && $this->type == 'fixtures') {
                     if(!$this->validateFixtureJson($this->prediction)['success']) {
@@ -209,6 +215,40 @@
             }
 
             return array('success' => true);
+        }
+
+        public function validateBet9jaPredictionJson($pridictionJson) {
+            $dataFromClient = json_decode($pridictionJson);
+            $bookingNumber = $dataFromClient->bet_code;
+
+            $url = $this->envObj->API_URL . '/bet9ja/' . $bookingNumber;
+            $data = json_decode(file_get_contents($url));
+
+            if (!$data->success) {
+                return array('success' => false, 'message' => $data->message);
+            }
+
+            if (sizeof($dataFromClient->fixtures) != sizeof($data->data->fixtures)) {
+                return array('success' => false, 'message' => 'Data does not match');
+            }
+
+            for($i = 0; $i < sizeof($data->data->dates); $i++) {
+                if (gmdate("Y-m-d\ H:i:s") > $data->data->dates[$i]) {
+                    return array('success' => false, 'message' => 'Date does not match');
+                }
+
+                if ($data->data->fixtures[$i] != $dataFromClient->fixtures[$i]) {
+                    return array('success' => false, 'message' => 'Fixtures does not match');
+                }
+
+                if ($data->data->outcomes[$i] != $dataFromClient->outcomes[$i]) {
+                    return array('success' => false, 'message' => 'Outcomes does not match');
+                }
+            }
+
+            return array('success' => true, 'date' => $data->data->dates);
+
+            // var_dump($data); exit;
         }
 
         /**
@@ -385,5 +425,4 @@
             return false;
         }
     }
-
 ?>

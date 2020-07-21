@@ -27,6 +27,18 @@
         return false;
     }
 
+    function genererateNotificationEmailHtml($match) {
+        $emailBody = '<div style = "padding: 10px; font-family: verdana">';
+        $emailBody .= '<p style = "background-color: #0089C9; color: white; margin: 0px !important; padding: 5px; border-radius: 5px; font-weight: bolder; font-size: 15;">Match Result</p>';
+        $emailBody .= "<hr style = 'margin: 0px; border-color: rgba(4, 146, 212, 0.55); border-width: 1px; border-top: 0px;'/>";
+        $emailBody .= "<ul style = 'display:flex; margin-top: 10px; padding: 0px; font-size: 12px; list-style-type:none'>";
+
+        $emailBody .= "<li><strong style = 'color:grey'>Post Date: </strong></li>";
+
+
+
+    }
+
     /**
      * This function takes two team from two 
      * different platform API and boking number and try 
@@ -145,6 +157,7 @@
                 foreach($endedMatches as $match) {
                     if ($match->home_id == $homeId && $match->away_id == $awayId) {
                         if ($prediction->is_each_game_update == 1) {
+                            
                             // send email notification
                         }
                         array_push($scores, array($predictionObj->fixtures[$index] => $match->ft_score));
