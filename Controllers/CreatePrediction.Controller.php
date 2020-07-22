@@ -239,7 +239,7 @@
                     return array('success' => false, 'message' => 'Date does not match');
                 }
 
-                if ($data->data->fixtures[$i] != $dataFromClient->fixtures[$i]) {
+                if (!$this->checkBet9jaMatchFixture($dataFromClient->fixtures, $data->data->fixtures[$i])) {
                     return array('success' => false, 'message' => 'Fixtures does not match');
                 }
 
@@ -252,6 +252,15 @@
             $this->endDateTime = $data->data->dates[sizeof($data->data->dates) - 1];
 
             return array('success' => true, 'date' => $data->data->dates);
+        }
+
+        public function checkBet9jaMatchFixture($fixturesFromClient, $fixtureFromServer) {
+            foreach($fixturesFromClient as $f) {
+                if ($f == $fixtureFromServer)
+                    return true;
+            }
+
+            return false;
         }
 
         /**
