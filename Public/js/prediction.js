@@ -12,7 +12,6 @@ var shouldSubmitPrediction = false; // A variable that determines if the predict
 var predictionRes = {};
 var getEachGameUpdate = $('#each-game-update');
 var getAllGameUpdate = $('#all-game-update');
-console.log('Yes...');
 
 /**
  * Start of declarations of constants uses
@@ -333,8 +332,8 @@ function resetCreatePredictionModal() {
         $('#outcome').val('');
         $('#table-section').empty();
         $('#main-error').val('');
-        getEachGameUpdate.attr("checked", false);
-        getAllGameUpdate.attr("checked", false);
+        getEachGameUpdate.prop("checked", false);
+        getAllGameUpdate.prop("checked", false);
     }
 }
 
@@ -641,11 +640,9 @@ function savePrediction(data) {
     data.current_date = getCurrentDateInStr();
     data.token = localStorage.getItem('$$token');
     data.id = $$id;
-    data.get_each_game_update = (getEachGameUpdate.val() == 'on')? 1:0;
-    data.get_all_game_update = (getAllGameUpdate.val() == 'on')? 1:0;
+    data.get_each_game_update = (getEachGameUpdate.is(':checked'))? 1:0;
+    data.get_all_game_update = (getAllGameUpdate.is(':checked'))? 1:0;
     
-
-
     predictionButton.text('Submitting...');
     predictionButton.prop('disabled', true);
 

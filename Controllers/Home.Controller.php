@@ -250,7 +250,6 @@
             return $html;
         }
 
-
         public function formatPredictionJson($predictionJson) {
             $predictions = json_decode($predictionJson);
         }

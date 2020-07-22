@@ -99,7 +99,9 @@
                 }
 
                 if ($this->type == BetGamesController::PLATFORM_BET9JA) {
+                    // echo 'Here'; exit;
                     $bet9jaIsValid = $this->validateBet9jaPredictionJson($this->prediction);
+                    // var_dump($bet9jaIsValid); exit;
                     if (!$bet9jaIsValid['success']) {
                         $this->error['prediction'] = $bet9jaIsValid['message'];
                     } else {
@@ -246,9 +248,10 @@
                 }
             }
 
-            return array('success' => true, 'date' => $data->data->dates);
+            $this->startDateTime = $data->data->dates[0];
+            $this->endDateTime = $data->data->dates[sizeof($data->data->dates) - 1];
 
-            // var_dump($data); exit;
+            return array('success' => true, 'date' => $data->data->dates);
         }
 
         /**

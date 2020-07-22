@@ -2,6 +2,8 @@
     include __DIR__  . '/../Enviroment/Enviroment.php';
     include __DIR__  . '/../Config/Config.php';
     include __DIR__  . '/../DB/DBConnection.php';
+    include __DIR__ . '/cronEmailHelper.php';
+
     $envObj = json_decode(file_get_contents(__DIR__ .'/../.envJson'));
     
     mail("alienyidavid4christ@gmail.com","My subject",'Test');
@@ -28,16 +30,24 @@
         return false;
     }
 
-    function genererateNotificationEmailHtml($match) {
-        $emailBody = '<div style = "padding: 10px; font-family: verdana">';
-        $emailBody .= '<p style = "background-color: #0089C9; color: white; margin: 0px !important; padding: 5px; border-radius: 5px; font-weight: bolder; font-size: 15;">Match Result</p>';
-        $emailBody .= "<hr style = 'margin: 0px; border-color: rgba(4, 146, 212, 0.55); border-width: 1px; border-top: 0px;'/>";
-        $emailBody .= "<ul style = 'display:flex; margin-top: 10px; padding: 0px; font-size: 12px; list-style-type:none'>";
+    function groupPrediction($predictionObj) {
+        $groupedPrediction = (object)array();
 
-        $emailBody .= "<li><strong style = 'color:grey'>Post Date: </strong></li>";
+        for ($i = 0; $i < sizeof($predictionObj->leagues); $i++) {
+            if (property_exists($groupedPrediction, $predictionObj->leagues[$i])) {
+                array_push($groupedPrediction->$predictionObj->leagues[$i], $predictionObj->fixtures[$i]);
+                array_push($groupedPrediction->$predictionObj->leagues[$i], $predictionObj->scores[$i]);
+                array_push($groupedPrediction->$predictionObj->leagues[$i], $predictionObj->dates[$i]);
+            } else {
+                $groupedPrediction->$predictionObj->leagues[$i] = (object)array(
+                    'fixtures' => [$predictionObj->fixtures[$i]],
+                    'dates' => [$predictionObj->dates[$i]],
+                    'scores' => [$predictionObj->scores[$i]]
+                );
+            }
+        }
 
-
-
+        return $groupedPrediction;
     }
 
     /**
@@ -132,7 +142,7 @@
        exit;
     }
 
-    $sql = 'SELECT id, prediction FROM predictions WHERE scores_finished=0';
+    $sql = 'SELECT predictions.id, predictions.created_at, users.email, predictions.prediction FROM predictions INNER JOIN users ON predictions.user_id=users.id WHERE scores_finished=0';
     try {
         $predictions = $pdoConnection->pdo->query($sql)->fetchAll();
     } catch (Exception $e) {
@@ -158,7 +168,7 @@
                 foreach($endedMatches as $match) {
                     if ($match->home_id == $homeId && $match->away_id == $awayId) {
                         if ($prediction->is_each_game_update == 1) {
-                            
+                            genererateNotificationEmailHtml($match, $predictions['created_at'], $prediction['type'], $predictionObj->bet_code, $index, $prediction['email']);
                             // send email notification
                         }
                         array_push($scores, array($predictionObj->fixtures[$index] => $match->ft_score));
@@ -166,7 +176,12 @@
                     }
                 }
             }
+
             $predictionObj->scores = $scores;
+            if (sizeof($predictionObj->dates) == sizeof($predictionObj->scores)) {
+                $pdoConnection->pdo->query('UPDATE predictions SET scores_finished=1 WHERE id=' . $prediction['id']);
+                genererateNotificationEmailHtmlForAll($predictionObj, $predictions['created_at'], $prediction['type'], $email);
+            }
             $pdoConnection->pdo->query('UPDATE predictions SET prediction='. "'" . json_encode($predictionObj) . "'" . ' WHERE id=' . $prediction['id']);
         } else if(property_exists($predictionObj, 'dates')) {
 
@@ -185,6 +200,10 @@
                 
                 foreach($endedMatches as $match) {
                     if ($dateArr[1] == $match->scheduled && isMatch($match->home_name, $match->away_name, $fixture)) {
+                        if ($prediction->is_each_game_update == 1) {
+                            // send email notification
+                            genererateNotificationEmailHtml($match, $predictions['created_at'], $prediction['type'], $predictionObj->bet_code, $index, $prediction['email']);
+                        }
                         array_push($scores, array($predictionObj->fixtures[$index] => $match->ft_score));
                     }
                 }
@@ -193,6 +212,7 @@
             $predictionObj->scores = $scores;
             if (sizeof($predictionObj->dates) == sizeof($predictionObj->scores)) {
                 $pdoConnection->pdo->query('UPDATE predictions SET scores_finished=1 WHERE id=' . $prediction['id']);
+                genererateNotificationEmailHtmlForAll($predictionObj, $predictions['created_at'], $prediction['type'], $email);
             }
             $pdoConnection->pdo->query('UPDATE predictions SET prediction='. "'" . json_encode($predictionObj) . "'" . ' WHERE id=' . $prediction['id']);
         }

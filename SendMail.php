@@ -9,9 +9,9 @@
 
     class SendMail {
         
-        public function __construct($to, $subject, $message) {
+        public function __construct($to, $subject, $message, $isHeaderFooterSet=false) {
             $this->envObj = json_decode(file_get_contents(__DIR__ .'/.envJson'));
-
+            $this->isHeaderFooterSet = $isHeaderFooterSet;
             $this->to = $to;
             $this->subject = $subject;
             $this->message = '';
@@ -56,12 +56,14 @@
         }
 
         public function setMessage($message) {
-            $this->message = $this->getEmailHeader() . $message .  $this->getEmailFooter();
-            // echo $this->message; exit;
+            if (!$this->isHeaderFooterSet) {
+                $this->message = $this->getEmailHeader() . $message .  $this->getEmailFooter();
+            } else {
+                $this->message = $message;
+            }
         }
 
         public function send() {
-            // echo $this->message; exit;
             try {
                 $this->mail->isHTML(true); 
                 $this->mail->isSMTP();

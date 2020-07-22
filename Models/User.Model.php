@@ -180,6 +180,7 @@
                 // echo $sql; exit;
                 return $pdoConnection->pdo->query($sql)->fetchAll();
             } catch(Exception $e) {
+                // echo 'Home'; exit;
                 ErrorMail::LogError($e);
                 return null;
             }

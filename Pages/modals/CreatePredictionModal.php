@@ -77,7 +77,7 @@
      </div>
     </div>
       <div class="modal-footer">
-        <!-- <div style = 'text-align:left'>
+        <div style = 'text-align:left'>
           <strong>Receive Game Update:</strong>
           <div>
             <label for = 'each-game-update' class = 'check-container'>
@@ -97,7 +97,7 @@
             </label>
             <span class = '#'>Update me at the end of all games.</span>
           </div>
-        </div> -->
+        </div>
         <button id="prediction-submit" type="button" class="btn btn-primary">Submit</button>
       </div>
     </div>
