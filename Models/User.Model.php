@@ -141,8 +141,10 @@
         public static function getFollowers($pdoConnection, $userId) {
             try {
                 $sql = 'SELECT * FROM followers WHERE follower_id=' . $userId;
+                // var_dump($sql); exit;
                 return $pdoConnection->pdo->query($sql)->fetchAll();
             } catch(Exception $e) {
+                mail("alienyidavid4christ@gmail.com", "SQL", $sql);
                 ErrorMail::LogError($e);
                 return null;
             }
