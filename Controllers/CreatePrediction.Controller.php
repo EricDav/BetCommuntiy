@@ -125,6 +125,24 @@
 
         }
 
+        public function setStartEndDatesForBet9ja($dates) {
+            $minDate = $dates[0];
+            $maxDate = $date[0];
+
+            for ($i = 0; $i < sizeof($dates); $i++) {
+                $cDate = $dates[$i];
+                if ($cDate > $maxDate) {
+                    $maxDate = $cDate;
+                }
+
+                if ($cDate < $minDate) {
+                    $minDate = $cDate;
+                }
+            }
+            $this->startDateTime = $minDate;
+            $this->endDateTime = $maxDate;
+        }
+
 
         public function isGetGameUpdateValid($value){
             $__isNumeric = false;
@@ -222,6 +240,7 @@
         public function validateBet9jaPredictionJson($pridictionJson) {
             $dataFromClient = json_decode($pridictionJson);
             $bookingNumber = $dataFromClient->bet_code;
+            // var_dump($dataFromClient->fixtures); exit;
 
             $url = $this->envObj->API_URL . '/bet9ja/' . $bookingNumber;
             $data = json_decode(file_get_contents($url));
@@ -244,10 +263,11 @@
                 }
             }
 
-            $this->startDateTime = $data->data->dates[0];
-            $this->endDateTime = $data->data->dates[sizeof($data->data->dates) - 1];
+            $dates = $this->getDates($dataFromClient->fixtures, $data->data->fixtures, $data->data->dates);
 
-            return array('success' => true, 'date' => $data->data->dates);
+            $this->setStartEndDatesForBet9ja($dates);
+
+            return array('success' => true, 'date' => $dates);
         }
 
         public function checkBet9jaMatchFixture($fixturesFromClient, $fixtureFromServer) {
@@ -257,6 +277,24 @@
             }
 
             return false;
+        }
+
+        public function getDates($fixturesFromClient, $fixturesFromAPI, $dates) {
+            $newDates = array();
+
+            foreach($fixturesFromClient as $fc) {
+                $index = 0;
+                foreach($fixturesFromAPI as $fa) {
+                    if ($fc == $fa) {
+                        array_push($newDates, $dates[$index]);
+                        break;
+                    }
+
+                    $index +=1;
+                }
+            }
+
+            return $newDates;
         }
 
         /**
