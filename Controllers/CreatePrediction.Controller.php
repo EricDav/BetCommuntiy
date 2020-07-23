@@ -242,10 +242,6 @@
                 if (!$this->checkBet9jaMatchFixture($dataFromClient->fixtures, $data->data->fixtures[$i])) {
                     return array('success' => false, 'message' => 'Fixtures does not match');
                 }
-
-                if ($data->data->outcomes[$i] != $dataFromClient->outcomes[$i]) {
-                    return array('success' => false, 'message' => 'Outcomes does not match');
-                }
             }
 
             $this->startDateTime = $data->data->dates[0];
