@@ -8,7 +8,7 @@
 
     $envObj = json_decode(file_get_contents(__DIR__ .'/../.envJson'));
     
-    mail("alienyidavid4christ@gmail.com","My subject",'Test');
+    // mail("alienyidavid4christ@gmail.com","My subject",'Test');
     function getMinutesDiffFromNow($dateStr){
         $startDate = new DateTime($dateStr);
         $sinceStart = $startDate->diff(new DateTime(gmdate("Y-m-d\ H:i:s")));
@@ -98,7 +98,10 @@
    // while (true) {
     $page = 0;
     $liveScroes = array();
-    $data = json_decode(file_get_contents('http://livescore-api.com/api-client/scores/live.json?key='. $envObj->LIVESCORE_API_KEY . '&secret=' . $envObj->LIVESCORE_API_SECRET));
+    $jsonData = file_get_contents('http://livescore-api.com/api-client/scores/live.json?key='. $envObj->LIVESCORE_API_KEY . '&secret=' . $envObj->LIVESCORE_API_SECRET);
+    $data = json_decode($jsonData);
+    // var_dump($data); exit;
+    file_put_contents("f.json", $jsonData);
     
     if (!$data->data->match) {
         ErrorMail::Log('updateScores.php', '110', 'It seems livescores API failed or returns empty result');

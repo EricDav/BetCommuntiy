@@ -499,6 +499,3 @@ $match = (object)[
 
 // genererateNotificationEmailHtmlForAll($predictionObj, 'Bet9ja', 'FGHRTY6', 'pythonboss123@gmail.com');
 ?>
-
-
-?>
