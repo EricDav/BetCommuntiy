@@ -3,6 +3,8 @@
     include __DIR__  . '/../Config/Config.php';
     include __DIR__  . '/../DB/DBConnection.php';
     include __DIR__ . '/cronEmailHelper.php';
+    include __DIR__  . '/../ErrorMail.php';
+    include __DIR__  . '/../BetCommunity.Class.php';
 
     $envObj = json_decode(file_get_contents(__DIR__ .'/../.envJson'));
     
@@ -20,34 +22,12 @@
 
     function checkFixture($fixture, $scores) {
         foreach($scores as $score) {
-            // (property_exists($score, $fixture));
-            // exit;
             if (property_exists($score, $fixture)) {
                 return true;
             }
         }
 
         return false;
-    }
-
-    function groupPrediction($predictionObj) {
-        $groupedPrediction = (object)array();
-
-        for ($i = 0; $i < sizeof($predictionObj->leagues); $i++) {
-            if (property_exists($groupedPrediction, $predictionObj->leagues[$i])) {
-                array_push($groupedPrediction->$predictionObj->leagues[$i], $predictionObj->fixtures[$i]);
-                array_push($groupedPrediction->$predictionObj->leagues[$i], $predictionObj->scores[$i]);
-                array_push($groupedPrediction->$predictionObj->leagues[$i], $predictionObj->dates[$i]);
-            } else {
-                $groupedPrediction->$predictionObj->leagues[$i] = (object)array(
-                    'fixtures' => [$predictionObj->fixtures[$i]],
-                    'dates' => [$predictionObj->dates[$i]],
-                    'scores' => [$predictionObj->scores[$i]]
-                );
-            }
-        }
-
-        return $groupedPrediction;
     }
 
     /**
@@ -104,7 +84,6 @@
         }
 
         $isSubStringForHome = checkTeamMatch($homeName, $homeAwayArr[0]);
-       // var_dump($isSubStringForHome);
         $isSubStringForAway = checkTeamMatch($awayName, $homeAwayArr[1]); // || strpos($homeAwayArr[1], $awayName);
         
         if ($isSubStringForHome && $isSubStringForAway)
@@ -121,6 +100,10 @@
     $liveScroes = array();
     $data = json_decode(file_get_contents('http://livescore-api.com/api-client/scores/live.json?key='. $envObj->LIVESCORE_API_KEY . '&secret=' . $envObj->LIVESCORE_API_SECRET));
     
+    if (!$data->data->match) {
+        ErrorMail::Log('updateScores.php', '110', 'It seems livescores API failed or returns empty result');
+       exit(-1);
+    }
 
     $endedMatches = array();
 
@@ -129,17 +112,9 @@
             array_push($endedMatches, $match);
     }
 
-    if (!$data->data->match) {
-        ErrorMail::Log('updateScores.php', '110', 'It seems livescores API failed or returns empty result');
-    }
-
-
-    if (!$data->data->match || sizeof($endedMatches) == 0) {
-        echo $counter;
-        $counter +=1;
-        // sleep(1800);
-       //  continue;
-       exit;
+    if (sizeof($endedMatches) == 0) {
+        // ErrorMail::Log('updateScores.php', '110', 'It seems livescores API failed or returns empty result');
+        exit(0);
     }
 
     $sql = 'SELECT predictions.id, predictions.created_at, users.email, predictions.prediction FROM predictions INNER JOIN users ON predictions.user_id=users.id WHERE scores_finished=0';
@@ -168,6 +143,7 @@
                 foreach($endedMatches as $match) {
                     if ($match->home_id == $homeId && $match->away_id == $awayId) {
                         if ($prediction->is_each_game_update == 1) {
+                            echo 'Here'; exit;
                             genererateNotificationEmailHtml($match, $predictions['created_at'], $prediction['type'], $predictionObj->bet_code, $index, $prediction['email']);
                             // send email notification
                         }
@@ -180,7 +156,7 @@
             $predictionObj->scores = $scores;
             if (sizeof($predictionObj->dates) == sizeof($predictionObj->scores)) {
                 $pdoConnection->pdo->query('UPDATE predictions SET scores_finished=1 WHERE id=' . $prediction['id']);
-                genererateNotificationEmailHtmlForAll($predictionObj, $predictions['created_at'], $prediction['type'], $email);
+                genererateNotificationEmailHtmlForAll($predictionObj, $predictions['created_at'], $prediction['type'], $prediction['email']);
             }
             $pdoConnection->pdo->query('UPDATE predictions SET prediction='. "'" . json_encode($predictionObj) . "'" . ' WHERE id=' . $prediction['id']);
         } else if(property_exists($predictionObj, 'dates')) {
@@ -201,6 +177,7 @@
                 foreach($endedMatches as $match) {
                     if ($dateArr[1] == $match->scheduled && isMatch($match->home_name, $match->away_name, $fixture)) {
                         if ($prediction->is_each_game_update == 1) {
+                            echo "here other";
                             // send email notification
                             genererateNotificationEmailHtml($match, $predictions['created_at'], $prediction['type'], $predictionObj->bet_code, $index, $prediction['email']);
                         }
@@ -211,8 +188,9 @@
 
             $predictionObj->scores = $scores;
             if (sizeof($predictionObj->dates) == sizeof($predictionObj->scores)) {
+                echo "ALLLLLLLLLL";
                 $pdoConnection->pdo->query('UPDATE predictions SET scores_finished=1 WHERE id=' . $prediction['id']);
-                genererateNotificationEmailHtmlForAll($predictionObj, $predictions['created_at'], $prediction['type'], $email);
+                genererateNotificationEmailHtmlForAll($predictionObj, $predictions['created_at'], $prediction['type'], $prediction['email']);
             }
             $pdoConnection->pdo->query('UPDATE predictions SET prediction='. "'" . json_encode($predictionObj) . "'" . ' WHERE id=' . $prediction['id']);
         }

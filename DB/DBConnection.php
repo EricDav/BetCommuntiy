@@ -22,8 +22,6 @@ class PDOConnection {
 
             $this->pdo = $pdo;
         } catch(Exception $e) {
-            // TODO 
-            // Determines what to do in catch of open 
             ErrorMail::LogError($e);
         }
     }

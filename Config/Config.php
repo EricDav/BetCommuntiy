@@ -4,7 +4,7 @@
             'development' => array(
                 'user' => 'root',
                 'password' => 'root',
-                'host' => 'localhost',
+                'host' => '127.0.0.1',
                 'database' => 'bet_community',
                 'port' => 8889
             ),

@@ -492,12 +492,12 @@ $match = (object)[
     "fixture_id"=> 5,
     "scheduled"=> "14:00"
 ];
-$str = '{"leagues":["Premier League","Bundesliga","Allsvenskan","Allsvenskan","Bundesliga","Premier League","Serie A"],"fixtures":["FC Ararat-Armenia - Alashkert","TSV Hartberg - Wolfsberger AC","Hammarby IF - Varbergs BoIS FC","Orebro SK - BK Hacken","Werder Bremen - 1. FC Heidenheim 1846","Man City - Liverpool","Roma - Udinese"],"outcomes":["1X2 - Home","1X2 - Away","1X2 - Home","1X2 - Away","1X2 - Home","1X2 - Away","1X2 - Home"],"odds":["2.00","1.48","1.53","2.00","1.54","3.84","1.78"],"dates":["2020-07-02 16:00","2020-07-02 16:30","2020-07-02 17:00","2020-07-02 17:00","2020-07-02 18:30","2020-07-02 19:15","2020-07-02 19:45"],"bet_code":"BC5MSRQF","scores":[{"Hammarby IF - Varbergs BoIS FC":"1 - 0"},{"Man City - Liverpool":"4 - 0"},{"Roma - Udinese":"0 - 2"},{"FC Ararat-Armenia - Alashkert":"1-0"},{"TSV Hartberg - Wolfsberger AC":"2-1"},{"FC Ararat-Armenia - Alashkert":"1-0"},{"TSV Hartberg - Wolfsberger AC":"2-1"}]}';
+// $str = '{"leagues":["Premier League","Bundesliga","Allsvenskan","Allsvenskan","Bundesliga","Premier League","Serie A"],"fixtures":["FC Ararat-Armenia - Alashkert","TSV Hartberg - Wolfsberger AC","Hammarby IF - Varbergs BoIS FC","Orebro SK - BK Hacken","Werder Bremen - 1. FC Heidenheim 1846","Man City - Liverpool","Roma - Udinese"],"outcomes":["1X2 - Home","1X2 - Away","1X2 - Home","1X2 - Away","1X2 - Home","1X2 - Away","1X2 - Home"],"odds":["2.00","1.48","1.53","2.00","1.54","3.84","1.78"],"dates":["2020-07-02 16:00","2020-07-02 16:30","2020-07-02 17:00","2020-07-02 17:00","2020-07-02 18:30","2020-07-02 19:15","2020-07-02 19:45"],"bet_code":"BC5MSRQF","scores":[{"Hammarby IF - Varbergs BoIS FC":"1 - 0"},{"Man City - Liverpool":"4 - 0"},{"Roma - Udinese":"0 - 2"},{"FC Ararat-Armenia - Alashkert":"1-0"},{"TSV Hartberg - Wolfsberger AC":"2-1"},{"FC Ararat-Armenia - Alashkert":"1-0"},{"TSV Hartberg - Wolfsberger AC":"2-1"}]}';
 
-$predictionObj = json_decode($str);
-// var_dump($predictionObj); exit;
+// $predictionObj = json_decode($str);
+// // var_dump($predictionObj); exit;
 
-genererateNotificationEmailHtmlForAll($predictionObj, 'Bet9ja', 'FGHRTY6', 'pythonboss123@gmail.com');
+// genererateNotificationEmailHtmlForAll($predictionObj, 'Bet9ja', 'FGHRTY6', 'pythonboss123@gmail.com');
 ?>
 
 
