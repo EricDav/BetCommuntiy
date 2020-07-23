@@ -80,6 +80,7 @@ if (!isset($_SESSION['userInfo']) && $request->route != '/logout') {
                     );
 
                     $_SESSION['userInfo'] = $userInfo;
+                    $request->session = $_SESSION;
                 }
             }
         }
