@@ -101,7 +101,7 @@
 
     $jsonData = file_get_contents('http://livescore-api.com/api-client/scores/live.json?key='. $envObj->LIVESCORE_API_KEY . '&secret=' . $envObj->LIVESCORE_API_SECRET);
     $data = json_decode($jsonData);
-    var_dump($data); exit;
+   // var_dump($data); exit;
     
     if (!$data->data->match) {
         ErrorMail::Log('updateScores.php', '110', 'It seems livescores API failed or returns empty result');
