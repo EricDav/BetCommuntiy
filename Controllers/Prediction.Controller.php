@@ -22,6 +22,18 @@
 
         }
 
+        public function getNum($data) {
+            $newNum = '';
+        
+            for($i = 0; $i < strlen($data); $i++) {
+                if (is_numeric($data[$i]) || $data[$i] == '.') {
+                    $newNum .=$data[$i];
+                }
+            }
+        
+            return $newNum;
+        }
+
         public function update() {
             $this->authenticateAdmin();
             $this->pdoConnection->open();
@@ -369,6 +381,124 @@
             }
 
             $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_SERVER_ERROR_CODE, 'message' => 'Server error liking or unliking'));
+        }
+
+        public function getGamesFromBet9jaBetslip() {
+            include_once __DIR__ . '/../simplehtmldom/simple_html_dom.php';
+
+            $betslip = $this->request->postData['betslip'] ? $this->request->postData['betslip'] : null;
+
+            $url = 'https://shop.bet9ja.com/Sport/Default.aspx';
+            $data = array('h$w$PC$ctl05$txtCodiceCoupon' => $betslip,
+                    'h$w$SM' => 'h$w$PC$ctl05$upCheckCoupon|h$w$PC$ctl05$lnkCheckCoupon',
+                    '__VIEWSTATEGENERATOR' => '15C4A0A3',
+                    '__EVENTTARGET' => 'h$w$PC$ctl05$lnkCheckCoupon',
+                    '__ASYNCPOST' => true,
+            );
+
+            // use key 'http' even if you send the request to https://...
+            $options = array(
+                'http' => array(
+                    'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+                    'method'  => 'POST',
+                    'content' => http_build_query($data)
+                )
+            );
+            $context  = stream_context_create($options);
+            $result = file_get_contents($url, false, $context);
+
+            $r = explode('showPopupCouponCheck', $result)[2];
+
+            $sn = explode(';', $r);
+            $data = explode(',', $sn[0]);
+
+            $IDCoupon = $this->getNum($data[0]);
+            $IDBookmaker = $this->getNum($data[2]);
+            $IDUtente = $this->getNum($data[3]);
+
+            $html = file_get_html('https://shop.bet9ja.com/Sport/CouponCheckDetailsPopup.aspx?IDCoupon=' . $IDCoupon . '&IDBookmaker=' . $IDBookmaker . '&IDUtente=' . $IDUtente);
+            $leagues = [];
+            $fixtures = [];
+            $outcomes = [];
+            $outcomesOv = [];
+            $odds = [];
+            $dates = [];
+
+            foreach($html->find('.dgAItemStyle') as $elem) {
+                $index = 0;
+                foreach($elem->find('td') as $td) {
+                    echo $index;
+                    if ($index == 0) {
+                        $event = explode('-', $td->innertext);
+                        array_push($leagues, trim($event[0]));
+                        array_push($fixtures, trim($event[1] . '-' . $event[2]));
+                    }
+            
+                    if ($index == 1) {
+                        array_push($dates, trim($td->innertext));
+                    }
+            
+                    if ($index == 2) {
+                        array_push($outcomes, trim($td->innertext));
+                    }
+            
+                    if ($index == 3) {
+                        array_push($outcomesOv, trim($this->getNum($td->innertext)));
+                    }
+            
+                    if ($index == 4) {
+                        array_push($odds, trim($td->innertext));
+                    }
+            
+                    $index+=1;
+                }
+            }
+            
+            foreach($html->find('.dgItemStyle') as $elem) {
+                $index = 0;
+                foreach($elem->find('td') as $td) {
+                    echo $index;
+                    if ($index == 0) {
+                        $event = explode('-', $td->innertext);
+                        array_push($leagues, trim($event[0]));
+                        array_push($fixtures, trim($event[1] . '-' . $event[2]));
+                    }
+            
+                    if ($index == 1) {
+                        array_push($dates, trim($td->innertext));
+                    }
+            
+                    if ($index == 2) {
+                        array_push($outcomes, trim($td->innertext));
+                    }
+            
+                    if ($index == 3) {
+                        array_push($outcomesOv, trim($this->getNum($td->innertext)));
+                    }
+            
+                    if ($index == 4) {
+                        array_push($odds, trim($td->innertext));
+                    }
+            
+                    $index+=1;
+                }
+            }
+
+            for ($i = 0; $i < sizeof($outcomes); $i++) {
+                if ((int)$outcomesOv[$i] > 0) {
+                    $outcomes[$i] = $outcomes[$i] . ' ' . $outcomesOv[$i];
+                }
+            }
+
+            $data = array(
+                'leagues' => $leagues,
+                'fixtures' => $fixtures,
+                'dates' => $dates,
+                'outcomes' => $outcomes,
+                'odds' => $odds
+            );
+
+            $this->jsonResponse(array('success' => true, 'data' => $data, 'code' => Controller::HTTP_OKAY_CODE));
         }
     }
 ?>
