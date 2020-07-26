@@ -1,9 +1,11 @@
 <?php
 include 'SendMail.php';
 
-function genererateNotificationEmailHtml($match, $dateCreated, $type, $betslip, $gamePos, $email) {
+function genererateNotificationEmailHtml($match, $dateCreated, $type, $betslip, $gamePos, $email, $id) {
     $htScore = explode(' - ', $match->ht_score);
     $ftScore = explode(' - ', $match->score);
+    $url = "http://www.4castbet.com/predictions/" . $id;
+
     // exit;
     $emailBody = '<head>
     <meta name = "viewport" content = "width=device-width, initial-scale=1">
@@ -143,13 +145,13 @@ function genererateNotificationEmailHtml($match, $dateCreated, $type, $betslip, 
                 <center>
                 <div style = "width: 100%; height: auto; margin-top: 20px;">
                     <!--button-->
-                    <button style = "box-shadow:inset 0px 1px 0px 0px #97c4fe; background:linear-gradient(to bottom, #3d94f6 5%, #1e62d0 100%); background-color:#3d94f6; border-radius:6px; border:1px solid #337fed;
+                    <a href=' . '"' . $url . '"' .  ' style = "box-shadow:inset 0px 1px 0px 0px #97c4fe; background:linear-gradient(to bottom, #3d94f6 5%, #1e62d0 100%); background-color:#3d94f6; border-radius:6px; border:1px solid #337fed;
                     display:inline-block; cursor:pointer; color:#ffffff; font-family:Arial; font-size:15px; font-weight:bold; padding:6px 24px; text-decoration:none; text-shadow:0px 1px 0px #1570cd;"
                     onmouseover = "this.style.background = "linear-gradient(to bottom, #1e62d0 5%, #3d94f6 100%)"; this.style.background = "#1e62d0""
                     onmousedown="this.style.position = "relative"; this.style.top =  1+"px""
                     onmouseup="this.style.position = "relative"; this.style.top =  0+"px"">
                         Click to view post status
-                    </button>
+                    </a>
                     <!--end of button-->
                 </div>
                 </center>
@@ -204,8 +206,8 @@ function genererateNotificationEmailHtml($match, $dateCreated, $type, $betslip, 
     // return $emailBody;
 }
 
-function genererateNotificationEmailHtmlForAll($predictionObj, $dateCreated, $type, $email) {
-    // exit;
+function genererateNotificationEmailHtmlForAll($predictionObj, $dateCreated, $type, $email, $id) {
+    $url = "http://www.4castbet.com/predictions/" . $id;
     $emailBody = '<head>
     <meta name = "viewport" content = "width=device-width, initial-scale=1">
     <style>
@@ -287,13 +289,13 @@ function genererateNotificationEmailHtmlForAll($predictionObj, $dateCreated, $ty
                 <center>
                 <div style = "width: 100%; height: auto; margin-top: 20px;">
                     <!--button-->
-                    <button style = "box-shadow:inset 0px 1px 0px 0px #97c4fe; background:linear-gradient(to bottom, #3d94f6 5%, #1e62d0 100%); background-color:#3d94f6; border-radius:6px; border:1px solid #337fed;
+                    <a href='.'"' . $url . '"' .  ' style = "box-shadow:inset 0px 1px 0px 0px #97c4fe; background:linear-gradient(to bottom, #3d94f6 5%, #1e62d0 100%); background-color:#3d94f6; border-radius:6px; border:1px solid #337fed;
                     display:inline-block; cursor:pointer; color:#ffffff; font-family:Arial; font-size:15px; font-weight:bold; padding:6px 24px; text-decoration:none; text-shadow:0px 1px 0px #1570cd;"
                     onmouseover = "this.style.background = "linear-gradient(to bottom, #1e62d0 5%, #3d94f6 100%)"; this.style.background = "#1e62d0""
                     onmousedown="this.style.position = "relative"; this.style.top =  1+"px""
                     onmouseup="this.style.position = "relative"; this.style.top =  0+"px"">
                         Click to view post status
-                    </button>
+                    </>
                     <!--end of button-->
                 </div>
                 </center>
@@ -468,34 +470,4 @@ function groupPrediction($predictionObj) {
 
     return $groupedPrediction;
 }
-
-$match = (object)[
-    "competition_id"=> 370,
-    "status"=> "IN PLAY",
-    "ht_score"=> "0 - 0",
-    "ft_score"=> "0 - 2",
-    "et_score"=> "",
-    "last_changed"=> "2019-07-19 14=>14=>05",
-    "id"=> 149525,
-    "league_name"=> "Club Friendlies",
-    "away_id"=> 499,
-    "score"=> "0 - 2",
-    "competition_name"=> "Club Friendlies",
-    "events"=> false,
-    "home_id"=> 0,
-    "away_name"=> "Bristol City",
-    "added"=> "2019-07-19 12=>45=>04",
-    "time"=> "37",
-    "home_name"=> "Sarasota Metropolis FC",
-    "league_id"=> 5,
-    "location"=> "IMG Academy Bradenton, Florida",
-    "fixture_id"=> 5,
-    "scheduled"=> "14:00"
-];
-// $str = '{"leagues":["Premier League","Bundesliga","Allsvenskan","Allsvenskan","Bundesliga","Premier League","Serie A"],"fixtures":["FC Ararat-Armenia - Alashkert","TSV Hartberg - Wolfsberger AC","Hammarby IF - Varbergs BoIS FC","Orebro SK - BK Hacken","Werder Bremen - 1. FC Heidenheim 1846","Man City - Liverpool","Roma - Udinese"],"outcomes":["1X2 - Home","1X2 - Away","1X2 - Home","1X2 - Away","1X2 - Home","1X2 - Away","1X2 - Home"],"odds":["2.00","1.48","1.53","2.00","1.54","3.84","1.78"],"dates":["2020-07-02 16:00","2020-07-02 16:30","2020-07-02 17:00","2020-07-02 17:00","2020-07-02 18:30","2020-07-02 19:15","2020-07-02 19:45"],"bet_code":"BC5MSRQF","scores":[{"Hammarby IF - Varbergs BoIS FC":"1 - 0"},{"Man City - Liverpool":"4 - 0"},{"Roma - Udinese":"0 - 2"},{"FC Ararat-Armenia - Alashkert":"1-0"},{"TSV Hartberg - Wolfsberger AC":"2-1"},{"FC Ararat-Armenia - Alashkert":"1-0"},{"TSV Hartberg - Wolfsberger AC":"2-1"}]}';
-
-// $predictionObj = json_decode($str);
-// // var_dump($predictionObj); exit;
-
-// genererateNotificationEmailHtmlForAll($predictionObj, 'Bet9ja', 'FGHRTY6', 'pythonboss123@gmail.com');
 ?>

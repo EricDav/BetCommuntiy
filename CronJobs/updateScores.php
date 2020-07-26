@@ -22,6 +22,7 @@
 
     function checkFixture($fixture, $scores) {
         foreach($scores as $score) {
+            var_dump($score); var_dump($fixture); echo '|';
             if (property_exists($score, $fixture)) {
                 return true;
             }
@@ -98,10 +99,12 @@
    // while (true) {
     $page = 0;
     $liveScroes = array();
-    $jsonData = file_get_contents('http://livescore-api.com/api-client/scores/live.json?key='. $envObj->LIVESCORE_API_KEY . '&secret=' . $envObj->LIVESCORE_API_SECRET);
+    $jsonData = file_get_contents('G.json');
+
+    //$jsonData = file_get_contents('http://livescore-api.com/api-client/scores/live.json?key='. $envObj->LIVESCORE_API_KEY . '&secret=' . $envObj->LIVESCORE_API_SECRET);
     $data = json_decode($jsonData);
     // var_dump($data); exit;
-    file_put_contents("f.json", $jsonData);
+    // file_put_contents("G.json", $jsonData);
     
     if (!$data->data->match) {
         ErrorMail::Log('updateScores.php', '110', 'It seems livescores API failed or returns empty result');
@@ -120,7 +123,7 @@
         exit(0);
     }
 
-    $sql = 'SELECT predictions.id, predictions.created_at, users.email, predictions.prediction FROM predictions INNER JOIN users ON predictions.user_id=users.id WHERE scores_finished=0';
+    $sql = 'SELECT predictions.id, created_at, type, is_each_game_update, is_all_game_update, predictions.created_at, users.email, predictions.prediction FROM predictions INNER JOIN users ON predictions.user_id=users.id WHERE scores_finished=0';
     try {
         $predictions = $pdoConnection->pdo->query($sql)->fetchAll();
     } catch (Exception $e) {
@@ -145,30 +148,28 @@
                 
                 foreach($endedMatches as $match) {
                     if ($match->home_id == $homeId && $match->away_id == $awayId) {
-                        if ($prediction->is_each_game_update == 1) {
-                            echo 'Here'; exit;
-                            genererateNotificationEmailHtml($match, $predictions['created_at'], $prediction['type'], $predictionObj->bet_code, $index, $prediction['email']);
+                        array_push($scores, array($predictionObj->fixtures[$index] => $match->ft_score));
+                        if ($prediction['is_each_game_update'] == 1) {
+                            genererateNotificationEmailHtml($match, $prediction['created_at'], $prediction['type'], $predictionObj->bet_code, $index, $prediction['email'],$prediction['id']);
                             // send email notification
                         }
-                        array_push($scores, array($predictionObj->fixtures[$index] => $match->ft_score));
                         break;
                     }
                 }
             }
 
             $predictionObj->scores = $scores;
+            $pdoConnection->pdo->query('UPDATE predictions SET prediction='. "'" . json_encode($predictionObj) . "'" . ' WHERE id=' . $prediction['id']);
             if (sizeof($predictionObj->dates) == sizeof($predictionObj->scores)) {
                 $pdoConnection->pdo->query('UPDATE predictions SET scores_finished=1 WHERE id=' . $prediction['id']);
-                genererateNotificationEmailHtmlForAll($predictionObj, $predictions['created_at'], $prediction['type'], $prediction['email']);
+                genererateNotificationEmailHtmlForAll($predictionObj, $prediction['created_at'], $prediction['type'], $prediction['email'], $prediction['id']);
             }
-            $pdoConnection->pdo->query('UPDATE predictions SET prediction='. "'" . json_encode($predictionObj) . "'" . ' WHERE id=' . $prediction['id']);
         } else if(property_exists($predictionObj, 'dates')) {
-
             for ($index = 0; $index < sizeof($predictionObj->dates); $index++) {
 
                 // checks if fixture scores has been updated.
                 if (checkFixture($predictionObj->fixtures[$index], $scores))
-                    continue;
+                    continue; 
                 $dateArr = explode(' ', $predictionObj->dates[$index]); // Get's the date arr e.g ['2020-07-01', '6:20'] 
                 $fixture = explode(' - ', $predictionObj->fixtures[$index]); // Get's the fixtures in array e.g ['Chelsea', 'Barca']
                 
@@ -179,26 +180,23 @@
                 
                 foreach($endedMatches as $match) {
                     if ($dateArr[1] == $match->scheduled && isMatch($match->home_name, $match->away_name, $fixture)) {
-                        if ($prediction->is_each_game_update == 1) {
-                            echo "here other";
-                            // send email notification
-                            genererateNotificationEmailHtml($match, $predictions['created_at'], $prediction['type'], $predictionObj->bet_code, $index, $prediction['email']);
-                        }
                         array_push($scores, array($predictionObj->fixtures[$index] => $match->ft_score));
+                        if ($prediction['is_each_game_update'] == 1) {
+                            // send email notification
+                            genererateNotificationEmailHtml($match, $prediction['created_at'], $prediction['type'], $predictionObj->bet_code, $index, $prediction['email'],  $prediction['id']);
+                        }
                     }
                 }
             }
 
             $predictionObj->scores = $scores;
-            if (sizeof($predictionObj->dates) == sizeof($predictionObj->scores)) {
-                echo "ALLLLLLLLLL";
-                $pdoConnection->pdo->query('UPDATE predictions SET scores_finished=1 WHERE id=' . $prediction['id']);
-                genererateNotificationEmailHtmlForAll($predictionObj, $predictions['created_at'], $prediction['type'], $prediction['email']);
-            }
             $pdoConnection->pdo->query('UPDATE predictions SET prediction='. "'" . json_encode($predictionObj) . "'" . ' WHERE id=' . $prediction['id']);
+            if (sizeof($predictionObj->dates) == sizeof($predictionObj->scores)) {
+                $pdoConnection->pdo->query('UPDATE predictions SET scores_finished=1 WHERE id=' . $prediction['id']);
+                genererateNotificationEmailHtmlForAll($predictionObj, $prediction['created_at'], $prediction['type'], $prediction['email'], $prediction['id']);
+            }
         }
     }
 
     exit(1);
- // }
 ?>
