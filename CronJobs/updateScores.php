@@ -184,23 +184,28 @@
                 // Checks if game has not started or in progress
                 if ($predictionObj->dates[$index] > gmdate("Y-m-d\ H:i:s") || getMinutesDiffFromNow($predictionObj->dates[$index]) < 90)
                     continue;
-                
+                $counter = 0;
                 foreach($endedMatches as $match) {
                     if ($dateArr[1] == $match->scheduled && isMatch($match->home_name, $match->away_name, $fixture)) {
-                        mail("alienyidavid4christ@gmail.com","My subject", "I got something!!!");
+                        
+                        // mail("alienyidavid4christ@gmail.com","My subject", "I got something!!!");
                         array_push($scores, array($predictionObj->fixtures[$index] => $match->ft_score));
+                        mail("alienyidavid4christ@gmail.com","My subject", json_encode($scores));
                         if ($prediction['is_each_game_update'] == 1) {
+                            mail("alienyidavid4christ@gmail.com","My subject", "InIn");
                             // send email notification
                             genererateNotificationEmailHtml($match, $prediction['created_at'], $prediction['type'], $predictionObj->bet_code, $index, $prediction['email'],  $prediction['id']);
                             mail("alienyidavid4christ@gmail.com","My subject", "Sent email");
                         }
                     }
+                    file_put_contents(__DIR__ . "/" . $prediction['id'] . "-" . (string)$counter , $jsonData);
+                    $counter+=1;
                 }
             }
 
             $predictionObj->scores = $scores;
             $pdoConnection->pdo->query('UPDATE predictions SET prediction='. "'" . json_encode($predictionObj) . "'" . ' WHERE id=' . $prediction['id']);
-            mail("alienyidavid4christ@gmail.com","My subject", "Updateed shit");
+            // mail("alienyidavid4christ@gmail.com","My subject", "Updateed shit");
             if (sizeof($predictionObj->dates) == sizeof($predictionObj->scores)) {
                 $pdoConnection->pdo->query('UPDATE predictions SET scores_finished=1 WHERE id=' . $prediction['id']);
                 genererateNotificationEmailHtmlForAll($predictionObj, $prediction['created_at'], $prediction['type'], $prediction['email'], $prediction['id']);
