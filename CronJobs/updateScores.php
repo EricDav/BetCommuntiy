@@ -2,6 +2,7 @@
     include __DIR__  . '/../Enviroment/Enviroment.php';
     include __DIR__  . '/../Config/Config.php';
     include __DIR__  . '/../DB/DBConnection.php';
+    include __DIR__ . '/../SendMail.php';
     include __DIR__ . '/cronEmailHelper.php';
     include __DIR__  . '/../ErrorMail.php';
     include __DIR__  . '/../BetCommunity.Class.php';
@@ -100,12 +101,10 @@
     $page = 0;
     $liveScroes = array();
 
-    $jsonData = file_get_contents('http://livescore-api.com/api-client/scores/live.json?key='. $envObj->LIVESCORE_API_KEY . '&secret=' . $envObj->LIVESCORE_API_SECRET);
+    // $jsonData = file_get_contents('http://livescore-api.com/api-client/scores/live.json?key='. $envObj->LIVESCORE_API_KEY . '&secret=' . $envObj->LIVESCORE_API_SECRET);
+    $jsonData = file_get_contents(__DIR__ . "/G.json");
     $data = json_decode($jsonData);
     file_put_contents(__DIR__ . "/G.json", $jsonData);
-
-    mail("alienyidavid4christ@gmail.com","My subject", $jsonData);
-    // var_dump($data->data->match); exit;
     
     if (!$data->data->match) {
         mail("alienyidavid4christ@gmail.com","My subject", "API return empty or fail");
@@ -123,7 +122,6 @@
     // var_dump($endedMatches); exit;
 
     if (sizeof($endedMatches) == 0) {
-        mail("alienyidavid4christ@gmail.com","My subject", "No ended matches!!!");
         ErrorMail::Log('updateScores.php', '110', 'Empty ended matches');
         exit(0);
     }
@@ -134,8 +132,6 @@
     } catch (Exception $e) {
         ErrorMail::LogError($e);
     }
-
-    mail("alienyidavid4christ@gmail.com","My subject", json_encode($predictions));
 
     foreach($predictions as $prediction) {
         $predictionObj = json_decode($prediction['prediction']);
@@ -198,14 +194,13 @@
                             mail("alienyidavid4christ@gmail.com","My subject", "Sent email");
                         }
                     }
-                    file_put_contents(__DIR__ . "/" . $prediction['id'] . "-" . (string)$counter , $jsonData);
                     $counter+=1;
                 }
             }
 
             $predictionObj->scores = $scores;
             $pdoConnection->pdo->query('UPDATE predictions SET prediction='. "'" . json_encode($predictionObj) . "'" . ' WHERE id=' . $prediction['id']);
-            // mail("alienyidavid4christ@gmail.com","My subject", "Updateed shit");
+            // mail("alienyidavid4christ@gmail.com","My subject", "Updated shit");
             if (sizeof($predictionObj->dates) == sizeof($predictionObj->scores)) {
                 $pdoConnection->pdo->query('UPDATE predictions SET scores_finished=1 WHERE id=' . $prediction['id']);
                 genererateNotificationEmailHtmlForAll($predictionObj, $prediction['created_at'], $prediction['type'], $prediction['email'], $prediction['id']);

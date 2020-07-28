@@ -1,6 +1,4 @@
 <?php
-include 'SendMail.php';
-
 function genererateNotificationEmailHtml($match, $dateCreated, $type, $betslip, $gamePos, $email, $id) {
     $htScore = explode(' - ', $match->ht_score);
     $ftScore = explode(' - ', $match->score);
