@@ -104,9 +104,11 @@
     $jsonData = file_get_contents('http://livescore-api.com/api-client/scores/live.json?key='. $envObj->LIVESCORE_API_KEY . '&secret=' . $envObj->LIVESCORE_API_SECRET);
     $data = json_decode($jsonData);
     file_put_contents(__DIR__ . "/G.json", $jsonData);
+    mail("alienyidavid4christ@gmail.com","My subject", $jsonData);
     // var_dump($data->data->match); exit;
     
     if (!$data->data->match) {
+        mail("alienyidavid4christ@gmail.com","My subject", "API return empty or fail");
         ErrorMail::Log('updateScores.php', '110', 'It seems livescores API failed or returns empty result');
         exit(-1);
     }
@@ -118,13 +120,13 @@
             array_push($endedMatches, $match);
     }
 
+    // var_dump($endedMatches); exit;
+
     if (sizeof($endedMatches) == 0) {
         mail("alienyidavid4christ@gmail.com","My subject", "No ended matches!!!");
         ErrorMail::Log('updateScores.php', '110', 'Empty ended matches');
         exit(0);
     }
-
-    mail("alienyidavid4christ@gmail.com","My subject", $jsonData);
 
     $sql = 'SELECT predictions.id, created_at, type, is_each_game_update, is_all_game_update, predictions.created_at, users.email, predictions.prediction FROM predictions INNER JOIN users ON predictions.user_id=users.id WHERE scores_finished=0';
     try {
