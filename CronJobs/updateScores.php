@@ -24,7 +24,7 @@
 
     function checkFixture($fixture, $scores) {
         foreach($scores as $score) {
-            var_dump($score); var_dump($fixture); echo '|';
+            // var_dump($score); var_dump($fixture); echo '|';
             if (property_exists($score, $fixture)) {
                 return true;
             }
@@ -103,8 +103,8 @@
 
     $jsonData = file_get_contents('http://livescore-api.com/api-client/scores/live.json?key='. $envObj->LIVESCORE_API_KEY . '&secret=' . $envObj->LIVESCORE_API_SECRET);
     $data = json_decode($jsonData);
-    file_put_contents("G.json", $data);
-    // var_dump($data); exit;
+    file_put_contents(__DIR__ . "/G.json", $jsonData);
+    // var_dump($data->data->match); exit;
     
     if (!$data->data->match) {
         ErrorMail::Log('updateScores.php', '110', 'It seems livescores API failed or returns empty result');
