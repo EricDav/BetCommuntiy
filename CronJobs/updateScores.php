@@ -6,7 +6,6 @@
     include __DIR__  . '/../ErrorMail.php';
     include __DIR__  . '/../BetCommunity.Class.php';
 
-
     $envObj = json_decode(file_get_contents(__DIR__ .'/../.envJson'));
     
     mail("alienyidavid4christ@gmail.com","My subject",'Test');
@@ -104,6 +103,7 @@
     $jsonData = file_get_contents('http://livescore-api.com/api-client/scores/live.json?key='. $envObj->LIVESCORE_API_KEY . '&secret=' . $envObj->LIVESCORE_API_SECRET);
     $data = json_decode($jsonData);
     file_put_contents(__DIR__ . "/G.json", $jsonData);
+
     mail("alienyidavid4christ@gmail.com","My subject", $jsonData);
     // var_dump($data->data->match); exit;
     
@@ -187,10 +187,12 @@
                 
                 foreach($endedMatches as $match) {
                     if ($dateArr[1] == $match->scheduled && isMatch($match->home_name, $match->away_name, $fixture)) {
+                        mail("alienyidavid4christ@gmail.com","My subject", "I got something!!!");
                         array_push($scores, array($predictionObj->fixtures[$index] => $match->ft_score));
                         if ($prediction['is_each_game_update'] == 1) {
                             // send email notification
                             genererateNotificationEmailHtml($match, $prediction['created_at'], $prediction['type'], $predictionObj->bet_code, $index, $prediction['email'],  $prediction['id']);
+                            mail("alienyidavid4christ@gmail.com","My subject", "Sent email");
                         }
                     }
                 }
@@ -198,6 +200,7 @@
 
             $predictionObj->scores = $scores;
             $pdoConnection->pdo->query('UPDATE predictions SET prediction='. "'" . json_encode($predictionObj) . "'" . ' WHERE id=' . $prediction['id']);
+            mail("alienyidavid4christ@gmail.com","My subject", "Updateed shit");
             if (sizeof($predictionObj->dates) == sizeof($predictionObj->scores)) {
                 $pdoConnection->pdo->query('UPDATE predictions SET scores_finished=1 WHERE id=' . $prediction['id']);
                 genererateNotificationEmailHtmlForAll($predictionObj, $prediction['created_at'], $prediction['type'], $prediction['email'], $prediction['id']);
