@@ -2,7 +2,7 @@
 function genererateNotificationEmailHtml($match, $dateCreated, $type, $betslip, $gamePos, $email, $id) {
     $htScore = explode(' - ', $match->ht_score);
     $ftScore = explode(' - ', $match->score);
-    $url = "http://www.4castbet.com/predictions/" . $id;
+    $url = "http://www.4castbet.com/predictions?id=" . $id;
 
     // exit;
     $emailBody = '<head>
@@ -205,7 +205,7 @@ function genererateNotificationEmailHtml($match, $dateCreated, $type, $betslip, 
 }
 
 function genererateNotificationEmailHtmlForAll($predictionObj, $dateCreated, $type, $email, $id) {
-    $url = "http://www.4castbet.com/predictions/" . $id;
+    $url = "http://www.4castbet.com/predictions?id=" . $id;
     $emailBody = '<head>
     <meta name = "viewport" content = "width=device-width, initial-scale=1">
     <style>
