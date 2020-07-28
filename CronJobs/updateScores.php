@@ -119,6 +119,7 @@
     }
 
     if (sizeof($endedMatches) == 0) {
+        mail("alienyidavid4christ@gmail.com","My subject", "No ended matches!!!");
         ErrorMail::Log('updateScores.php', '110', 'Empty ended matches');
         exit(0);
     }
@@ -133,7 +134,7 @@
     }
 
     mail("alienyidavid4christ@gmail.com","My subject", json_encode($predictions));
-    
+
     foreach($predictions as $prediction) {
         $predictionObj = json_decode($prediction['prediction']);
         $scores = property_exists($predictionObj, 'scores') ? $predictionObj->scores : [];
