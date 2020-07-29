@@ -386,7 +386,7 @@
         public function getGamesFromBet9jaBetslip() {
             include_once __DIR__ . '/../simplehtmldom/simple_html_dom.php';
 
-            $betslip = $this->request->postData['betslip'] ? $this->request->postData['betslip'] : null;
+            $betslip = $this->request->query['betslip'] ? $this->request->query['betslip'] : null;
 
             $url = 'https://shop.bet9ja.com/Sport/Default.aspx';
             $data = array('h$w$PC$ctl05$txtCodiceCoupon' => $betslip,
@@ -416,38 +416,70 @@
             $IDBookmaker = $this->getNum($data[2]);
             $IDUtente = $this->getNum($data[3]);
 
+            if (!$IDCoupon || !$IDBookmaker || !$IDUtente) {
+                $this->jsonResponse(array('success' => false, 'message' => 'Bet slip is invalid', 'code' => Controller::HTTP_SERVER_ERROR_CODE));
+            }
+
             $html = file_get_html('https://shop.bet9ja.com/Sport/CouponCheckDetailsPopup.aspx?IDCoupon=' . $IDCoupon . '&IDBookmaker=' . $IDBookmaker . '&IDUtente=' . $IDUtente);
+            $leagues1 = [];
+            $fixtures1 = [];
+            $outcomes1 = [];
+            $outcomesOv1 = [];
+            $odds1 = [];
+            $dates1 = [];
+            $results1 = [];
+
+            $leagues2 = [];
+            $fixtures2 = [];
+            $outcomes2 = [];
+            $outcomesOv2 = [];
+            $odds2 = [];
+            $dates2 = [];
+            $results2 = [];
+
             $leagues = [];
             $fixtures = [];
             $outcomes = [];
             $outcomesOv = [];
             $odds = [];
             $dates = [];
+            $results = [];
 
             foreach($html->find('.dgAItemStyle') as $elem) {
                 $index = 0;
                 foreach($elem->find('td') as $td) {
-                    echo $index;
                     if ($index == 0) {
                         $event = explode('-', $td->innertext);
-                        array_push($leagues, trim($event[0]));
-                        array_push($fixtures, trim($event[1] . '-' . $event[2]));
+                        array_push($leagues2, trim($event[0]));
+                        array_push($fixtures2, trim($event[1] . '-' . $event[2]));
                     }
             
                     if ($index == 1) {
-                        array_push($dates, trim($td->innertext));
+                        array_push($dates2, trim($td->innertext));
                     }
             
                     if ($index == 2) {
-                        array_push($outcomes, trim($td->innertext));
+                        array_push($outcomes2, trim($td->innertext));
                     }
             
                     if ($index == 3) {
-                        array_push($outcomesOv, trim($this->getNum($td->innertext)));
+                        array_push($outcomesOv2, trim($this->getNum($td->innertext)));
                     }
             
                     if ($index == 4) {
-                        array_push($odds, trim($td->innertext));
+                        array_push($odds2, trim($td->innertext));
+                    }
+            
+                    if ($index == 6) {
+                        $resultHtml = str_get_html($td->innertext);
+                        $t = '';
+                        foreach($resultHtml->find('span') as $e) {
+                            $t = $e->innertext;
+                            if ($t) {
+                                break;
+                            }
+                        }
+                       array_push($results2, $t);
                     }
             
                     $index+=1;
@@ -457,33 +489,70 @@
             foreach($html->find('.dgItemStyle') as $elem) {
                 $index = 0;
                 foreach($elem->find('td') as $td) {
-                    echo $index;
                     if ($index == 0) {
                         $event = explode('-', $td->innertext);
-                        array_push($leagues, trim($event[0]));
-                        array_push($fixtures, trim($event[1] . '-' . $event[2]));
+                        array_push($leagues1, trim($event[0]));
+                        array_push($fixtures1, trim($event[1] . '-' . $event[2]));
                     }
             
                     if ($index == 1) {
-                        array_push($dates, trim($td->innertext));
+                        array_push($dates1, trim($td->innertext));
                     }
             
                     if ($index == 2) {
-                        array_push($outcomes, trim($td->innertext));
+                        array_push($outcomes1, trim($td->innertext));
                     }
             
                     if ($index == 3) {
-                        array_push($outcomesOv, trim($this->getNum($td->innertext)));
+                        array_push($outcomesOv1, trim($this->getNum($td->innertext)));
                     }
             
                     if ($index == 4) {
-                        array_push($odds, trim($td->innertext));
+                        array_push($odds1, trim($td->innertext));
                     }
             
+                    if ($index == 6) {
+                        $resultHtml = str_get_html($td->innertext);
+                        $t = null;
+                        foreach($resultHtml->find('span') as $e) {
+                            $t = $e->innertext;
+                            if ($t) {
+                                break;
+                            }
+                        }
+                       array_push($results1, $t);
+                    }
                     $index+=1;
                 }
             }
-
+            
+            // $size = sizeof($leagues1) + sizeof($leagues2);
+            // B945TEARARSAWT-7704684
+            $size = sizeof($leagues1);
+            
+            for ($i = 0; $i < $size; $i++) { 
+               // if (fmod($i, 2) == 0) {
+                   array_push($leagues, $leagues1[$i]);
+                   array_push($dates, $dates1[$i]);
+                   array_push($odds, $odds1[$i]);
+                   array_push($outcomes, $outcomes1[$i]);
+                   array_push($outcomesOv, $outcomesOv1[$i]);
+                   array_push($results, $results1[$i]);
+                   array_push($fixtures, $fixtures1[$i]);
+               // } else {
+                   if ($i == $size - 1 && sizeof($leagues1) > sizeof($leagues2))
+                        continue;
+                    
+                    array_push($leagues, $leagues2[$i]);
+                    array_push($dates, $dates2[$i]);
+                    array_push($odds, $odds2[$i]);
+                    array_push($outcomes, $outcomes2[$i]);
+                    array_push($outcomesOv, $outcomesOv2[$i]);
+                    array_push($results, $results2[$i]);
+                    array_push($fixtures, $fixtures2[$i]);
+                //}
+            }
+            
             for ($i = 0; $i < sizeof($outcomes); $i++) {
                 if ((int)$outcomesOv[$i] > 0) {
                     $outcomes[$i] = $outcomes[$i] . ' ' . $outcomesOv[$i];
@@ -495,7 +564,8 @@
                 'fixtures' => $fixtures,
                 'dates' => $dates,
                 'outcomes' => $outcomes,
-                'odds' => $odds
+                'odds' => $odds,
+                'results' => $results
             );
 
             $this->jsonResponse(array('success' => true, 'data' => $data, 'code' => Controller::HTTP_OKAY_CODE));

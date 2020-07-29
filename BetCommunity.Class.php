@@ -33,6 +33,7 @@ class BetCommunity {
         '/api/web/notifications/email-settings' => "NotificationController@updateSettings",
         '/notifications/email-settings' => "NotificationController@updateEmailSettings",
         '/api/web/predictions/update' => 'PredictionController@update',
+        '/api/bet9ja-betslip' =>  'PredictionController@getGamesFromBet9jaBetslip',
         '/about' => "AboutController",
         '/' => "HomeController"
     ];
