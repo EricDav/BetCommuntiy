@@ -1,5 +1,6 @@
 <?php 
     class PredictionController extends Controller {
+        const CLIENT_ID = '90e32c15459b9cdb5a86c6f0bd2f096c';
         public function __construct($request) {
             parent::__construct($request);
             $this->predictionId = null;
@@ -19,7 +20,6 @@
             }
 
             $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_SERVER_ERROR_CODE, 'message' => 'Server error could not delete prediction'));
-
         }
 
         public function getNum($data) {
@@ -383,10 +383,27 @@
             $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_SERVER_ERROR_CODE, 'message' => 'Server error liking or unliking'));
         }
 
+        /**
+         * It get the game info from a bet9ja betslip
+         * game info that includes fixtures, odds, dates, etc.
+         * 
+         * It handles the route 
+         */
         public function getGamesFromBet9jaBetslip() {
             include_once __DIR__ . '/../simplehtmldom/simple_html_dom.php';
 
             $betslip = $this->request->query['betslip'] ? $this->request->query['betslip'] : null;
+            $slipPos = $this->request->query['pos'] ? explode(',', $this->request->query['pos']) : null;
+            $clientID = $this->request->query['client_id'] ?  $this->request->query['client_id'] : null;
+            
+            if (!$clientID) {
+                $this->authenticate();
+            }
+
+            if ($clientID && $clientID != self::CLIENT_ID) {
+                // Client id is invalid
+                $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_SERVER_ERROR_CODE, 'message' => 'Server error'));
+            }
 
             $url = 'https://shop.bet9ja.com/Sport/Default.aspx';
             $data = array('h$w$PC$ctl05$txtCodiceCoupon' => $betslip,
@@ -526,20 +543,17 @@
                 }
             }
             
-            // $size = sizeof($leagues1) + sizeof($leagues2);
-            // B945TEARARSAWT-7704684
             $size = sizeof($leagues1);
             
             for ($i = 0; $i < $size; $i++) { 
-               // if (fmod($i, 2) == 0) {
                    array_push($leagues, $leagues1[$i]);
                    array_push($dates, $dates1[$i]);
                    array_push($odds, $odds1[$i]);
                    array_push($outcomes, $outcomes1[$i]);
                    array_push($outcomesOv, $outcomesOv1[$i]);
+
                    array_push($results, $results1[$i]);
                    array_push($fixtures, $fixtures1[$i]);
-               // } else {
                    if ($i == $size - 1 && sizeof($leagues1) > sizeof($leagues2))
                         continue;
                     
@@ -550,7 +564,6 @@
                     array_push($outcomesOv, $outcomesOv2[$i]);
                     array_push($results, $results2[$i]);
                     array_push($fixtures, $fixtures2[$i]);
-                //}
             }
             
             for ($i = 0; $i < sizeof($outcomes); $i++) {
@@ -568,7 +581,175 @@
                 'results' => $results
             );
 
+            if ($clientID) {
+                $data = $this->retrieveNeededData((object)$data, $slipPos);
+            }
+
             $this->jsonResponse(array('success' => true, 'data' => $data, 'code' => Controller::HTTP_OKAY_CODE));
+        }
+
+        public function retrieveNeededData($data, $pos) {
+            $envObj = json_decode(file_get_contents(__DIR__ .'/../.envJson'));
+
+            $livescores = array();
+
+            $leagues = array();
+            $fixtures = array();
+            $results = array();
+            $events = array();
+            $outcomes = array();
+
+            $isFetch = false;
+
+            if (!$pos) {
+                $pos = [];
+                $counter = 1;
+                for($i = 1; $i <= sizeof($data->leagues); $i++) {
+                    array_push($pos, $i);
+                }
+            }
+
+            foreach($pos as $p) {
+                $index = (int)$p - 1;
+                $result = $data->results[$index];
+                $time = null;
+
+                if (!$result) {
+
+                    $date = $this->convertBet9jaDate($data->dates[$index]);
+                    if ($date > gmdate("Y-m-d\ H:i:s")) {
+                        $time = 'NS';  // abbreviation for not started
+                    } else if (!$isFetch) {
+                        $url = $envObj->API_URL . '/soccer24/live-score';
+                        $liveData = json_decode(file_get_contents($url));
+                        $livescores = $liveData->data;
+
+                        $isFetch = true;
+                        $fixture = explode(' - ', $data->fixtures[$index]);
+                        $liveScore = $this->getResult($fixture, $livescores);
+                        $result = $liveScore ? $liveScore->score : 'NF';
+                        $time = $liveScore->time ? $liveScore->time : 'NF';
+                    } else if ($livescores) {
+                        $fixture = explode(' - ', $data->fixtures[$index]);
+                        $liveScore = $this->getResult($fixture, $livescores);
+                        $result = $liveScore ? $liveScore->score : 'NF';
+                        $time = $liveScore->time ? $liveScore->time : 'NF';
+                    }
+                } else {
+                    $time = 'FT';
+                }
+
+                if (!$isFetch && !$livescores) {
+                    // something  is not right here
+                }
+
+                array_push($fixtures, $data->fixtures[$index]);
+                array_push($leagues, $data->leagues[$index]);
+                array_push($outcomes, $data->outcomes[$index]);
+                array_push($results, $result);
+                array_push($events, $time);
+            }
+
+            return array(
+                'leagues' => $leagues,
+                'events' => $events,
+                'results' => $results,
+                'fixtures' => $fixtures,
+                'outcomes' => $outcomes,
+            );
+        }
+
+        public function convertBet9jaDate($date) {
+            $dateTime = explode(' ', $date);
+            $dateArr = explode('/', $dateTime[0]);
+
+            $timeArr = explode(':', $dateTime[1]);
+            $timeStr = (string)((int)$timeArr[0] - 1) . ':' . $timeArr[1] . ':' . $timeArr[2];
+
+            return $dateArr[2] . '-' . $dateArr[1] . '-' . $dateArr[0] . ' ' . $timeStr;
+        }
+
+        public function getResult($fixture, $livescores) {
+            foreach($livescores as $livescore) {
+                if ($this->isMatch($livescore->home_name, $livescore->away_name, $fixture)) {
+                    return $livescore;
+                }
+            }
+
+            return null;
+        }
+
+        public function getMinutesDiffFromNow($dateStr){
+            $startDate = new DateTime($dateStr);
+            $sinceStart = $startDate->diff(new DateTime(gmdate("Y-m-d\ H:i:s")));
+    
+            $minutes = $sinceStart->days * 24 * 60;
+            $minutes += $sinceStart->h * 60;
+            $minutes += $sinceStart->i;
+            
+            return $minutes;
+        }
+    
+        /**
+         * This function takes two team from two 
+         * different platform API and boking number and try 
+         * to do some matching if they are the same.
+         * 
+         * E.g Manchester City && Man City should return true 
+         * for the above instance.
+         */
+        public function checkTeamMatch($fromApi, $fromBooking) {
+            if ($fromApi == $fromBooking) 
+                return true;
+            
+            // return strpos($fromApi, $fromBooking) !== false || strpos($fromBooking, $fromApi) !== false;
+    
+            $fromAPiArr = explode(' ', $fromApi);
+            $fromBookingArr = explode(' ', $fromBooking);
+    
+            // Loop to find empty elements and 
+            // unset the empty elements 
+            foreach($fromAPiArr as $key => $value)          
+                if(empty($value)) 
+                    unset($fromAPiArr[$key]);
+    
+            foreach($fromBookingArr as $key => $value)          
+                if(empty($value))
+                    unset($fromBookingArr[$key]);
+    
+            
+    
+            if (sizeof($fromAPiArr) == 1 || sizeof($fromBookingArr) == 1) {
+                return strpos($fromApi, $fromBooking) !== false || strpos($fromBooking, $fromApi) !== false;
+            }
+    
+            if (sizeof($fromAPiArr) != sizeof($fromBookingArr)) {
+                return false;
+            }
+    
+            for($i = 0; $i < sizeof($fromBookingArr); $i++) {
+                if (strpos($fromAPiArr[$i], $fromBookingArr[$i]) !== false || strpos($fromBookingArr[$i], $fromAPiArr[$i]) !== false) {
+                    continue;
+                }
+    
+                return false;
+            }
+    
+            return true;
+        }
+    
+        public function isMatch($homeName, $awayName, $homeAwayArr) {
+            if ($homeName == $homeAwayArr[0] && $awayName == $homeAwayArr[1]) {
+                true;
+            }
+    
+            $isSubStringForHome = $this->checkTeamMatch($homeName, $homeAwayArr[0]);
+            $isSubStringForAway = $this->checkTeamMatch($awayName, $homeAwayArr[1]); // || strpos($homeAwayArr[1], $awayName);
+            
+            if ($isSubStringForHome && $isSubStringForAway)
+                return true;
+            
+            return false;
         }
     }
 ?>
