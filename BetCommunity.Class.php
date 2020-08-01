@@ -34,6 +34,7 @@ class BetCommunity {
         '/notifications/email-settings' => "NotificationController@updateEmailSettings",
         '/api/web/predictions/update' => 'PredictionController@update',
         '/api/bet9ja-betslip' =>  'PredictionController@getGamesFromBet9jaBetslip',
+        '/api/bet9ja-cashout' =>  'PredictionController@getCashout',
         '/about' => "AboutController",
         '/' => "HomeController"
     ];
@@ -109,7 +110,8 @@ class BetCommunity {
         'NotificationController' => 'Controllers/Notification.Controller.php',
         'AboutController' => 'Controllers/About.Controller.php',
         'ErrorMail' => 'ErrorMail.php',
-        'ResizeImage' => 'Helper/ResizeImage.php'
+        'ResizeImage' => 'Helper/ResizeImage.php',
+        'PredictionModel' => 'Models/Sms.Model.php',
     ];
 
     const OUTCOMES = array('1', '2', 'X', '1X', 'X2', '12', 'GG', 'NG', 'Over 0.5', 'Over 1.5',

@@ -139,3 +139,10 @@ ALTER TABLE `predictions`
     AFTER `type`,  
     ADD `get_all_game_update` BOOLEAN NOT NULL DEFAULT FALSE  
     AFTER `get_each_game_update`;
+
+CREATE TABLE sms_bolt (
+    `id` int NOT NULL AUTO_INCREMENT,
+    phone_number VARCHAR(20),
+    credits VARCHAR(20),
+    PRIMARY KEY(id)
+)

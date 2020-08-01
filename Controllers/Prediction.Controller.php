@@ -383,6 +383,22 @@
             $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_SERVER_ERROR_CODE, 'message' => 'Server error liking or unliking'));
         }
 
+        public function getBalance($pdoConnection, $phoneNumber) {
+            $balanceObj = SmsModel::getBalance($pdoConnection, $phoneNumber);
+            if (!$phoneNumber || !is_numeric($phoneNumber)) {
+                $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_BAD_REQUEST, 'message' => 'Invalid phone number'));
+            }
+            if (!$balanceObj) {
+                $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_NOT_FOUND, 'message' => 'Phone number not registered'));
+            }
+
+            if ((int)$balanceObj->credits == 0) {
+                $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_BAD_REQUEST, 'message' => 'You did not have any credit'));
+            }
+
+            return $balanceObj->credits;
+        }
+
         /**
          * It get the game info from a bet9ja betslip
          * game info that includes fixtures, odds, dates, etc.
@@ -395,7 +411,9 @@
             $betslip = $this->request->query['betslip'] ? $this->request->query['betslip'] : null;
             $slipPos = $this->request->query['pos'] ? explode(',', $this->request->query['pos']) : null;
             $clientID = $this->request->query['client_id'] ?  $this->request->query['client_id'] : null;
-            
+            $phoneNumber = $this->request->query['phone_number'] ?  $this->request->query['phone_number'] : null;
+
+            $this->pdoConnection->open();
             if (!$clientID) {
                 $this->authenticate();
             }
@@ -403,6 +421,8 @@
             if ($clientID && $clientID != self::CLIENT_ID) {
                 // Client id is invalid
                 $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_SERVER_ERROR_CODE, 'message' => 'Server error'));
+            } else {
+                $balance = $this->getBalance( $this->pdoConnection, $phoneNumber);
             }
 
             $url = 'https://shop.bet9ja.com/Sport/Default.aspx';
@@ -578,7 +598,8 @@
                 'dates' => $dates,
                 'outcomes' => $outcomes,
                 'odds' => $odds,
-                'results' => $results
+                'results' => $results,
+                'balance' => $balance,
             );
 
             if ($clientID) {
@@ -610,7 +631,14 @@
             }
 
             foreach($pos as $p) {
+                if (!is_numeric($p))
+                    continue;
+                
                 $index = (int)$p - 1;
+
+                if ($index >= sizeof($data->leagues))
+                    continue;
+                
                 $result = $data->results[$index];
                 $time = null;
 
@@ -750,6 +778,84 @@
                 return true;
             
             return false;
+        }
+
+        public function getCashout() {
+            $betslip = $this->request->query['betslip'] ? $this->request->query['betslip'] : null;
+            $phoneNumber = $this->request->query['phone_number'] ?  $this->request->query['phone_number'] : null;
+            $this->pdoConnection->open();
+
+            $balance = $this->getBalance($this->pdoConnection, $phoneNumber);
+            $url = 'https://shop.bet9ja.com/Sport/Default.aspx';
+            $data = array('h$w$PC$ctl05$txtCodiceCoupon' => $betslip,
+                    'h$w$SM' => 'h$w$PC$ctl05$upCheckCoupon|h$w$PC$ctl05$lnkCheckCoupon',
+                    '__VIEWSTATEGENERATOR' => '15C4A0A3',
+                    '__EVENTTARGET' => 'h$w$PC$ctl05$lnkCheckCoupon',
+                    '__ASYNCPOST' => true,
+                );
+
+            $options = array(
+                'http' => array(
+                    'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+                    'method'  => 'POST',
+                    'content' => http_build_query($data)
+                )
+            );
+
+            $context  = stream_context_create($options);
+            $result = file_get_contents($url, false, $context);
+
+            $r = explode('showPopupCouponCheck', $result)[2];
+
+            $sn = explode(';', $r);
+            $data = explode(',', $sn[0]);
+
+            $IDCoupon = $this->getNum($data[0]);
+            $IDBookmaker = $this->getNum($data[2]);
+            $IDUtente = $this->getNum($data[3]);
+            $urlCashout = 'https://shop.bet9ja.com/Controls/CouponWS.asmx/Cashout_CheckOut';
+
+            $dataCashout = array(
+                'IDBookmaker' => $IDBookmaker,
+                'IDCoupon' => $IDCoupon,
+                'IDUtente' => 0,
+                'IDUtenteCoupon' => $IDUtente,
+            );
+            $headers  = [
+                'Content-Type: application/json; charset=UTF-8'
+            ];
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlCashout);
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($dataCashout));           
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            $result     = curl_exec ($ch);
+            $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+            $data = json_decode($result);
+
+            $this->jsonResponse(array('success' => $data->d->isValid, 'data' => array('amount' => $data->d->amount), 'code' => Controller::HTTP_OKAY_CODE));
+        }
+
+        public function updateBalance() {
+            $phoneNumber = $this->request->query['phone_number'] ?  $this->request->query['phone_number'] : null;
+            $usedCredits = $this->request->query['used_credits'] ?  $this->request->query['credits'] : null;
+            $this->pdoConnection->open();
+            $balance = $this->getBalance($this->pdoConnection, $phoneNumber);
+
+            if ($balance < $usedCredits) {
+                $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_BAD_REQUEST, 'message' => 'Credits not enoug!'));
+            }
+
+            $newBalance = (int)$balance - (int)$usedCredits;
+
+            if (SmsModel::updateBalance($this->pdoConnection, $phoneNumber, $newBalance)) {
+                $this->jsonResponse(array('success' => true, 'code' => Controller::HTTP_OKAY_CODE));
+            }
+
+            $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_SERVER_ERROR_CODE, 'message' => 'Server error could not update balance'));
         }
     }
 ?>
