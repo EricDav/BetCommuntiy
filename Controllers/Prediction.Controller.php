@@ -386,14 +386,14 @@
         public function getBalance($pdoConnection, $phoneNumber) {
             $balanceObj = SmsModel::getBalance($pdoConnection, $phoneNumber);
             if (!$phoneNumber || !is_numeric($phoneNumber)) {
-                $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_BAD_REQUEST, 'message' => 'Invalid phone number'));
+                $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_BAD_REQUEST_CODE, 'message' => 'Invalid phone number'));
             }
             if (!$balanceObj) {
                 $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_NOT_FOUND, 'message' => 'Phone number not registered'));
             }
 
             if ((int)$balanceObj->credits == 0) {
-                $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_BAD_REQUEST, 'message' => 'You did not have any credit'));
+                $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_BAD_REQUEST_CODE, 'message' => 'You did not have any credit'));
             }
 
             return $balanceObj->credits;
@@ -782,7 +782,7 @@
 
         public function getCashout() {
             $betslip = $this->request->query['betslip'] ? $this->request->query['betslip'] : null;
-            $phoneNumber = $this->request->query['phone_number'] ?  $this->request->query['phone_number'] : null;
+            $phoneNumber = isset($this->request->query['phone_number']) ?  $this->request->query['phone_number'] : null;
             $this->pdoConnection->open();
 
             $balance = $this->getBalance($this->pdoConnection, $phoneNumber);
@@ -831,12 +831,12 @@
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($dataCashout));           
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            $result     = curl_exec ($ch);
+            $result     = curl_exec($ch);
             $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
             $data = json_decode($result);
 
-            $this->jsonResponse(array('success' => $data->d->isValid, 'data' => array('amount' => $data->d->amount), 'code' => Controller::HTTP_OKAY_CODE));
+            $this->jsonResponse(array('success' => $data->d->isValid, 'data' => $data->d, 'code' => Controller::HTTP_OKAY_CODE));
         }
 
         public function updateBalance() {
@@ -846,7 +846,7 @@
             $balance = $this->getBalance($this->pdoConnection, $phoneNumber);
 
             if ($balance < $usedCredits) {
-                $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_BAD_REQUEST, 'message' => 'Credits not enoug!'));
+                $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_BAD_REQUEST_CODE, 'message' => 'Credits not enoug!'));
             }
 
             $newBalance = (int)$balance - (int)$usedCredits;

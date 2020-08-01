@@ -111,7 +111,7 @@ class BetCommunity {
         'AboutController' => 'Controllers/About.Controller.php',
         'ErrorMail' => 'ErrorMail.php',
         'ResizeImage' => 'Helper/ResizeImage.php',
-        'PredictionModel' => 'Models/Sms.Model.php',
+        'SmsModel' => 'Models/Sms.Model.php',
     ];
 
     const OUTCOMES = array('1', '2', 'X', '1X', 'X2', '12', 'GG', 'NG', 'Over 0.5', 'Over 1.5',
