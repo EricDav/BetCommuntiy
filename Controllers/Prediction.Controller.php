@@ -868,8 +868,7 @@
                 $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_SERVER_ERROR_CODE, 'message' => 'Server error could not update balance'));
             }
 
-
-            $this->jsonResponse(array('success' => $data->d->isValid, 'balance' => $newBalance, 'data' => $data->d, 'code' => Controller::HTTP_OKAY_CODE, 'isNewUser' => $balance['isNewUser']));
+            $this->jsonResponse(array('success' => $data->d->isValid, 'creditsUsed' => '2', 'balance' => $newBalance, 'data' => $data->d, 'code' => Controller::HTTP_OKAY_CODE, 'isNewUser' => $balance['isNewUser']));
         }
 
         public function refundBalance() {
