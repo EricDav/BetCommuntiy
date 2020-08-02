@@ -35,6 +35,7 @@ class BetCommunity {
         '/api/web/predictions/update' => 'PredictionController@update',
         '/api/bet9ja-betslip' =>  'PredictionController@getGamesFromBet9jaBetslip',
         '/api/bet9ja-cashout' =>  'PredictionController@getCashout',
+        '/api/bet9ja-refund' =>  'PredictionController@refundBalance',
         '/about' => "AboutController",
         '/' => "HomeController"
     ];

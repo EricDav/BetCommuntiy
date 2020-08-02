@@ -385,18 +385,32 @@
 
         public function getBalance($pdoConnection, $phoneNumber) {
             $balanceObj = SmsModel::getBalance($pdoConnection, $phoneNumber);
+            if ($balanceObj == 'Server error') {
+                $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_BAD_REQUEST_CODE, 'message' => 'Server error'));
+            }
+
             if (!$phoneNumber || !is_numeric($phoneNumber)) {
                 $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_BAD_REQUEST_CODE, 'message' => 'Invalid phone number'));
             }
+
             if (!$balanceObj) {
-                $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_NOT_FOUND, 'message' => 'Phone number not registered'));
+                $smsUser = SmsModel::createSmsUser($pdoConnection, $phoneNumber);
+
+                if ($smsUser === 'Server error') {
+                    $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_BAD_REQUEST_CODE, 'message' => 'Server error while creating sms user'));
+                }
+
+                if (!$smsUser) {
+                    $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_BAD_REQUEST_CODE, 'message' => 'Something unexpected happened while creating sms user'));
+                }
+                return array('balance' => '100', 'isNewUser' => true);
             }
 
             if ((int)$balanceObj->credits == 0) {
                 $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_BAD_REQUEST_CODE, 'message' => 'You did not have any credit'));
             }
 
-            return $balanceObj->credits;
+            return array('balance' => $balanceObj->credits, 'isNewUser' => false);
         }
 
         /**
@@ -409,7 +423,7 @@
             include_once __DIR__ . '/../simplehtmldom/simple_html_dom.php';
 
             $betslip = $this->request->query['betslip'] ? $this->request->query['betslip'] : null;
-            $slipPos = $this->request->query['pos'] ? explode(',', $this->request->query['pos']) : null;
+            $slipPos = isset($this->request->query['pos']) ? explode(',', $this->request->query['pos']) : null;
             $clientID = $this->request->query['client_id'] ?  $this->request->query['client_id'] : null;
             $phoneNumber = $this->request->query['phone_number'] ?  $this->request->query['phone_number'] : null;
 
@@ -606,10 +620,18 @@
                 $data = $this->retrieveNeededData((object)$data, $slipPos);
             }
 
-            $this->jsonResponse(array('success' => true, 'data' => $data, 'code' => Controller::HTTP_OKAY_CODE));
+            $newBalance = $balance['balance'] - $data['creditsUsed'];
+
+            if (!SmsModel::updateBalance($this->pdoConnection, $phoneNumber, $newBalance)) {
+                $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_SERVER_ERROR_CODE, 'message' => 'Server error could not update balance'));
+            }
+
+            $this->jsonResponse(array('success' => true, 'data' => $data, 'code' => Controller::HTTP_OKAY_CODE, 'balance' => $newBalance, 'isNewUser' => $balance['isNewUser']));
         }
 
         public function retrieveNeededData($data, $pos) {
+            $creditsPerGame = 2;
+
             $envObj = json_decode(file_get_contents(__DIR__ .'/../.envJson'));
 
             $livescores = array();
@@ -619,6 +641,7 @@
             $results = array();
             $events = array();
             $outcomes = array();
+            $creditsUsed = 0;
 
             $isFetch = false;
 
@@ -671,6 +694,10 @@
                     // something  is not right here
                 }
 
+                if ($time != "NF") {
+                    $creditsUsed += $creditsPerGame;
+                }
+
                 array_push($fixtures, $data->fixtures[$index]);
                 array_push($leagues, $data->leagues[$index]);
                 array_push($outcomes, $data->outcomes[$index]);
@@ -684,6 +711,7 @@
                 'results' => $results,
                 'fixtures' => $fixtures,
                 'outcomes' => $outcomes,
+                'creditsUsed' => $creditsUsed,
             );
         }
 
@@ -829,27 +857,32 @@
             curl_setopt($ch, CURLOPT_URL, $urlCashout);
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($dataCashout));           
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($dataCashout));         
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
             $result     = curl_exec($ch);
             $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
             $data = json_decode($result);
+            $newBalance = (int)$balance['balance'] - 2; // 2 is for per game and cahout is within that range
+            if (!SmsModel::updateBalance($this->pdoConnection, $phoneNumber, $newBalance)) {
+                $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_SERVER_ERROR_CODE, 'message' => 'Server error could not update balance'));
+            }
 
-            $this->jsonResponse(array('success' => $data->d->isValid, 'data' => $data->d, 'code' => Controller::HTTP_OKAY_CODE));
+
+            $this->jsonResponse(array('success' => $data->d->isValid, 'balance' => $newBalance, 'data' => $data->d, 'code' => Controller::HTTP_OKAY_CODE, 'isNewUser' => $balance['isNewUser']));
         }
 
-        public function updateBalance() {
+        public function refundBalance() {
             $phoneNumber = $this->request->query['phone_number'] ?  $this->request->query['phone_number'] : null;
-            $usedCredits = $this->request->query['used_credits'] ?  $this->request->query['credits'] : null;
+            $usedCredits = isset($this->request->query['used_credits']) ?  $this->request->query['used_credits'] : null;
             $this->pdoConnection->open();
             $balance = $this->getBalance($this->pdoConnection, $phoneNumber);
 
-            if ($balance < $usedCredits) {
-                $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_BAD_REQUEST_CODE, 'message' => 'Credits not enoug!'));
+            if (!$usedCredits) {
+                $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_BAD_REQUEST_CODE, 'message' => 'Invalid used credits'));
             }
 
-            $newBalance = (int)$balance - (int)$usedCredits;
+            $newBalance = (int)$balance['balance'] + (int)$usedCredits;
 
             if (SmsModel::updateBalance($this->pdoConnection, $phoneNumber, $newBalance)) {
                 $this->jsonResponse(array('success' => true, 'code' => Controller::HTTP_OKAY_CODE));
