@@ -618,13 +618,13 @@
 
             if ($clientID) {
                 $data = $this->retrieveNeededData((object)$data, $slipPos);
+                $newBalance = $balance['balance'] - $data['creditsUsed'];
+
+                if (!SmsModel::updateBalance($this->pdoConnection, $phoneNumber, $newBalance)) {
+                    $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_SERVER_ERROR_CODE, 'message' => 'Server error could not update balance'));
+                }
             }
 
-            $newBalance = $balance['balance'] - $data['creditsUsed'];
-
-            if (!SmsModel::updateBalance($this->pdoConnection, $phoneNumber, $newBalance)) {
-                $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_SERVER_ERROR_CODE, 'message' => 'Server error could not update balance'));
-            }
 
             $this->jsonResponse(array('success' => true, 'data' => $data, 'code' => Controller::HTTP_OKAY_CODE, 'balance' => $newBalance, 'isNewUser' => $balance['isNewUser']));
         }

@@ -8,10 +8,7 @@
     include __DIR__  . '/../BetCommunity.Class.php';
 
     $envObj = json_decode(file_get_contents(__DIR__ .'/../.envJson'));
-    $soccer24 = 'https://bet-games.herokuapp.com/soccer24/live-score';
-    $apiLiveScores = 'http://livescore-api.com/api-client/scores/live.json?key='. $envObj->LIVESCORE_API_KEY . '&secret=' . $envObj->LIVESCORE_API_SECRET;
 
-    
     function getMinutesDiffFromNow($dateStr){
         $startDate = new DateTime($dateStr);
         $sinceStart = $startDate->diff(new DateTime(gmdate("Y-m-d\ H:i:s")));
@@ -102,22 +99,22 @@
     $page = 0;
     $liveScroes = array();
 
-    $jsonData = file_get_contents($soccer24);
+    $jsonData = file_get_contents('http://livescore-api.com/api-client/scores/live.json?key='. $envObj->LIVESCORE_API_KEY . '&secret=' . $envObj->LIVESCORE_API_SECRET);
     $data = json_decode($jsonData);
     
-    if (!$data->data) {
+    if (!$data->data->match) {
         ErrorMail::Log('updateScores.php', '110', 'It seems livescores API failed or returns empty result');
         exit(-1);
     }
 
     $endedMatches = array();
 
-    foreach($data->data as $match) {
-        if ($match->time == 'Finished')
+    foreach($data->data->match as $match) {
+        if ($match->status == 'FINISHED')
             array_push($endedMatches, $match);
     }
 
-    var_dump($endedMatches); exit;
+    // var_dump($endedMatches); exit;
 
     if (sizeof($endedMatches) == 0) {
         ErrorMail::Log('updateScores.php', '110', 'Empty ended matches');
@@ -136,7 +133,6 @@
         $scores = property_exists($predictionObj, 'scores') ? $predictionObj->scores : [];
 
         if (property_exists($predictionObj, 'competition_ids')) {
-            continue;
             for ($index = sizeof($scores); $index < sizeof($predictionObj->competition_ids); $index++) {
                 $competitionId = $predictionObj->competition_ids[$index];
                 $teamIDs = explode('-', $predictionObj->team_ids[$index]);
@@ -184,7 +180,7 @@
                     if ($dateArr[1] == $match->scheduled && isMatch($match->home_name, $match->away_name, $fixture)) {
                         
                         // mail("alienyidavid4christ@gmail.com","My subject", "I got something!!!");
-                        array_push($scores, array($predictionObj->fixtures[$index] => $match->score));
+                        array_push($scores, array($predictionObj->fixtures[$index] => $match->ft_score));
                         if ($prediction['is_each_game_update'] == 1) {
                             // send email notification
                             genererateNotificationEmailHtml($match, $prediction['created_at'], $prediction['type'], $predictionObj->bet_code, $index, $prediction['email'],  $prediction['id']);

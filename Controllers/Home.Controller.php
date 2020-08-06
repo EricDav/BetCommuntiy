@@ -156,6 +156,7 @@
                 $predictions = PredictionModel::getPredictions($this->pdoConnection, Controller::DEFAULT_LIMIT,
                     $this->offset, $this->startDateInUTC, $this->endDateInUTC, $this->predictionStatus, $this->isPendingOutcomes, $this->pendingUserId);
 
+               // var_dump($predictions); exit;
                 
                 $featuredUsers = UserModel::getFeaturedUsers($this->pdoConnection);
 
@@ -208,6 +209,8 @@
          * 
          */
         public function generatePaginationNum($count, $pageNum) {
+           //  echo $count; exit;
+            $baseUrl = $this->request->route;
             if ($count == 0) return ''; // Returns empty if there is no predictions
 
             $quo = (int)($count/20); // Calculate the quotient
@@ -242,7 +245,7 @@
 
             $html = $pageNum != $min ? ($html . '<li class="page-item"><a class="page-link" href="#">Previous</a></li>') : $html;
             for ($i = $min; $i <= $max; $i++) {
-                $html.= '<li class="page-item"><a class="page-link" href="#">' . $i . '</a></li>';
+                $html.= '<li class="' . ($pageNum == $i ? "page-item active" : "page-item") . '"><a class="page-link" href="' . $baseUrl . '?page=' . $i . '">' . $i . '</a></li>';
             }
             $html = $pageNum != $max ? ($html . '<li class="page-item"><a class="page-link" href="#">Next</a></li>') : $html;
 

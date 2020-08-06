@@ -23,16 +23,17 @@
 
         public static function getPredictions($pdoConnection, $limit, $offset, $startDateInUTC, $endDateInUTC, $statusWon, $isPendingOutcomes, $myApprovedUserId) {
             try {
-                $sql = "SELECT (SELECT COUNT(*) FROM predictions WHERE predictions.approved = 0) AS total, 
+                $whereClause = ($startDateInUTC && $endDateInUTC ? ' AND predictions.start_date >= ' . "'" . $startDateInUTC . "'" . ' AND predictions.start_date <= ' . "'" . $endDateInUTC . "'"
+                . ' AND predictions.end_date >= ' . "'" . $startDateInUTC . "'" . ' AND predictions.end_date <= ' . "'" . $endDateInUTC . "'" : '') . ($statusWon ? ' AND predictions.won =1' : '')
+                . ($myApprovedUserId ? ' AND predictions.updated_by=' . $myApprovedUserId : '') . ($isPendingOutcomes ? ' AND predictions.won IS NULL AND predictions.end_date <' . "'" . gmdate("Y-m-d\ H:i:s") . "'"  : '');
+
+                $sql = "SELECT (SELECT COUNT(*) FROM predictions WHERE predictions.approved = " . self::APPROVED . $whereClause . ") AS total, 
                      (SELECT COUNT(*) FROM likes WHERE predictions.id=likes.prediction_id) AS total_likes,
                     predictions.prediction, predictions.id, predictions.created_at, predictions.start_date, 
                     predictions.end_date, predictions.won, predictions.type, users.id AS user_id, users.name, users.sex, users.image_path
                     FROM predictions 
                     INNER JOIN users ON predictions.user_id = users.id 
-                    WHERE predictions.approved = " . self::APPROVED . ($startDateInUTC && $endDateInUTC ? ' AND predictions.start_date >= ' . "'" . $startDateInUTC . "'" . ' AND predictions.start_date <= ' . "'" . $endDateInUTC . "'"
-                    . ' AND predictions.end_date >= ' . "'" . $startDateInUTC . "'" . ' AND predictions.end_date <= ' . "'" . $endDateInUTC . "'" : '') . ($statusWon ? ' AND predictions.won =1' : '') . 
-                    ($myApprovedUserId ? ' AND predictions.updated_by=' . $myApprovedUserId : '') .
-                    ($isPendingOutcomes ? ' AND predictions.won IS NULL AND predictions.end_date <' . "'" . gmdate("Y-m-d\ H:i:s") . "'"  : '') .
+                    WHERE predictions.approved = " . self::APPROVED . $whereClause .
                     " ORDER BY predictions.start_date desc
                     LIMIT " . $limit . " OFFSET " . $offset . ";";
                     
