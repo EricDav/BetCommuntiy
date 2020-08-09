@@ -210,10 +210,21 @@ function generatePredictionHtmlForMobileView(prediction, scores, outcomeResults)
                 homeScore = '';
                 awayScore = '';
             }
-            fixtureArr = datesFixturesObj.fixtures[index].split(' - ');
+            let fixContent;
+            let style = '';
+            let outcomeContent;
+            if (datesFixturesObj.fixtures[index]) {
+                outcomeContent = datesFixturesObj.outcomes[index] + outcomeResult;
+                fixtureArr = datesFixturesObj.fixtures[index].split(' - ');
+                fixContent = fixtureArr[0] + homeScore.toString() + ' - ' + awayScore.toString() + fixtureArr[1];
+            } else {
+                outcomeContent = '<i class="fa fa-lock" aria-hidden="true" style="font-size: 16px;"></i>';
+                style = ' style="' + 'background-color: #000; color: #fff; width: 180px; text-align: center;" ';
+                fixContent = 'Subscribe to view';
+            }
             $html += '<div style="font-weight: unset; max-width: 30%;">' + (date === 'NS' ? 'NS' : formatDateForPrediction(date)) + '</div>';
-            $html += '<div class="mobile-fixture">' + fixtureArr[0] + homeScore.toString() + ' - ' + awayScore.toString() + fixtureArr[1] + '</div>';
-            $html += '<div style="font-weight: 700;">' + datesFixturesObj.outcomes[index] + outcomeResult +'</div>';
+            $html += '<div' + style + ' class="mobile-fixture">' + fixContent + '</div>';
+            $html += '<div style="font-weight: 700;">' + outcomeContent +'</div>';
             $html += '</div>';
         });
     }
@@ -234,12 +245,18 @@ function calculateOdds(odds) {
 }
 
 function generatePredictionInfoHtml(prediction, predictionType) {
-    $html = '<div>No.Selection:<span><b>' + prediction.leagues.length.toString() + '</b></span></div>';
+    $html = '<div style="display:flex;"><div style="width: 50%;">No.Selection:<span style="color: #27aae1; font-size: 14;"><b>' + prediction.leagues.length.toString() + '</b></span></div>';
     if (prediction.bet_code) {
-        $html += '<div>Selection Type:<span><b>' + predictionType + '</b></span></div>';
-        $html += '<div>Booking Code:<span><b>' + prediction.bet_code + '</b></span></div>';
-        $html += '<div>Total Odds:<span><b>' + calculateOdds(prediction.odds) + '</b></span></div>';
+        $html += '<div style="width: 100%; text-align: right; margin-right: 30px;">Selection Type:<span style="color: #27aae1; font-size: 14;"><b>' + predictionType + '</b></span></div>';
+        $html +='</div>';
+        $html +='<div style="display: flex;">'
+        $html += '<div style="width: 50%;">Code:<span style="color: #27aae1; font-size: 14;"><b>' + prediction.bet_code + '</b></span></div>';
+        $html += '<div style="width: 100%; text-align: right; margin-right: 30px;">Total Odds:<span style="color: #27aae1; font-size: 14;"><b>' + calculateOdds(prediction.odds) + '</b></span></div>';
+        $html += '</div>'
+    } else {
+        $html+='</div>';
     }
+
     return $html;
 }
 
@@ -255,8 +272,12 @@ function generatePredictionTable(data) {
         }
         let outcomeResults = data.hasOwnProperty('outcome_results') ? data.outcome_results : [];
 
-        $table += '<tr style="border:unset;">' + '<td style="border:unset;">' + (data.dates ? formatDateCreated(date) : 'NS') + '</td>' + '<td style="border:unset;">' + item + '</td>' + '<td style="border:unset;">' + data.fixtures[index] + '</td>' +
-            '<td style="border:unset;">' + data.outcomes[index] + '</td>' + (data.hasOwnProperty('scores') && data.scores.length > 0 ? '<td style="border:unset; padding-right: 0px;">' + getScore(data.fixtures[index], data.scores) + getOutcomeResult(data.fixtures[index], outcomeResults) + '</td>' : '');
+        $table += '<tr style="border:unset;">' + 
+            '<td style="border:unset;">' + (data.dates ? formatDateCreated(date) : 'NS') + '</td>' + 
+            '<td style="border:unset;">' + item + '</td>' +
+            '<td ' + (data.fixtures[index] ? '' : 'class="' + 'lock' + '"') + ' style="border:unset;"><div>' + ( data.fixtures[index] ? data.fixtures[index] : 'Subscribe to view') + '</div></td>' +
+            '<td style="border:unset;">' + (data.outcomes[index] ? data.outcomes[index] : '<i class="fa fa-lock" aria-hidden="true" style="font-size: 16px;"></i>') + '</td>' +
+            (data.hasOwnProperty('scores') && data.scores.length > 0 ? '<td style="border:unset; padding-right: 0px;">' + getScore(data.fixtures[index], data.scores) + getOutcomeResult(data.fixtures[index], outcomeResults) + '</td>' : '');
     });
 
     $table += '</table>';

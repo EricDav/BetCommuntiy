@@ -146,3 +146,12 @@ CREATE TABLE sms_bolt (
     credits VARCHAR(20),
     PRIMARY KEY(id)
 )
+
+CREATE TABLE subscribers (
+    user_id int NOT NULL,
+    subscriber_id int NOT NULL,
+    date_from DATETIME NOT NULL,
+    date_to DATETIME NOT NULL
+)
+
+ALTER TABLE `predictions` ADD `privacy` BOOLEAN NOT NULL DEFAULT FALSE

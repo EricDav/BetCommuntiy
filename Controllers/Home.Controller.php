@@ -155,8 +155,6 @@
 
                 $predictions = PredictionModel::getPredictions($this->pdoConnection, Controller::DEFAULT_LIMIT,
                     $this->offset, $this->startDateInUTC, $this->endDateInUTC, $this->predictionStatus, $this->isPendingOutcomes, $this->pendingUserId);
-
-               // var_dump($predictions); exit;
                 
                 $featuredUsers = UserModel::getFeaturedUsers($this->pdoConnection);
 
@@ -170,7 +168,6 @@
                 
                 if ($this->isLogin()) {
                     $followers = UserModel::getFollowers($this->pdoConnection, $this->request->session['userInfo']['id']);
-                    // var_dump($followers); exit;
                 }
 
                 if (!$isProblemWhileFecthingData) {
@@ -198,6 +195,10 @@
 
         public function getFeaturedUsers() {
             $featuredUsers = UserModel::getFeaturedUsers($this->pdoConnection);
+        }
+
+        public function getSubscribers($userId) {
+            return UserModel::getSubscribers($this->pdoConnection, $userId);
         }
 
         /**

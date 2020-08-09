@@ -165,6 +165,52 @@ abstract class Controller {
         return false;
     }
 
+    public function getSubscribers($userId) {
+        return UserModel::getSubscribers($this->pdoConnection, $userId);
+    }
+
+    public function getPrivacyPrediction($prediction) {
+        $fixtures = $prediction->fixtures;
+        $outcomes = $prediction->outcomes;
+        $newFixtures = [];
+        $newOutcomes = [];
+
+        if (sizeof($fixtures) < 5) {
+            foreach($fixtures as $fixture) {
+                array_push($newFixtures, 0);
+                array_push($newOutcomes, 0);
+            }
+        } else {
+            $i = 0;
+            foreach($fixtures as $fixture) {
+                if ($i < 2) {
+                    array_push($newFixtures, $fixture);
+                    array_push($newOutcomes, $outcomes[$i]);
+                } else {
+                    array_push($newFixtures, 0);
+                    array_push($newOutcomes, 0);
+                }
+
+                $i+=1;
+            }
+        }
+
+        $prediction->fixtures = $newFixtures;
+        $prediction->outcomes = $newOutcomes;
+
+        return $prediction;
+    }
+
+    public function isSubscribedTo($subscribers, $predictionUserId) {
+        foreach($subscribers as $subscriber) {
+            if ($subscriber['user_id'] == $predictionUserId) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
     * This functions set the user_i, prediction_id of 
     * the prediction. It is used at the client side to make 
@@ -175,10 +221,22 @@ abstract class Controller {
     * have all the followers, or we have called the getFollowers method.
     */
     public function setPredictionInfo($predictions) {
+            $userId = $this->request->session['userInfo']['id'];
+            $subscribers = $this->getSubscribers($userId);
             $predictionInfo = array();
 
             foreach($predictions as $prediction):
+                if ($prediction['id'] == 87) {
+                    // var_dump($prediction['privacy'] == 1 && !$this->isSubscribedTo($subscribers, $prediction['user_id'])); exit;
+                }
                 $firstName = explode(' ', $prediction['name'])[0];
+                if ($prediction['privacy'] == 1 && !$this->isSubscribedTo($subscribers, $prediction['user_id'])) {
+                    // echo 'Yes!!'; exit;
+                    $predictionObj = $this->getPrivacyPrediction(json_decode($prediction['prediction']));
+                    $prediction['prediction'] = json_encode($predictionObj);
+                    // var_dump($prediction); exit;
+                }
+
                 array_push($predictionInfo, array('user_id' => $prediction['user_id'], 
                     'prediction_id' => $prediction['id'],
                     'isFollowing_author' => $this->isFollowing($prediction['user_id']),

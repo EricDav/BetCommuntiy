@@ -43,6 +43,18 @@
             }
         }
 
+        public static function getSubscribers($pdoConnection, $userId) {
+            try {
+                $sql = 'SELECT * FROM subscribers WHERE subscriber_id=?';
+                $stmt= $pdoConnection->pdo->prepare($sql);
+                $stmt->execute([$userId]);
+                return $stmt->fetchAll();
+            } catch(Exception $e) {
+                ErrorMail::LogError($e);
+                return 'Server error';
+            }
+        }
+
         public static function getUserById($pdoConnection, $id) {
             try {
                 $sql = 'SELECT *, (SELECT COUNT(*) FROM followers WHERE user_id =' . $id . ') AS num_followers  FROM users WHERE id=?';

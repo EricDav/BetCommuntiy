@@ -55,4 +55,11 @@ __predictionInfo.forEach(function (item, index) {
     $('#prediction-' + item.prediction_id).append(generatePredictionTable(prediction));
 });
 
+$(document).ready(function() {
+    //Set the carousel options
+    $('#quote-carousel').carousel({
+      pause: true,
+      interval: 4000,
+    });
+  });
 
