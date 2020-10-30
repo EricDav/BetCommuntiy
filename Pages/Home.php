@@ -21,6 +21,7 @@
 <?php if (isLogin()): ?>
   <!--Import create prediction Modal start -->
   <?php  include 'Pages/modals/CreatePredictionModal.php';?>
+  <?php  include 'Pages/modals/SubscriptionModal.php';?>
 
   <!--Import confirm create prediction Modal-->
   <?php  include 'Pages/modals/ConfirmCreatedPredictionModal.php';?>
@@ -223,5 +224,6 @@
     <script src="/bet_community/Public/js/script.js"></script>
     <script type="text/javascript">var __allCompetitions=<?=json_encode($data['competitions'])?>;</script>
     <script type="text/javascript">var __outcomes=<?=json_encode($data['outcomes'])?>;</script>
+    <script src="https://js.paystack.co/v1/inline.js"></script>
   </body>
 </html>

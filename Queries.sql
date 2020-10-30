@@ -154,4 +154,12 @@ CREATE TABLE subscribers (
     date_to DATETIME NOT NULL
 )
 
+CREATE TABLE match_results (
+    match_id VARCHAR(20),
+    home_name VARCHAR(120),
+    away_name VARCHAR(120),
+    score VARCHAR(20),
+    created_at DATETIME
+);
+
 ALTER TABLE `predictions` ADD `privacy` BOOLEAN NOT NULL DEFAULT FALSE

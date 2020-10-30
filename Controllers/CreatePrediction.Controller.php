@@ -181,7 +181,8 @@
 
         public function perform() {
             $this->pdoConnection->open();
-            if (!$this->validatePredictionsPerDay($this->pdoConnection, $this->currentDate)) {
+            // var_dump($this->currentDate); exit;
+            if (!$this->validatePredictionsPerDay($this->currentDate)) {
                 $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_BAD_REQUEST_CODE, 'messages' => 'Maximum prediction reached for the day. You only make three predictions per day'));
             }
 
@@ -411,7 +412,8 @@
          * to the maximum prediction for the day else returns false
          * 
          */
-        public function validatePredictionsPerDay($predictionsPerDay, $currentDateTimeInClientTimeZone) {
+        public function validatePredictionsPerDay($currentDateTimeInClientTimeZone) {
+            // var_dump($currentDateTimeInClientTimeZone); exit;
             $maxPredictions = PredictionModel::getUsersLastPredictions($this->pdoConnection, $this->request->session['userInfo']['id'],
                 BetCommunity::NUM_PREDICTIONS_PER_DAY * 2);
             
@@ -428,6 +430,7 @@
                 $sixthDate = explode(' ', $maxPredictions[5]['created_at'])[0];
     
                 if (explode('-', $firstDate)[2] == explode('-', $sixthDate)[2]) {
+                    echo 'Here'; exit;
                     // TODO log error here should not get to this
                     $msg = "Something unexpected happened at line 346 file: CreatePrediction.Controller.php";
                     mail(BetCommunity::DEFAULT_TODO_LOG_EMAIL,"Error Log",$msg);
@@ -440,17 +443,20 @@
             $minutesDiff = $currentDateTimeInClientTimeZone > $currentDateTimeInUTC 
                     ? $this->getMinutesDiff($currentDateTimeInClientTimeZone, $currentDateTimeInUTC) : -1 * $this->getMinutesDiff($currentDateTimeInClientTimeZone, $currentDateTimeInUTC);
 
-            // var_dump($maxPredictions); exit;
-            // last third prediction the user made
+            // last num predictions per day the user made
             $thirdPreDateTimeUTC = $maxPredictions[BetCommunity::NUM_PREDICTIONS_PER_DAY - 1]['created_at']; // get created in UTC
-            // var_dump($thirdPreDateTime); exit;
             $time = strtotime($thirdPreDateTimeUTC) + ($minutesDiff * 60); // converting time to local
             $thirdPreDateTimeInClientTimeZone = date("Y-m-d H:i:s", $time);
+            
 
             $thirdPreDate = explode(' ', $thirdPreDateTimeInClientTimeZone)[0];
             $currentDateInClientTimeZone = explode(' ', $currentDateTimeInClientTimeZone)[0];
 
-            if (explode('-', $thirdPreDate)[2] == explode('-', $currentDateInClientTimeZone)[2]) {
+            $thirdPreDateArr = explode('-', $thirdPreDate);
+            $currentDateInClientTimeZoneArr = explode('-', $currentDateInClientTimeZone);
+
+            if ($thirdPreDate[0] == $currentDateInClientTimeZoneArr[0] && $thirdPreDate[1] == $currentDateInClientTimeZoneArr[1]
+                && $thirdPreDate[2] == $currentDateInClientTimeZoneArr[2]) {
                 return false;
             }
 

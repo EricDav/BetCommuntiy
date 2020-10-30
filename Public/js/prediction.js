@@ -212,6 +212,7 @@ function generatePredictionHtmlForMobileView(prediction, scores, outcomeResults)
             }
             let fixContent;
             let style = '';
+            let onclick =  '';
             let outcomeContent;
             if (datesFixturesObj.fixtures[index]) {
                 outcomeContent = datesFixturesObj.outcomes[index] + outcomeResult;
@@ -219,11 +220,12 @@ function generatePredictionHtmlForMobileView(prediction, scores, outcomeResults)
                 fixContent = fixtureArr[0] + homeScore.toString() + ' - ' + awayScore.toString() + fixtureArr[1];
             } else {
                 outcomeContent = '<i class="fa fa-lock" aria-hidden="true" style="font-size: 16px;"></i>';
-                style = ' style="' + 'background-color: #000; color: #fff; width: 180px; text-align: center;" ';
+                style = ' style="' + 'background-color: #000; color: #fff; width: 180px; text-align: center;height: 26px;" ';
+                onclick = ' onclick="' + 'openSubscribeModal()" ';
                 fixContent = 'Subscribe to view';
             }
             $html += '<div style="font-weight: unset; max-width: 30%;">' + (date === 'NS' ? 'NS' : formatDateForPrediction(date)) + '</div>';
-            $html += '<div' + style + ' class="mobile-fixture">' + fixContent + '</div>';
+            $html += '<div' + style + onclick + ' class="mobile-fixture">' + fixContent + '</div>';
             $html += '<div style="font-weight: 700;">' + outcomeContent +'</div>';
             $html += '</div>';
         });
@@ -232,6 +234,10 @@ function generatePredictionHtmlForMobileView(prediction, scores, outcomeResults)
     $html += '</div>';
 
     return $html;
+}
+
+function openSubscribeModal() {
+    $('#subscriptionModal').modal('show');
 }
 
 function calculateOdds(odds) {
@@ -271,11 +277,11 @@ function generatePredictionTable(data) {
             var date = new Date(dateStr.replace(/-/g, '/'));
         }
         let outcomeResults = data.hasOwnProperty('outcome_results') ? data.outcome_results : [];
-
+        let onclick = ' onclick="' + 'openSubscribeModal()" ';
         $table += '<tr style="border:unset;">' + 
             '<td style="border:unset;">' + (data.dates ? formatDateCreated(date) : 'NS') + '</td>' + 
             '<td style="border:unset;">' + item + '</td>' +
-            '<td ' + (data.fixtures[index] ? '' : 'class="' + 'lock' + '"') + ' style="border:unset;"><div>' + ( data.fixtures[index] ? data.fixtures[index] : 'Subscribe to view') + '</div></td>' +
+            '<td ' + (data.fixtures[index] ? '' : onclick) + (data.fixtures[index] ? '' : 'class="' + 'lock' + '"') + ' style="border:unset;"><div>' + ( data.fixtures[index] ? data.fixtures[index] : 'Subscribe to view') + '</div></td>' +
             '<td style="border:unset;">' + (data.outcomes[index] ? data.outcomes[index] : '<i class="fa fa-lock" aria-hidden="true" style="font-size: 16px;"></i>') + '</td>' +
             (data.hasOwnProperty('scores') && data.scores.length > 0 ? '<td style="border:unset; padding-right: 0px;">' + getScore(data.fixtures[index], data.scores) + getOutcomeResult(data.fixtures[index], outcomeResults) + '</td>' : '');
     });

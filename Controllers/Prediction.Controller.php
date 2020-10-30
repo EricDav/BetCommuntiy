@@ -1,6 +1,7 @@
 <?php 
     class PredictionController extends Controller {
         const CLIENT_ID = '90e32c15459b9cdb5a86c6f0bd2f096c';
+        const _CLIENT_ID = '90e32c15459b9cdb5a86c6f0bd2f0000';
         public function __construct($request) {
             parent::__construct($request);
             $this->predictionId = null;
@@ -420,12 +421,14 @@
          * It handles the route 
          */
         public function getGamesFromBet9jaBetslip() {
+            // echo 'Yes'; exit;
             include_once __DIR__ . '/../simplehtmldom/simple_html_dom.php';
 
             $betslip = $this->request->query['betslip'] ? $this->request->query['betslip'] : null;
             $slipPos = isset($this->request->query['pos']) ? explode(',', $this->request->query['pos']) : null;
             $clientID = $this->request->query['client_id'] ?  $this->request->query['client_id'] : null;
             $phoneNumber = $this->request->query['phone_number'] ?  $this->request->query['phone_number'] : null;
+            $isLive = $this->request->query['live'] ?  $this->request->query['live'] : null;
 
             $this->pdoConnection->open();
             if (!$clientID) {
@@ -618,6 +621,9 @@
 
             if ($clientID) {
                 $data = $this->retrieveNeededData((object)$data, $slipPos);
+                if ($isLive) {
+                    $this->jsonResponse(array('success' => true, 'data' => $this->groupPrediction((object)$data), 'code' => Controller::HTTP_OKAY_CODE));
+                }
                 $newBalance = $balance['balance'] - $data['creditsUsed'];
 
                 if (!SmsModel::updateBalance($this->pdoConnection, $phoneNumber, $newBalance)) {
@@ -628,6 +634,34 @@
 
             $this->jsonResponse(array('success' => true, 'data' => $data, 'code' => Controller::HTTP_OKAY_CODE, 'balance' => $newBalance, 'isNewUser' => $balance['isNewUser']));
         }
+        public function getProp($str) {
+            return $str;
+        }
+        public function groupPrediction($predictionObj) {
+            $groupedPrediction = (object)array();
+        
+            for ($i = 0; $i < sizeof($predictionObj->leagues); $i++) {
+                $prop = $this->getProp($predictionObj->leagues[$i]);
+                if (property_exists($groupedPrediction, $prop)) {
+                    array_push($groupedPrediction->$prop->fixtures, $predictionObj->fixtures[$i]);
+                    array_push($groupedPrediction->$prop->results, $predictionObj->results[$i]);
+                    array_push($groupedPrediction->$prop->outcomes, $predictionObj->outcomes[$i]);
+                    array_push($groupedPrediction->$prop->events, $predictionObj->events[$i]);
+                    array_push($groupedPrediction->$prop->match_ids, $predictionObj->match_ids[$i]);
+                } else {
+                    $groupedPrediction->$prop = (object)array(
+                        'fixtures' => [$predictionObj->fixtures[$i]],
+                        'results' => [$predictionObj->results[$i]],
+                        'outcomes' => [$predictionObj->outcomes[$i]],
+                        'events' => [$predictionObj->events[$i]],
+                        'match_ids' => [$predictionObj->match_ids[$i]]
+                    );
+                  //  var_dump($groupedPrediction->$prop);
+                }
+            }
+        
+            return (array)$groupedPrediction;
+        }
 
         public function retrieveNeededData($data, $pos) {
             $creditsPerGame = 2;
@@ -635,16 +669,15 @@
             $envObj = json_decode(file_get_contents(__DIR__ .'/../.envJson'));
 
             $livescores = array();
-
             $leagues = array();
             $fixtures = array();
             $results = array();
             $events = array();
             $outcomes = array();
+            $matchIds = array();
             $creditsUsed = 0;
 
             $isFetch = false;
-
             if (!$pos) {
                 $pos = [];
                 $counter = 1;
@@ -680,13 +713,38 @@
                         $liveScore = $this->getResult($fixture, $livescores);
                         $result = $liveScore ? $liveScore->score : 'NF';
                         $time = $liveScore->time ? $liveScore->time : 'NF';
+                        if ($liveScore) {
+                            array_push($matchIds,$liveScore->match_id);
+                        } else {
+                            array_push($matchIds, null);
+                        }
                     } else if ($livescores) {
                         $fixture = explode(' - ', $data->fixtures[$index]);
                         $liveScore = $this->getResult($fixture, $livescores);
                         $result = $liveScore ? $liveScore->score : 'NF';
                         $time = $liveScore->time ? $liveScore->time : 'NF';
+                        if ($liveScore) {
+                            array_push($matchIds,$liveScore->match_id);
+                        } else {
+                            array_push($matchIds, null);
+                        }
                     }
                 } else {
+                    if (!$isFetch) {
+                        $url = $envObj->API_URL . '/soccer24/live-score';
+                        $liveData = json_decode(file_get_contents($url));
+                        $livescores = $liveData->data;
+                        $isFetch = true;
+                    }
+
+                    $fixture = explode(' - ', $data->fixtures[$index]);
+                    $liveScore = $this->getResult($fixture, $livescores);
+
+                    if ($liveScore) {
+                        array_push($matchIds,$liveScore->match_id);
+                    } else {
+                        array_push($matchIds, null);
+                    }
                     $time = 'FT';
                 }
 
@@ -711,6 +769,7 @@
                 'results' => $results,
                 'fixtures' => $fixtures,
                 'outcomes' => $outcomes,
+                'match_ids' => $matchIds,
                 'creditsUsed' => $creditsUsed,
             );
         }
@@ -728,9 +787,20 @@
         public function getResult($fixture, $livescores) {
             foreach($livescores as $livescore) {
                 if ($this->isMatch($livescore->home_name, $livescore->away_name, $fixture)) {
+                    // if ('San Lorenzo' == $livescore->home_name) {
+                    //     var_dump($fixture);
+                    //     var_dump('True');
+                    //     var_dump($livescore); exit;
+                    // }
                     return $livescore;
                 }
             }
+
+            // if ('San Lorenzo' == $livescore->home_name) {
+            //     var_dump($fixture);
+            //     var_dump('False');
+            //     var_dump($livescore); exit;
+            // }
 
             return null;
         }
@@ -787,7 +857,7 @@
                 if (strpos($fromAPiArr[$i], $fromBookingArr[$i]) !== false || strpos($fromBookingArr[$i], $fromAPiArr[$i]) !== false) {
                     continue;
                 }
-    
+
                 return false;
             }
     
@@ -802,7 +872,7 @@
             $isSubStringForHome = $this->checkTeamMatch($homeName, $homeAwayArr[0]);
             $isSubStringForAway = $this->checkTeamMatch($awayName, $homeAwayArr[1]); // || strpos($homeAwayArr[1], $awayName);
             
-            if ($isSubStringForHome && $isSubStringForAway)
+            if ($isSubStringForHome || $isSubStringForAway)
                 return true;
             
             return false;
