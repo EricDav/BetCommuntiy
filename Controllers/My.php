@@ -15,6 +15,11 @@
             }
             $this->jsonResponse(array('success' => false, 'code' => Controller::HTTP_SERVER_ERROR_CODE, 'messages' => 'Server error'));
         }
+        public function validate() {
+        }
+
+        public function perform() {
+        }
     }
 
 ?>
