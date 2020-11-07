@@ -60,7 +60,7 @@
             </ol>
 
             <!-- Wrapper for slides -->
-            <div class="carousel-inner">
+            <!-- <div class="carousel-inner">
               <div class="item">
                 <img src="https://www.w3schools.com/bootstrap/chicago.jpg" alt="Chania">
                 <div class="carousel-caption">
@@ -95,7 +95,7 @@
               <span class="glyphicon glyphicon-chevron-right"></span>
               <span class="sr-only">Next</span>
             </a>
-          </div>
+          </div> -->
             <!-- Post Create Box
             ================================================= -->
             <div class="create-post">
